@@ -1,6 +1,6 @@
 /*
  * Copyright 2004-2019 H2 Group. Multiple-Licensed under the MPL 2.0,
- * and the EPL 1.0 (https://h2database.com/html/license.html).
+ * and the EPL 1.0 (http://h2database.com/html/license.html).
  * Initial Developer: H2 Group
  */
 package org.h2.value;
@@ -8,7 +8,6 @@ package org.h2.value;
 import org.h2.api.CustomDataTypesHandler;
 import org.h2.api.ErrorCode;
 import org.h2.api.IntervalQualifier;
-import org.h2.engine.CastDataProvider;
 import org.h2.message.DbException;
 import org.h2.util.JdbcUtils;
 import org.h2.util.MathUtils;
@@ -89,22 +88,12 @@ public class TypeInfo {
     public static final TypeInfo TYPE_TIMESTAMP;
 
     /**
-     * BYTES type with maximum parameters.
-     */
-    public static final TypeInfo TYPE_BYTES;
-
-    /**
      * STRING type with maximum parameters.
      */
     public static final TypeInfo TYPE_STRING;
 
     /**
-     * STRING_IGNORECASE type with maximum parameters.
-     */
-    public static final TypeInfo TYPE_STRING_IGNORECASE;
-
-    /**
-     * ARRAY type with maximum parameters.
+     * ARRAY type with parameters.
      */
     public static final TypeInfo TYPE_ARRAY;
 
@@ -158,16 +147,6 @@ public class TypeInfo {
      */
     public static final TypeInfo TYPE_ROW;
 
-    /**
-     * JSON type.
-     */
-    public static final TypeInfo TYPE_JSON;
-
-    /**
-     * TIME WITH TIME ZONE type with maximum parameters.
-     */
-    public static final TypeInfo TYPE_TIME_TZ;
-
     private static final TypeInfo[] TYPE_INFOS_BY_VALUE_TYPE;
 
     private final int valueType;
@@ -191,7 +170,7 @@ public class TypeInfo {
                 null);
         infos[Value.INT] = TYPE_INT = new TypeInfo(Value.INT, ValueInt.PRECISION, 0, ValueInt.DISPLAY_SIZE, null);
         infos[Value.LONG] = TYPE_LONG = new TypeInfo(Value.LONG, ValueLong.PRECISION, 0, ValueLong.DISPLAY_SIZE, null);
-        infos[Value.DECIMAL] = TYPE_DECIMAL = new TypeInfo(Value.DECIMAL, Integer.MAX_VALUE, Integer.MAX_VALUE,
+        infos[Value.DECIMAL] = TYPE_DECIMAL= new TypeInfo(Value.DECIMAL, Integer.MAX_VALUE, Integer.MAX_VALUE,
                 Integer.MAX_VALUE, null);
         TYPE_DECIMAL_DEFAULT = new TypeInfo(Value.DECIMAL, ValueDecimal.DEFAULT_PRECISION, ValueDecimal.DEFAULT_SCALE,
                 ValueDecimal.DEFAULT_PRECISION + 2, null);
@@ -204,10 +183,10 @@ public class TypeInfo {
         infos[Value.DATE] = TYPE_DATE = new TypeInfo(Value.DATE, ValueDate.PRECISION, 0, ValueDate.PRECISION, null);
         infos[Value.TIMESTAMP] = TYPE_TIMESTAMP = new TypeInfo(Value.TIMESTAMP, ValueTimestamp.MAXIMUM_PRECISION,
                 ValueTimestamp.MAXIMUM_SCALE, ValueTimestamp.MAXIMUM_PRECISION, null);
-        infos[Value.BYTES] = TYPE_BYTES = new TypeInfo(Value.BYTES, Integer.MAX_VALUE, 0, Integer.MAX_VALUE, null);
+        infos[Value.BYTES] = new TypeInfo(Value.BYTES, Integer.MAX_VALUE, 0, Integer.MAX_VALUE, null);
         infos[Value.STRING] = TYPE_STRING = new TypeInfo(Value.STRING, Integer.MAX_VALUE, 0, Integer.MAX_VALUE, null);
-        infos[Value.STRING_IGNORECASE] = TYPE_STRING_IGNORECASE = new TypeInfo(Value.STRING_IGNORECASE,
-                Integer.MAX_VALUE, 0, Integer.MAX_VALUE, null);
+        infos[Value.STRING_IGNORECASE] = new TypeInfo(Value.STRING_IGNORECASE, Integer.MAX_VALUE, 0, Integer.MAX_VALUE,
+                null);
         infos[Value.BLOB] = new TypeInfo(Value.BLOB, Long.MAX_VALUE, 0, Integer.MAX_VALUE, null);
         infos[Value.CLOB] = new TypeInfo(Value.CLOB, Long.MAX_VALUE, 0, Integer.MAX_VALUE, null);
         infos[Value.ARRAY] = TYPE_ARRAY = new TypeInfo(Value.ARRAY, Integer.MAX_VALUE, 0, Integer.MAX_VALUE, null);
@@ -221,7 +200,7 @@ public class TypeInfo {
         infos[Value.GEOMETRY] = TYPE_GEOMETRY = new TypeInfo(Value.GEOMETRY, Integer.MAX_VALUE, 0, Integer.MAX_VALUE,
                 null);
         infos[Value.TIMESTAMP_TZ] = TYPE_TIMESTAMP_TZ = new TypeInfo(Value.TIMESTAMP_TZ,
-                ValueTimestampTimeZone.MAXIMUM_PRECISION, ValueTimestamp.MAXIMUM_SCALE,
+                ValueTimestampTimeZone.MAXIMUM_PRECISION, ValueTimestampTimeZone.MAXIMUM_SCALE,
                 ValueTimestampTimeZone.MAXIMUM_PRECISION, null);
         infos[Value.ENUM] = TYPE_ENUM_UNDEFINED = new TypeInfo(Value.ENUM, Integer.MAX_VALUE, 0, Integer.MAX_VALUE,
                 null);
@@ -230,16 +209,12 @@ public class TypeInfo {
                     IntervalQualifier.valueOf(i - Value.INTERVAL_YEAR).hasSeconds() ? ValueInterval.MAXIMUM_SCALE : 0,
                     ValueInterval.getDisplaySize(i, ValueInterval.MAXIMUM_PRECISION,
                             // Scale will be ignored if it is not supported
-                            ValueInterval.MAXIMUM_SCALE),
-                    null);
+                            ValueInterval.MAXIMUM_SCALE), null);
         }
         TYPE_INTERVAL_DAY = infos[Value.INTERVAL_DAY];
         TYPE_INTERVAL_DAY_TO_SECOND = infos[Value.INTERVAL_DAY_TO_SECOND];
         TYPE_INTERVAL_HOUR_TO_SECOND = infos[Value.INTERVAL_HOUR_TO_SECOND];
         infos[Value.ROW] = TYPE_ROW = new TypeInfo(Value.ROW, Integer.MAX_VALUE, 0, Integer.MAX_VALUE, null);
-        infos[Value.JSON] = TYPE_JSON = new TypeInfo(Value.JSON, Integer.MAX_VALUE, 0, Integer.MAX_VALUE, null);
-        infos[Value.TIME_TZ] = TYPE_TIME_TZ = new TypeInfo(Value.TIME_TZ, ValueTimeTimeZone.MAXIMUM_PRECISION,
-                ValueTime.MAXIMUM_SCALE, ValueTimeTimeZone.MAXIMUM_PRECISION, null);
         TYPE_INFOS_BY_VALUE_TYPE = infos;
     }
 
@@ -296,19 +271,17 @@ public class TypeInfo {
         case Value.DOUBLE:
         case Value.FLOAT:
         case Value.DATE:
+        case Value.ARRAY:
         case Value.RESULT_SET:
         case Value.JAVA_OBJECT:
         case Value.UUID:
         case Value.ROW:
-        case Value.JSON:
             return TYPE_INFOS_BY_VALUE_TYPE[type];
         case Value.UNKNOWN:
             return TYPE_UNKNOWN;
         case Value.DECIMAL:
             if (precision < 0) {
                 precision = ValueDecimal.DEFAULT_PRECISION;
-            } else if (precision > Integer.MAX_VALUE) {
-                precision = Integer.MAX_VALUE;
             }
             if (scale < 0) {
                 scale = ValueDecimal.DEFAULT_SCALE;
@@ -324,13 +297,6 @@ public class TypeInfo {
             int d = scale == 0 ? 8 : 9 + scale;
             return new TypeInfo(Value.TIME, d, scale, d, null);
         }
-        case Value.TIME_TZ: {
-            if (scale < 0 || scale >= ValueTime.MAXIMUM_SCALE) {
-                return TYPE_TIME_TZ;
-            }
-            int d = scale == 0 ? 14 : 15 + scale;
-            return new TypeInfo(Value.TIME_TZ, d, scale, d, null);
-        }
         case Value.TIMESTAMP: {
             if (scale < 0 || scale >= ValueTimestamp.MAXIMUM_SCALE) {
                 return TYPE_TIMESTAMP;
@@ -339,43 +305,34 @@ public class TypeInfo {
             return new TypeInfo(Value.TIMESTAMP, d, scale, d, null);
         }
         case Value.TIMESTAMP_TZ: {
-            if (scale < 0 || scale >= ValueTimestamp.MAXIMUM_SCALE) {
+            if (scale < 0 || scale >= ValueTimestampTimeZone.MAXIMUM_SCALE) {
                 return TYPE_TIMESTAMP_TZ;
             }
             int d = scale == 0 ? 25 : 26 + scale;
             return new TypeInfo(Value.TIMESTAMP_TZ, d, scale, d, null);
         }
         case Value.BYTES:
-            if (precision < 0 || precision > Integer.MAX_VALUE) {
-                return TYPE_BYTES;
+            if (precision < 0) {
+                precision = Integer.MAX_VALUE;
             }
-            return new TypeInfo(Value.BYTES, precision, 0, MathUtils.convertLongToInt(precision * 2), null);
+            return new TypeInfo(Value.BYTES, precision, 0, MathUtils.convertLongToInt(precision) * 2, null);
         case Value.STRING:
-            if (precision < 0 || precision >= Integer.MAX_VALUE) {
+            if (precision < 0) {
                 return TYPE_STRING;
             }
-            return new TypeInfo(Value.STRING, precision, 0, (int) precision, null);
+            //$FALL-THROUGH$
+        case Value.STRING_FIXED:
         case Value.STRING_IGNORECASE:
-            if (precision < 0 || precision >= Integer.MAX_VALUE) {
-                return TYPE_STRING_IGNORECASE;
+            if (precision < 0) {
+                precision = Integer.MAX_VALUE;
             }
-            return new TypeInfo(Value.STRING_IGNORECASE, precision, 0, (int) precision, null);
+            return new TypeInfo(type, precision, 0, MathUtils.convertLongToInt(precision), null);
         case Value.BLOB:
         case Value.CLOB:
             if (precision < 0) {
                 precision = Long.MAX_VALUE;
             }
             return new TypeInfo(type, precision, 0, MathUtils.convertLongToInt(precision), null);
-        case Value.ARRAY:
-            if (precision < 0 || precision >= Integer.MAX_VALUE) {
-                return TYPE_ARRAY;
-            }
-            return new TypeInfo(Value.ARRAY, precision, 0, Integer.MAX_VALUE, null);
-        case Value.STRING_FIXED:
-            if (precision < 0 || precision > Integer.MAX_VALUE) {
-                precision = Integer.MAX_VALUE;
-            }
-            return new TypeInfo(Value.STRING_FIXED, precision, 0, (int) precision, null);
         case Value.GEOMETRY:
             if (extTypeInfo instanceof ExtTypeInfoGeometry) {
                 return new TypeInfo(Value.GEOMETRY, Integer.MAX_VALUE, 0, Integer.MAX_VALUE, extTypeInfo);
@@ -491,52 +448,6 @@ public class TypeInfo {
     }
 
     /**
-     * Casts a specified value to this data type taking precision and scale into
-     * account.
-     *
-     * @param value
-     *            value to cast
-     * @param provider
-     *            the cast information provider
-     * @param forComparison
-     *            if {@code true}, perform cast for comparison operation
-     * @param convertPrecision
-     *            if {@code true}, value is truncated to the precision of data
-     *            type when possible, if {@code false} an exception in thrown
-     *            for too large values
-     * @param column
-     *            column, or null
-     * @return casted value
-     * @throws DbException
-     *             if value cannot be casted to this data type
-     */
-    public Value cast(Value value, CastDataProvider provider, boolean forComparison,
-            boolean convertPrecision, Object column) {
-        value = value.convertTo(this, provider, forComparison, column) //
-                .convertScale(provider.getMode().convertOnlyToSmallerScale, scale);
-        if (convertPrecision) {
-            value = value.convertPrecision(precision);
-        } else if (!value.checkPrecision(precision)) {
-            throw getValueTooLongException(value, column);
-        }
-        return value;
-    }
-
-    private DbException getValueTooLongException(Value value, Object column) {
-        String s = value.getTraceSQL();
-        if (s.length() > 127) {
-            s = s.substring(0, 128) + "...";
-        }
-        StringBuilder builder = new StringBuilder();
-        if (column != null) {
-            builder.append(column).append(' ');
-        }
-        getSQL(builder);
-        return DbException.get(ErrorCode.VALUE_TOO_LONG_2, builder.toString(),
-                s + " (" + value.getType().getPrecision() + ')');
-    }
-
-    /**
      * Appends SQL representation of this object to the specified string
      * builder.
      *
@@ -580,18 +491,8 @@ public class TypeInfo {
             if (valueType == Value.TIMESTAMP_TZ) {
                 builder.append(" WITH TIME ZONE");
             }
-            break;
-        case Value.ARRAY:
-            if (precision < Integer.MAX_VALUE) {
-                builder.append('[').append(precision).append(']');
-            }
         }
         return builder;
-    }
-
-    @Override
-    public String toString() {
-        return getSQL(new StringBuilder()).toString();
     }
 
 }

@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <!--
 Copyright 2004-2019 H2 Group. Multiple-Licensed under the MPL 2.0,
-and the EPL 1.0 (https://h2database.com/html/license.html).
+and the EPL 1.0 (http://h2database.com/html/license.html).
 Initial Developer: H2 Group
 -->
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
@@ -21,16 +21,14 @@ SQL Grammar
 <img src="images/h2-logo-2.png"
     alt="H2 database logo"
     onclick="document.location='main.html'"
-    width="136" height="74"/>
-&nbsp;&nbsp;<span id = "goTop" onclick="window.scrollTo(0,0)" style="color: #fff; position:fixed; font-size: 20px; cursor: pointer;">&#x25b2;</span>
-</div>
+    width="136" height="74"/> &nbsp;&nbsp;<span id = "goTop" onclick="window.scrollTo(0,0)" style="color: #fff; position:fixed; font-size: 20px; cursor: pointer;">&#x25b2;</span> </div>
 
 <form action="submit" onsubmit="return goFirst();">
 <table width="100%" class="search">
     <tr class="search">
         <td class="search" colspan="2">
 <!-- translate
-<a href="https://translate.google.com/translate?u=https%3A%2F%2Fh2database.com"
+<a href="http://translate.google.com/translate?u=http%3A%2F%2Fh2database.com"
     onclick="javascript:startTranslate();return false;">Translate</a>
 <div id = "translate" style="display:none"><div id = "google_translate_element"></div></div>
 translate -->
@@ -80,9 +78,6 @@ translate -->
 <b>Reference</b><br />
 <a href="commands.html">Commands</a><br />
 <a href="functions.html">Functions</a><br />
-&#8226;&nbsp;<a href="functions-aggregate.html">Aggregate</a>
-&#8226;&nbsp;<a href="functions-window.html">Window</a>
-<br /><br />
 <a href="datatypes.html">Data Types</a><br />
 <a href="grammar.html">SQL Grammar</a><br />
 <a href="systemtables.html">System Tables</a><br />
@@ -140,8 +135,6 @@ translate -->
 
     <a href="#int">Int</a><br />
 
-    <a href="#json">JSON</a><br />
-
     <a href="#long">Long</a><br />
 
     <a href="#null">Null</a><br />
@@ -153,8 +146,6 @@ translate -->
     <a href="#string">String</a><br />
 
     <a href="#time">Time</a><br />
-
-    <a href="#time_with_time_zone">Time with time zone</a><br />
 
     <a href="#timestamp">Timestamp</a><br />
 
@@ -214,8 +205,6 @@ syntax-end -->
             
                 <a href="#int" >Int</a><br />
             
-                <a href="#json" >JSON</a><br />
-            
                 <a href="#long" >Long</a><br />
                     </td><td class="index">
             
@@ -228,8 +217,6 @@ syntax-end -->
                 <a href="#string" >String</a><br />
             
                 <a href="#time" >Time</a><br />
-            
-                <a href="#time_with_time_zone" >Time with time zone</a><br />
             
                 <a href="#timestamp" >Timestamp</a><br />
             
@@ -296,8 +283,6 @@ syntax-end -->
 
     <a href="#timezone_minute_field">Timezone minute field</a><br />
 
-    <a href="#timezone_second_field">Timezone second field</a><br />
-
     <a href="#day_of_week_field">Day of week field</a><br />
 
     <a href="#iso_week_year_field">ISO week year field</a><br />
@@ -345,12 +330,10 @@ syntax-end -->
             
                 <a href="#timezone_minute_field" >Timezone minute field</a><br />
             
-                <a href="#timezone_second_field" >Timezone second field</a><br />
-            
                 <a href="#day_of_week_field" >Day of week field</a><br />
-                    </td><td class="index">
             
                 <a href="#iso_week_year_field" >ISO week year field</a><br />
+                    </td><td class="index">
             
                 <a href="#iso_day_of_week_field" >ISO day of week field</a><br />
             
@@ -398,8 +381,6 @@ syntax-end -->
 
     <a href="#csv_options" >Csv Options</a><br />
 
-    <a href="#data_change_delta_table" >Data Change Delta Table</a><br />
-
     <a href="#data_type" >Data Type</a><br />
 
     <a href="#digit" >Digit</a><br />
@@ -408,8 +389,6 @@ syntax-end -->
 
     <a href="#factor" >Factor</a><br />
 
-    <a href="#grouping_element" >Grouping element</a><br />
-
     <a href="#hex" >Hex</a><br />
 
     <a href="#index_column" >Index Column</a><br />
@@ -417,8 +396,6 @@ syntax-end -->
     <a href="#insert_columns_and_source" >Insert columns and source</a><br />
 
     <a href="#insert_values" >Insert values</a><br />
-
-    <a href="#join_specification" >Join specification</a><br />
 
     <a href="#merge_when_clause" >Merge when clause</a><br />
 
@@ -432,8 +409,6 @@ syntax-end -->
 
     <a href="#order" >Order</a><br />
 
-    <a href="#query" >Query</a><br />
-
     <a href="#quoted_name" >Quoted Name</a><br />
 
     <a href="#referential_constraint" >Referential Constraint</a><br />
@@ -446,11 +421,7 @@ syntax-end -->
 
     <a href="#select_expression" >Select Expression</a><br />
 
-    <a href="#sequence_value_expression" >Sequence value expression</a><br />
-
     <a href="#sequence_options" >Sequence options</a><br />
-
-    <a href="#sequence_option" >Sequence option</a><br />
 
     <a href="#set_clause_list" >Set clause list</a><br />
 
@@ -473,8 +444,6 @@ syntax-end -->
     <a href="#window_frame_bound" >Window frame bound</a><br />
 
     <a href="#term" >Term</a><br />
-
-    <a href="#time_zone" >Time zone</a><br />
 
     <a href="#column" >Column</a><br />
 </p>
@@ -510,18 +479,14 @@ syntax-end -->
             
                 <a href="#csv_options" >Csv Options</a><br />
             
-                <a href="#data_change_delta_table" >Data Change Delta Table</a><br />
-            
                 <a href="#data_type" >Data Type</a><br />
             
                 <a href="#digit" >Digit</a><br />
             
                 <a href="#expression" >Expression</a><br />
-            
-                <a href="#factor" >Factor</a><br />
                     </td><td class="index">
             
-                <a href="#grouping_element" >Grouping element</a><br />
+                <a href="#factor" >Factor</a><br />
             
                 <a href="#hex" >Hex</a><br />
             
@@ -530,8 +495,6 @@ syntax-end -->
                 <a href="#insert_columns_and_source" >Insert columns and source</a><br />
             
                 <a href="#insert_values" >Insert values</a><br />
-            
-                <a href="#join_specification" >Join specification</a><br />
             
                 <a href="#merge_when_clause" >Merge when clause</a><br />
             
@@ -544,8 +507,6 @@ syntax-end -->
                 <a href="#operand" >Operand</a><br />
             
                 <a href="#order" >Order</a><br />
-            
-                <a href="#query" >Query</a><br />
             
                 <a href="#quoted_name" >Quoted Name</a><br />
             
@@ -560,11 +521,7 @@ syntax-end -->
             
                 <a href="#select_expression" >Select Expression</a><br />
             
-                <a href="#sequence_value_expression" >Sequence value expression</a><br />
-            
                 <a href="#sequence_options" >Sequence options</a><br />
-            
-                <a href="#sequence_option" >Sequence option</a><br />
             
                 <a href="#set_clause_list" >Set clause list</a><br />
             
@@ -588,8 +545,6 @@ syntax-end -->
             
                 <a href="#term" >Term</a><br />
             
-                <a href="#time_zone" >Time zone</a><br />
-            
                 <a href="#column" >Column</a><br />
                     </td>
     </tr>
@@ -607,16 +562,16 @@ syntax-end -->
 <!-- railroad-start -->
 <pre name="bnf" style="display: none">
 <a href="grammar.html#string">string</a> | <a href="grammar.html#dollar_quoted_string">dollarQuotedString</a> | <a href="grammar.html#numeric">numeric</a> | <a href="grammar.html#date_and_time">dateAndTime</a> | <a href="grammar.html#boolean">boolean</a> | <a href="grammar.html#bytes">bytes</a>
-| <a href="grammar.html#interval">interval</a> | <a href="grammar.html#array">array</a> | <a href="grammar.html#json">json</a> | <a href="grammar.html#null">null</a>
+| <a href="grammar.html#interval">interval</a> | <a href="grammar.html#array">array</a> | <a href="grammar.html#null">null</a>
 </pre>
 <div name="railroad">
-<table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d"><code class="c"><a href="grammar.html#string">string</a></code></td><td class="te"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><code class="c"><a href="grammar.html#dollar_quoted_string">dollarQuotedString</a></code></td><td class="ke"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><code class="c"><a href="grammar.html#numeric">numeric</a></code></td><td class="ke"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><code class="c"><a href="grammar.html#date_and_time">dateAndTime</a></code></td><td class="ke"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><code class="c"><a href="grammar.html#boolean">boolean</a></code></td><td class="ke"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><code class="c"><a href="grammar.html#bytes">bytes</a></code></td><td class="ke"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><code class="c"><a href="grammar.html#interval">interval</a></code></td><td class="ke"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><code class="c"><a href="grammar.html#array">array</a></code></td><td class="ke"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><code class="c"><a href="grammar.html#json">json</a></code></td><td class="ke"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><code class="c"><a href="grammar.html#null">null</a></code></td><td class="le"></td></tr></table>
+<table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d"><code class="c"><a href="grammar.html#string">string</a></code></td><td class="te"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><code class="c"><a href="grammar.html#dollar_quoted_string">dollarQuotedString</a></code></td><td class="ke"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><code class="c"><a href="grammar.html#numeric">numeric</a></code></td><td class="ke"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><code class="c"><a href="grammar.html#date_and_time">dateAndTime</a></code></td><td class="ke"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><code class="c"><a href="grammar.html#boolean">boolean</a></code></td><td class="ke"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><code class="c"><a href="grammar.html#bytes">bytes</a></code></td><td class="ke"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><code class="c"><a href="grammar.html#interval">interval</a></code></td><td class="ke"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><code class="c"><a href="grammar.html#array">array</a></code></td><td class="ke"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><code class="c"><a href="grammar.html#null">null</a></code></td><td class="le"></td></tr></table>
 </div>
 <!-- railroad-end -->
 <!-- syntax-start
 <pre>
 <a href="grammar.html#string">string</a> | <a href="grammar.html#dollar_quoted_string">dollarQuotedString</a> | <a href="grammar.html#numeric">numeric</a> | <a href="grammar.html#date_and_time">dateAndTime</a> | <a href="grammar.html#boolean">boolean</a> | <a href="grammar.html#bytes">bytes</a>
-| <a href="grammar.html#interval">interval</a> | <a href="grammar.html#array">array</a> | <a href="grammar.html#json">json</a> | <a href="grammar.html#null">null</a>
+| <a href="grammar.html#interval">interval</a> | <a href="grammar.html#array">array</a> | <a href="grammar.html#null">null</a>
 </pre>
 syntax-end -->
 <p>A literal value of any data type, or null.</p>
@@ -627,15 +582,15 @@ syntax-end -->
 <h3 id="array" class="notranslate" onclick="switchBnf(this)">Array</h3>
 <!-- railroad-start -->
 <pre name="bnf" style="display: none">
-ARRAY &#39;[&#39; [ <a href="grammar.html#expression">expression</a> [,...] ] &#39;]&#39;
+ARRAY &#39;[&#39; [ <a href="grammar.html#expression">expression</a>, [,...] ] &#39;]&#39;
 </pre>
 <div name="railroad">
-<table class="railroad"><tr class="railroad"><td class="d"><code class="c">ARRAY [</code></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><code class="c"><a href="grammar.html#expression">expression</a></code></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><code class="c">, ...</code></td><td class="le"></td></tr></table></td></tr></table></td><td class="le"></td></tr></table></td><td class="d"><code class="c">]</code></td></tr></table>
+<table class="railroad"><tr class="railroad"><td class="d"><code class="c">ARRAY [</code></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><code class="c"><a href="grammar.html#expression">expression</a> ,</code></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><code class="c">, ...</code></td><td class="le"></td></tr></table></td></tr></table></td><td class="le"></td></tr></table></td><td class="d"><code class="c">]</code></td></tr></table>
 </div>
 <!-- railroad-end -->
 <!-- syntax-start
 <pre>
-ARRAY &#39;[&#39; [ <a href="grammar.html#expression">expression</a> [,...] ] &#39;]&#39;
+ARRAY &#39;[&#39; [ <a href="grammar.html#expression">expression</a>, [,...] ] &#39;]&#39;
 </pre>
 syntax-end -->
 <p>An array of values.</p>
@@ -646,18 +601,18 @@ ARRAY[1, 2]<br />ARRAY[1]<br />ARRAY[]</p>
 <h3 id="boolean" class="notranslate" onclick="switchBnf(this)">Boolean</h3>
 <!-- railroad-start -->
 <pre name="bnf" style="display: none">
-TRUE | FALSE | UNKNOWN
+TRUE | FALSE
 </pre>
 <div name="railroad">
-<table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d"><code class="c">TRUE</code></td><td class="te"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><code class="c">FALSE</code></td><td class="ke"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><code class="c">UNKNOWN</code></td><td class="le"></td></tr></table>
+<table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d"><code class="c">TRUE</code></td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><code class="c">FALSE</code></td><td class="le"></td></tr></table>
 </div>
 <!-- railroad-end -->
 <!-- syntax-start
 <pre>
-TRUE | FALSE | UNKNOWN
+TRUE | FALSE
 </pre>
 syntax-end -->
-<p>A boolean value. <code>UNKNOWN</code> is a <code>NULL</code> value with the boolean data type.</p>
+<p>A boolean value.</p>
 <p>Example:</p>
 <p class="notranslate">
 TRUE</p>
@@ -665,37 +620,37 @@ TRUE</p>
 <h3 id="bytes" class="notranslate" onclick="switchBnf(this)">Bytes</h3>
 <!-- railroad-start -->
 <pre name="bnf" style="display: none">
-X&#39;<a href="grammar.html#hex">hex</a>&#39; [ &#39;<a href="grammar.html#hex">hex</a>&#39; [...] ]
+X&#39;<a href="grammar.html#hex">hex</a>&#39;
 </pre>
 <div name="railroad">
-<table class="railroad"><tr class="railroad"><td class="d"><code class="c">X &#39; <a href="grammar.html#hex">hex</a> &#39;</code></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><code class="c">&#39; <a href="grammar.html#hex">hex</a> &#39;</code></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><code class="c">...</code></td><td class="le"></td></tr></table></td></tr></table></td><td class="le"></td></tr></table></td></tr></table>
+<table class="railroad"><tr class="railroad"><td class="d"><code class="c">X &#39; <a href="grammar.html#hex">hex</a> &#39;</code></td></tr></table>
 </div>
 <!-- railroad-end -->
 <!-- syntax-start
 <pre>
-X&#39;<a href="grammar.html#hex">hex</a>&#39; [ &#39;<a href="grammar.html#hex">hex</a>&#39; [...] ]
+X&#39;<a href="grammar.html#hex">hex</a>&#39;
 </pre>
 syntax-end -->
-<p>A binary value. The hex value is not case sensitive and may contain space characters.</p>
+<p>A binary value. The hex value is not case sensitive.</p>
 <p>Example:</p>
 <p class="notranslate">
-X&#39;&#39;<br />X&#39;01FF&#39;<br />X&#39;01 bc 2a&#39;<br />X&#39;01&#39; &#39;02&#39;</p>
+X&#39;01FF&#39;</p>
 
 <h3 id="date" class="notranslate" onclick="switchBnf(this)">Date</h3>
 <!-- railroad-start -->
 <pre name="bnf" style="display: none">
-DATE &#39;[-]yyyy-MM-dd&#39;
+DATE &#39;yyyy-MM-dd&#39;
 </pre>
 <div name="railroad">
-<table class="railroad"><tr class="railroad"><td class="d"><code class="c">DATE &#39;</code></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><code class="c">-</code></td><td class="le"></td></tr></table></td><td class="d"><code class="c">2000-01-01 &#39;</code></td></tr></table>
+<table class="railroad"><tr class="railroad"><td class="d"><code class="c">DATE &#39; 2000-01-01 &#39;</code></td></tr></table>
 </div>
 <!-- railroad-end -->
 <!-- syntax-start
 <pre>
-DATE &#39;[-]yyyy-MM-dd&#39;
+DATE &#39;yyyy-MM-dd&#39;
 </pre>
 syntax-end -->
-<p>A date literal.</p>
+<p>A date literal. The limitations are the same as for the Java data type <code>java.sql.Date</code>, but for compatibility with other databases the suggested minimum and maximum years are 0001 and 9999.</p>
 <p>Example:</p>
 <p class="notranslate">
 DATE &#39;2004-12-31&#39;</p>
@@ -703,15 +658,15 @@ DATE &#39;2004-12-31&#39;</p>
 <h3 id="date_and_time" class="notranslate" onclick="switchBnf(this)">Date and time</h3>
 <!-- railroad-start -->
 <pre name="bnf" style="display: none">
-<a href="grammar.html#date">date</a> | <a href="grammar.html#time">time</a> | <a href="grammar.html#time_with_time_zone">timeWithTimeZone</a> | <a href="grammar.html#timestamp">timestamp</a> | <a href="grammar.html#timestamp_with_time_zone">timestampWithTimeZone</a>
+<a href="grammar.html#date">date</a> | <a href="grammar.html#time">time</a> | <a href="grammar.html#timestamp">timestamp</a> | <a href="grammar.html#timestamp_with_time_zone">timestampWithTimeZone</a>
 </pre>
 <div name="railroad">
-<table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d"><code class="c"><a href="grammar.html#date">date</a></code></td><td class="te"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><code class="c"><a href="grammar.html#time">time</a></code></td><td class="ke"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><code class="c"><a href="grammar.html#time_with_time_zone">timeWithTimeZone</a></code></td><td class="ke"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><code class="c"><a href="grammar.html#timestamp">timestamp</a></code></td><td class="ke"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><code class="c"><a href="grammar.html#timestamp_with_time_zone">timestampWithTimeZone</a></code></td><td class="le"></td></tr></table>
+<table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d"><code class="c"><a href="grammar.html#date">date</a></code></td><td class="te"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><code class="c"><a href="grammar.html#time">time</a></code></td><td class="ke"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><code class="c"><a href="grammar.html#timestamp">timestamp</a></code></td><td class="ke"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><code class="c"><a href="grammar.html#timestamp_with_time_zone">timestampWithTimeZone</a></code></td><td class="le"></td></tr></table>
 </div>
 <!-- railroad-end -->
 <!-- syntax-start
 <pre>
-<a href="grammar.html#date">date</a> | <a href="grammar.html#time">time</a> | <a href="grammar.html#time_with_time_zone">timeWithTimeZone</a> | <a href="grammar.html#timestamp">timestamp</a> | <a href="grammar.html#timestamp_with_time_zone">timestampWithTimeZone</a>
+<a href="grammar.html#date">date</a> | <a href="grammar.html#time">time</a> | <a href="grammar.html#timestamp">timestamp</a> | <a href="grammar.html#timestamp_with_time_zone">timestampWithTimeZone</a>
 </pre>
 syntax-end -->
 <p>A literal value of any date-time data type.</p>
@@ -762,15 +717,15 @@ syntax-end -->
 <h3 id="hex_number" class="notranslate" onclick="switchBnf(this)">Hex Number</h3>
 <!-- railroad-start -->
 <pre name="bnf" style="display: none">
-[ + | - ] 0x { <a href="grammar.html#digit">digit</a> | a-f | A-F } [...]
+[ + | - ] 0x <a href="grammar.html#hex">hex</a>
 </pre>
 <div name="railroad">
-<table class="railroad"><tr class="railroad"><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d"><code class="c">+</code></td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><code class="c">-</code></td><td class="le"></td></tr></table></td><td class="le"></td></tr></table></td><td class="d"><code class="c">0x</code></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d"><code class="c"><a href="grammar.html#digit">digit</a></code></td><td class="te"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><code class="c">a - f</code></td></tr></table></td><td class="ke"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><code class="c">A-F</code></td><td class="le"></td></tr></table></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><code class="c">...</code></td><td class="le"></td></tr></table></td></tr></table>
+<table class="railroad"><tr class="railroad"><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d"><code class="c">+</code></td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><code class="c">-</code></td><td class="le"></td></tr></table></td><td class="le"></td></tr></table></td><td class="d"><code class="c">0x <a href="grammar.html#hex">hex</a></code></td></tr></table>
 </div>
 <!-- railroad-end -->
 <!-- syntax-start
 <pre>
-[ + | - ] 0x { <a href="grammar.html#digit">digit</a> | a-f | A-F } [...]
+[ + | - ] 0x <a href="grammar.html#hex">hex</a>
 </pre>
 syntax-end -->
 <p>A number written in hexadecimal notation.</p>
@@ -796,25 +751,6 @@ syntax-end -->
 <p>Example:</p>
 <p class="notranslate">
 10</p>
-
-<h3 id="json" class="notranslate" onclick="switchBnf(this)">JSON</h3>
-<!-- railroad-start -->
-<pre name="bnf" style="display: none">
-JSON { <a href="grammar.html#bytes">bytes</a> | <a href="grammar.html#string">string</a> }
-</pre>
-<div name="railroad">
-<table class="railroad"><tr class="railroad"><td class="d"><code class="c">JSON</code></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d"><code class="c"><a href="grammar.html#bytes">bytes</a></code></td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><code class="c"><a href="grammar.html#string">string</a></code></td><td class="le"></td></tr></table></td></tr></table>
-</div>
-<!-- railroad-end -->
-<!-- syntax-start
-<pre>
-JSON { <a href="grammar.html#bytes">bytes</a> | <a href="grammar.html#string">string</a> }
-</pre>
-syntax-end -->
-<p>A binary or character string with a <code>RFC</code> 8259-compliant <code>JSON</code> text and data format. <code>JSON</code> text is parsed into internal representation. Order of object members is preserved as is. Duplicate object member names are allowed.</p>
-<p>Example:</p>
-<p class="notranslate">
-JSON &#39;{&quot;id&quot;:10,&quot;name&quot;:&quot;What&#39;&#39;s this?&quot;}&#39;<br />JSON &#39;[1, &#39; &#39;2]&#39;;<br />JSON X&#39;7472&#39; &#39;7565&#39;</p>
 
 <h3 id="long" class="notranslate" onclick="switchBnf(this)">Long</h3>
 <!-- railroad-start -->
@@ -895,21 +831,21 @@ SELECT -1600.05<br />SELECT CAST(0 AS DOUBLE)<br />SELECT -1.4e-10</p>
 <h3 id="string" class="notranslate" onclick="switchBnf(this)">String</h3>
 <!-- railroad-start -->
 <pre name="bnf" style="display: none">
-&#39;anything&#39; [ &#39;anything&#39; [...] ]
+&#39;anything&#39;
 </pre>
 <div name="railroad">
-<table class="railroad"><tr class="railroad"><td class="d"><code class="c">&#39; anything &#39;</code></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><code class="c">&#39; anything &#39;</code></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><code class="c">...</code></td><td class="le"></td></tr></table></td></tr></table></td><td class="le"></td></tr></table></td></tr></table>
+<table class="railroad"><tr class="railroad"><td class="d"><code class="c">&#39; anything &#39;</code></td></tr></table>
 </div>
 <!-- railroad-end -->
 <!-- syntax-start
 <pre>
-&#39;anything&#39; [ &#39;anything&#39; [...] ]
+&#39;anything&#39;
 </pre>
 syntax-end -->
 <p>A string starts and ends with a single quote. Two single quotes can be used to create a single quote inside a string.</p>
 <p>Example:</p>
 <p class="notranslate">
-&#39;John&#39;&#39;s car&#39;<br />&#39;A&#39; &#39;B&#39; &#39;C&#39;</p>
+&#39;John&#39;&#39;s car&#39;</p>
 
 <h3 id="time" class="notranslate" onclick="switchBnf(this)">Time</h3>
 <!-- railroad-start -->
@@ -930,40 +866,21 @@ syntax-end -->
 <p class="notranslate">
 TIME &#39;23:59:59&#39;</p>
 
-<h3 id="time_with_time_zone" class="notranslate" onclick="switchBnf(this)">Time with time zone</h3>
-<!-- railroad-start -->
-<pre name="bnf" style="display: none">
-TIME WITH TIME ZONE &#39;hh:mm:ss[.nnnnnnnnn]{Z | { - | + } <a href="grammar.html#string">timeZoneOffsetString</a>}&#39;
-</pre>
-<div name="railroad">
-<table class="railroad"><tr class="railroad"><td class="d"><code class="c">TIME WITH TIME ZONE &#39; 12:00:00</code></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><code class="c">. 000000000</code></td></tr></table></td><td class="le"></td></tr></table></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d"><code class="c">Z</code></td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d"><code class="c">-</code></td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><code class="c">+</code></td><td class="le"></td></tr></table></td><td class="d"><code class="c"><a href="grammar.html#string">timeZoneOffsetString</a></code></td></tr></table></td><td class="le"></td></tr></table></td><td class="d"><code class="c">&#39;</code></td></tr></table>
-</div>
-<!-- railroad-end -->
-<!-- syntax-start
-<pre>
-TIME WITH TIME ZONE &#39;hh:mm:ss[.nnnnnnnnn]{Z | { - | + } <a href="grammar.html#string">timeZoneOffsetString</a>}&#39;
-</pre>
-syntax-end -->
-<p>A time with time zone literal. A value is between 0:00:00 and 23:59:59.999999999 and has nanosecond resolution.</p>
-<p>Example:</p>
-<p class="notranslate">
-TIME WITH TIME ZONE &#39;23:59:59+01&#39;<br />TIME WITH TIME ZONE &#39;10:15:30.334-03:30&#39;<br />TIME WITH TIME ZONE &#39;0:00:00Z&#39;</p>
-
 <h3 id="timestamp" class="notranslate" onclick="switchBnf(this)">Timestamp</h3>
 <!-- railroad-start -->
 <pre name="bnf" style="display: none">
-TIMESTAMP [ WITHOUT TIME ZONE ] &#39;[-]yyyy-MM-dd hh:mm:ss[.nnnnnnnnn]&#39;
+TIMESTAMP [ WITHOUT TIME ZONE ] &#39;yyyy-MM-dd hh:mm:ss[.nnnnnnnnn]&#39;
 </pre>
 <div name="railroad">
-<table class="railroad"><tr class="railroad"><td class="d"><code class="c">TIMESTAMP</code></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><code class="c">WITHOUT TIME ZONE</code></td></tr></table></td><td class="le"></td></tr></table></td><td class="d"><code class="c">&#39;</code></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><code class="c">-</code></td><td class="le"></td></tr></table></td><td class="d"><code class="c">2000-01-01 12:00:00</code></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><code class="c">. 000000000</code></td></tr></table></td><td class="le"></td></tr></table></td><td class="d"><code class="c">&#39;</code></td></tr></table>
+<table class="railroad"><tr class="railroad"><td class="d"><code class="c">TIMESTAMP</code></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><code class="c">WITHOUT TIME ZONE</code></td></tr></table></td><td class="le"></td></tr></table></td><td class="d"><code class="c">&#39; 2000-01-01 12:00:00</code></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><code class="c">. 000000000</code></td></tr></table></td><td class="le"></td></tr></table></td><td class="d"><code class="c">&#39;</code></td></tr></table>
 </div>
 <!-- railroad-end -->
 <!-- syntax-start
 <pre>
-TIMESTAMP [ WITHOUT TIME ZONE ] &#39;[-]yyyy-MM-dd hh:mm:ss[.nnnnnnnnn]&#39;
+TIMESTAMP [ WITHOUT TIME ZONE ] &#39;yyyy-MM-dd hh:mm:ss[.nnnnnnnnn]&#39;
 </pre>
 syntax-end -->
-<p>A timestamp literal.</p>
+<p>A timestamp literal. The limitations are the same as for the Java data type <code>java.sql.Timestamp</code>, but for compatibility with other databases the suggested minimum and maximum years are 0001 and 9999.</p>
 <p>Example:</p>
 <p class="notranslate">
 TIMESTAMP &#39;2005-12-31 23:59:59&#39;</p>
@@ -971,16 +888,16 @@ TIMESTAMP &#39;2005-12-31 23:59:59&#39;</p>
 <h3 id="timestamp_with_time_zone" class="notranslate" onclick="switchBnf(this)">Timestamp with time zone</h3>
 <!-- railroad-start -->
 <pre name="bnf" style="display: none">
-TIMESTAMP WITH TIME ZONE &#39;[-]yyyy-MM-dd hh:mm:ss[.nnnnnnnnn]
+TIMESTAMP WITH TIME ZONE &#39;yyyy-MM-dd hh:mm:ss[.nnnnnnnnn]
 [Z | { - | + } <a href="grammar.html#string">timeZoneOffsetString</a> | <a href="grammar.html#string">timeZoneNameString</a> ]&#39;
 </pre>
 <div name="railroad">
-<table class="railroad"><tr class="railroad"><td class="d"><code class="c">TIMESTAMP WITH TIME ZONE &#39;</code></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><code class="c">-</code></td><td class="le"></td></tr></table></td><td class="d"><code class="c">2000-01-01 12:00:00</code></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><code class="c">. 000000000</code></td></tr></table></td><td class="le"></td></tr></table></td></tr></table><br /><table class="railroad"><tr class="railroad"><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d"><code class="c">Z</code></td><td class="te"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d"><code class="c">-</code></td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><code class="c">+</code></td><td class="le"></td></tr></table></td><td class="d"><code class="c"><a href="grammar.html#string">timeZoneOffsetString</a></code></td></tr></table></td><td class="ke"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><code class="c"><a href="grammar.html#string">timeZoneNameString</a></code></td><td class="le"></td></tr></table></td><td class="le"></td></tr></table></td><td class="d"><code class="c">&#39;</code></td></tr></table>
+<table class="railroad"><tr class="railroad"><td class="d"><code class="c">TIMESTAMP WITH TIME ZONE &#39; 2000-01-01 12:00:00</code></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><code class="c">. 000000000</code></td></tr></table></td><td class="le"></td></tr></table></td></tr></table><br /><table class="railroad"><tr class="railroad"><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d"><code class="c">Z</code></td><td class="te"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d"><code class="c">-</code></td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><code class="c">+</code></td><td class="le"></td></tr></table></td><td class="d"><code class="c"><a href="grammar.html#string">timeZoneOffsetString</a></code></td></tr></table></td><td class="ke"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><code class="c"><a href="grammar.html#string">timeZoneNameString</a></code></td><td class="le"></td></tr></table></td><td class="le"></td></tr></table></td><td class="d"><code class="c">&#39;</code></td></tr></table>
 </div>
 <!-- railroad-end -->
 <!-- syntax-start
 <pre>
-TIMESTAMP WITH TIME ZONE &#39;[-]yyyy-MM-dd hh:mm:ss[.nnnnnnnnn]
+TIMESTAMP WITH TIME ZONE &#39;yyyy-MM-dd hh:mm:ss[.nnnnnnnnn]
 [Z | { - | + } <a href="grammar.html#string">timeZoneOffsetString</a> | <a href="grammar.html#string">timeZoneNameString</a> ]&#39;
 </pre>
 syntax-end -->
@@ -1269,13 +1186,13 @@ INTERVAL &#39;11:12.123&#39; MINUTE TO SECOND</p>
 <a href="grammar.html#year_field">yearField</a> | <a href="grammar.html#month_field">monthField</a> | <a href="grammar.html#day_of_month_field">dayOfMonthField</a>
 | <a href="grammar.html#hour_field">hourField</a> | <a href="grammar.html#minute_field">minuteField</a> | <a href="grammar.html#second_field">secondField</a>
 | <a href="grammar.html#millisecond_field">millisecondField</a> | <a href="grammar.html#microsecond_field">microsecondField</a> | <a href="grammar.html#nanosecond_field">nanosecondField</a>
-| <a href="grammar.html#timezone_hour_field">timezoneHourField</a> | <a href="grammar.html#timezone_minute_field">timezoneMinuteField</a> | <a href="grammar.html#timezone_second_field">timezoneSecondField</a>
+| <a href="grammar.html#timezone_hour_field">timezoneHourField</a> | <a href="grammar.html#timezone_minute_field">timezoneMinuteField</a>
 | <a href="grammar.html#day_of_week_field">dayOfWeekField</a> | <a href="grammar.html#iso_week_year_field">isoWeekYearField</a> | <a href="grammar.html#iso_day_of_week_field">isoDayOfWeekField</a>
 | <a href="grammar.html#week_of_year_field">weekOfYearField</a> | <a href="grammar.html#iso_week_of_year_field">isoWeekOfYearField</a>
 | <a href="grammar.html#quarter_field">quarterField</a> | <a href="grammar.html#day_of_year_field">dayOfYearField</a> | <a href="grammar.html#epoch_field">epochField</a>
 </pre>
 <div name="railroad">
-<table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d"><code class="c"><a href="grammar.html#year_field">yearField</a></code></td><td class="te"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><code class="c"><a href="grammar.html#month_field">monthField</a></code></td><td class="ke"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><code class="c"><a href="grammar.html#day_of_month_field">dayOfMonthField</a></code></td><td class="ke"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><code class="c"><a href="grammar.html#hour_field">hourField</a></code></td><td class="ke"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><code class="c"><a href="grammar.html#minute_field">minuteField</a></code></td><td class="ke"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><code class="c"><a href="grammar.html#second_field">secondField</a></code></td><td class="ke"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><code class="c"><a href="grammar.html#millisecond_field">millisecondField</a></code></td><td class="ke"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><code class="c"><a href="grammar.html#microsecond_field">microsecondField</a></code></td><td class="ke"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><code class="c"><a href="grammar.html#nanosecond_field">nanosecondField</a></code></td><td class="ke"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><code class="c"><a href="grammar.html#timezone_hour_field">timezoneHourField</a></code></td><td class="ke"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><code class="c"><a href="grammar.html#timezone_minute_field">timezoneMinuteField</a></code></td><td class="ke"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><code class="c"><a href="grammar.html#timezone_second_field">timezoneSecondField</a></code></td><td class="ke"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><code class="c"><a href="grammar.html#day_of_week_field">dayOfWeekField</a></code></td><td class="ke"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><code class="c"><a href="grammar.html#iso_week_year_field">isoWeekYearField</a></code></td><td class="ke"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><code class="c"><a href="grammar.html#iso_day_of_week_field">isoDayOfWeekField</a></code></td><td class="ke"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><code class="c"><a href="grammar.html#week_of_year_field">weekOfYearField</a></code></td><td class="ke"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><code class="c"><a href="grammar.html#iso_week_of_year_field">isoWeekOfYearField</a></code></td><td class="ke"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><code class="c"><a href="grammar.html#quarter_field">quarterField</a></code></td><td class="ke"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><code class="c"><a href="grammar.html#day_of_year_field">dayOfYearField</a></code></td><td class="ke"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><code class="c"><a href="grammar.html#epoch_field">epochField</a></code></td><td class="le"></td></tr></table>
+<table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d"><code class="c"><a href="grammar.html#year_field">yearField</a></code></td><td class="te"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><code class="c"><a href="grammar.html#month_field">monthField</a></code></td><td class="ke"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><code class="c"><a href="grammar.html#day_of_month_field">dayOfMonthField</a></code></td><td class="ke"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><code class="c"><a href="grammar.html#hour_field">hourField</a></code></td><td class="ke"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><code class="c"><a href="grammar.html#minute_field">minuteField</a></code></td><td class="ke"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><code class="c"><a href="grammar.html#second_field">secondField</a></code></td><td class="ke"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><code class="c"><a href="grammar.html#millisecond_field">millisecondField</a></code></td><td class="ke"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><code class="c"><a href="grammar.html#microsecond_field">microsecondField</a></code></td><td class="ke"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><code class="c"><a href="grammar.html#nanosecond_field">nanosecondField</a></code></td><td class="ke"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><code class="c"><a href="grammar.html#timezone_hour_field">timezoneHourField</a></code></td><td class="ke"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><code class="c"><a href="grammar.html#timezone_minute_field">timezoneMinuteField</a></code></td><td class="ke"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><code class="c"><a href="grammar.html#day_of_week_field">dayOfWeekField</a></code></td><td class="ke"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><code class="c"><a href="grammar.html#iso_week_year_field">isoWeekYearField</a></code></td><td class="ke"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><code class="c"><a href="grammar.html#iso_day_of_week_field">isoDayOfWeekField</a></code></td><td class="ke"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><code class="c"><a href="grammar.html#week_of_year_field">weekOfYearField</a></code></td><td class="ke"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><code class="c"><a href="grammar.html#iso_week_of_year_field">isoWeekOfYearField</a></code></td><td class="ke"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><code class="c"><a href="grammar.html#quarter_field">quarterField</a></code></td><td class="ke"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><code class="c"><a href="grammar.html#day_of_year_field">dayOfYearField</a></code></td><td class="ke"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><code class="c"><a href="grammar.html#epoch_field">epochField</a></code></td><td class="le"></td></tr></table>
 </div>
 <!-- railroad-end -->
 <!-- syntax-start
@@ -1283,7 +1200,7 @@ INTERVAL &#39;11:12.123&#39; MINUTE TO SECOND</p>
 <a href="grammar.html#year_field">yearField</a> | <a href="grammar.html#month_field">monthField</a> | <a href="grammar.html#day_of_month_field">dayOfMonthField</a>
 | <a href="grammar.html#hour_field">hourField</a> | <a href="grammar.html#minute_field">minuteField</a> | <a href="grammar.html#second_field">secondField</a>
 | <a href="grammar.html#millisecond_field">millisecondField</a> | <a href="grammar.html#microsecond_field">microsecondField</a> | <a href="grammar.html#nanosecond_field">nanosecondField</a>
-| <a href="grammar.html#timezone_hour_field">timezoneHourField</a> | <a href="grammar.html#timezone_minute_field">timezoneMinuteField</a> | <a href="grammar.html#timezone_second_field">timezoneSecondField</a>
+| <a href="grammar.html#timezone_hour_field">timezoneHourField</a> | <a href="grammar.html#timezone_minute_field">timezoneMinuteField</a>
 | <a href="grammar.html#day_of_week_field">dayOfWeekField</a> | <a href="grammar.html#iso_week_year_field">isoWeekYearField</a> | <a href="grammar.html#iso_day_of_week_field">isoDayOfWeekField</a>
 | <a href="grammar.html#week_of_year_field">weekOfYearField</a> | <a href="grammar.html#iso_week_of_year_field">isoWeekOfYearField</a>
 | <a href="grammar.html#quarter_field">quarterField</a> | <a href="grammar.html#day_of_year_field">dayOfYearField</a> | <a href="grammar.html#epoch_field">epochField</a>
@@ -1502,25 +1419,6 @@ syntax-end -->
 <p>Example:</p>
 <p class="notranslate">
 TIMEZONE_MINUTE</p>
-
-<h3 id="timezone_second_field" class="notranslate" onclick="switchBnf(this)">Timezone second field</h3>
-<!-- railroad-start -->
-<pre name="bnf" style="display: none">
-TIMEZONE_SECOND
-</pre>
-<div name="railroad">
-<code class="c">TIMEZONE_SECOND</code>
-</div>
-<!-- railroad-end -->
-<!-- syntax-start
-<pre>
-TIMEZONE_SECOND
-</pre>
-syntax-end -->
-<p>Timezone second (from -59 to +59). Local mean time (<code>LMT</code>) used in the past may have offsets with seconds. Standard time doesn&#39;t use such offsets.</p>
-<p>Example:</p>
-<p class="notranslate">
-TIMEZONE_SECOND</p>
 
 <h3 id="day_of_week_field" class="notranslate" onclick="switchBnf(this)">Day of week field</h3>
 <!-- railroad-start -->
@@ -1779,11 +1677,11 @@ syntax-end -->
 | GENERATED {ALWAYS | BY DEFAULT} AS IDENTITY [(<a href="grammar.html#sequence_options">sequenceOptions</a>)]} ]
 [ ON UPDATE <a href="grammar.html#expression">expression</a> ] [ [ NOT ] NULL ]
 [ { AUTO_INCREMENT | IDENTITY } [ ( <a href="grammar.html#int">startInt</a> [, <a href="grammar.html#int">incrementInt</a> ] ) ] ]
-[ SELECTIVITY <a href="grammar.html#int">selectivityInt</a> ] [ COMMENT <a href="grammar.html#expression">expression</a> ]
+[ SELECTIVITY <a href="functions.html#selectivity">selectivity</a> ] [ COMMENT <a href="grammar.html#expression">expression</a> ]
 [ PRIMARY KEY [ HASH ] | UNIQUE ] [ CHECK <a href="grammar.html#condition">condition</a> ]
 </pre>
 <div name="railroad">
-<table class="railroad"><tr class="railroad"><td class="d"><code class="c"><a href="grammar.html#data_type">dataType</a></code></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d"><code class="c">VISIBLE</code></td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><code class="c">INVISIBLE</code></td><td class="le"></td></tr></table></td><td class="le"></td></tr></table></td></tr></table><br /><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><code class="c">DEFAULT <a href="grammar.html#expression">expression</a></code></td></tr></table></td><td class="te"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><code class="c">AS <a href="grammar.html#expression">computedColumnExpression</a></code></td></tr></table></td><td class="ke"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><code class="c">GENERATED</code></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d"><code class="c">ALWAYS</code></td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><code class="c">BY DEFAULT</code></td></tr></table></td><td class="le"></td></tr></table></td><td class="d"><code class="c">AS IDENTITY</code></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><code class="c">( <a href="grammar.html#sequence_options">sequenceOptions</a> )</code></td></tr></table></td><td class="le"></td></tr></table></td></tr></table></td><td class="le"></td></tr></table></td><td class="le"></td></tr></table><br /><table class="railroad"><tr class="railroad"><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><code class="c">ON UPDATE <a href="grammar.html#expression">expression</a></code></td></tr></table></td><td class="le"></td></tr></table></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><code class="c">NOT</code></td><td class="le"></td></tr></table></td><td class="d"><code class="c">NULL</code></td></tr></table></td><td class="le"></td></tr></table></td></tr></table><br /><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d"><code class="c">AUTO_INCREMENT</code></td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><code class="c">IDENTITY</code></td><td class="le"></td></tr></table></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><code class="c">( <a href="grammar.html#int">startInt</a></code></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><code class="c">, <a href="grammar.html#int">incrementInt</a></code></td></tr></table></td><td class="le"></td></tr></table></td><td class="d"><code class="c">)</code></td></tr></table></td><td class="le"></td></tr></table></td></tr></table></td><td class="le"></td></tr></table><br /><table class="railroad"><tr class="railroad"><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><code class="c">SELECTIVITY <a href="grammar.html#int">selectivityInt</a></code></td></tr></table></td><td class="le"></td></tr></table></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><code class="c">COMMENT <a href="grammar.html#expression">expression</a></code></td></tr></table></td><td class="le"></td></tr></table></td></tr></table><br /><table class="railroad"><tr class="railroad"><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><code class="c">PRIMARY KEY</code></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><code class="c">HASH</code></td><td class="le"></td></tr></table></td></tr></table></td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><code class="c">UNIQUE</code></td><td class="le"></td></tr></table></td><td class="le"></td></tr></table></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><code class="c">CHECK <a href="grammar.html#condition">condition</a></code></td></tr></table></td><td class="le"></td></tr></table></td></tr></table>
+<table class="railroad"><tr class="railroad"><td class="d"><code class="c"><a href="grammar.html#data_type">dataType</a></code></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d"><code class="c">VISIBLE</code></td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><code class="c">INVISIBLE</code></td><td class="le"></td></tr></table></td><td class="le"></td></tr></table></td></tr></table><br /><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><code class="c">DEFAULT <a href="grammar.html#expression">expression</a></code></td></tr></table></td><td class="te"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><code class="c">AS <a href="grammar.html#expression">computedColumnExpression</a></code></td></tr></table></td><td class="ke"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><code class="c">GENERATED</code></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d"><code class="c">ALWAYS</code></td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><code class="c">BY DEFAULT</code></td></tr></table></td><td class="le"></td></tr></table></td><td class="d"><code class="c">AS IDENTITY</code></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><code class="c">( <a href="grammar.html#sequence_options">sequenceOptions</a> )</code></td></tr></table></td><td class="le"></td></tr></table></td></tr></table></td><td class="le"></td></tr></table></td><td class="le"></td></tr></table><br /><table class="railroad"><tr class="railroad"><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><code class="c">ON UPDATE <a href="grammar.html#expression">expression</a></code></td></tr></table></td><td class="le"></td></tr></table></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><code class="c">NOT</code></td><td class="le"></td></tr></table></td><td class="d"><code class="c">NULL</code></td></tr></table></td><td class="le"></td></tr></table></td></tr></table><br /><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d"><code class="c">AUTO_INCREMENT</code></td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><code class="c">IDENTITY</code></td><td class="le"></td></tr></table></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><code class="c">( <a href="grammar.html#int">startInt</a></code></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><code class="c">, <a href="grammar.html#int">incrementInt</a></code></td></tr></table></td><td class="le"></td></tr></table></td><td class="d"><code class="c">)</code></td></tr></table></td><td class="le"></td></tr></table></td></tr></table></td><td class="le"></td></tr></table><br /><table class="railroad"><tr class="railroad"><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><code class="c">SELECTIVITY <a href="functions.html#selectivity">selectivity</a></code></td></tr></table></td><td class="le"></td></tr></table></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><code class="c">COMMENT <a href="grammar.html#expression">expression</a></code></td></tr></table></td><td class="le"></td></tr></table></td></tr></table><br /><table class="railroad"><tr class="railroad"><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><code class="c">PRIMARY KEY</code></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><code class="c">HASH</code></td><td class="le"></td></tr></table></td></tr></table></td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><code class="c">UNIQUE</code></td><td class="le"></td></tr></table></td><td class="le"></td></tr></table></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><code class="c">CHECK <a href="grammar.html#condition">condition</a></code></td></tr></table></td><td class="le"></td></tr></table></td></tr></table>
 </div>
 <!-- railroad-end -->
 <!-- syntax-start
@@ -1794,11 +1692,11 @@ syntax-end -->
 | GENERATED {ALWAYS | BY DEFAULT} AS IDENTITY [(<a href="grammar.html#sequence_options">sequenceOptions</a>)]} ]
 [ ON UPDATE <a href="grammar.html#expression">expression</a> ] [ [ NOT ] NULL ]
 [ { AUTO_INCREMENT | IDENTITY } [ ( <a href="grammar.html#int">startInt</a> [, <a href="grammar.html#int">incrementInt</a> ] ) ] ]
-[ SELECTIVITY <a href="grammar.html#int">selectivityInt</a> ] [ COMMENT <a href="grammar.html#expression">expression</a> ]
+[ SELECTIVITY <a href="functions.html#selectivity">selectivity</a> ] [ COMMENT <a href="grammar.html#expression">expression</a> ]
 [ PRIMARY KEY [ HASH ] | UNIQUE ] [ CHECK <a href="grammar.html#condition">condition</a> ]
 </pre>
 syntax-end -->
-<p>Default expressions are used if no explicit value was used when adding a row. The computed column expression is evaluated and assigned whenever the row changes. On update column expression is used if row is updated, at least one column have a new value that is different from its previous value and value for this column is not set explicitly in update statement.</p><p>Identity, auto-increment, or generated as identity columns are columns with a sequence as the default. The column declared as the identity columns with <code>IDENTITY</code> data type or with <code>IDENTITY</code> () clause is implicitly the primary key column of this table. <code>AUTO_INCREMENT</code> and <code>GENERATED</code> clauses do not create the primary key constraint. <code>GENERATED ALWAYS</code> is accepted but treated in the same way as <code>GENERATED BY DEFAULT</code>.</p><p>The invisible column will not be displayed as a result of <code>SELECT</code> * query. Otherwise, it works as normal column.</p><p>The options <code>PRIMARY KEY, UNIQUE</code>, and <code>CHECK</code> are not supported for <code>ALTER</code> statements.</p><p>Check constraints can reference columns of the table, and they can reference objects that exist while the statement is executed. Conditions are only checked when a row is added or modified in the table where the constraint exists.</p>
+<p>Default expressions are used if no explicit value was used when adding a row. The computed column expression is evaluated and assigned whenever the row changes. On update column expression is used if row is updated, at least one column have a new value that is different from its previous value and value for this column is not set explicitly in update statement.</p><p>Identity, auto-increment, or generated as identity columns are columns with a sequence as the default. The column declared as the identity columns with <code>IDENTITY</code> data type or with <code>IDENTITY</code> () clause is implicitly the primary key column of this table. <code>AUTO_INCREMENT</code> and <code>GENERATED</code> clauses do not create the primary key constraint. <code>GENERATED ALWAYS</code> is accepted by treated in the same way as <code>GENERATED BY DEFAULT</code>.</p><p>The invisible column will not be displayed as a result of <code>SELECT</code> * query. Otherwise, it works as normal column.</p><p>The options <code>PRIMARY KEY, UNIQUE</code>, and <code>CHECK</code> are not supported for <code>ALTER</code> statements.</p><p>Check constraints can reference columns of the table, and they can reference objects that exist while the statement is executed. Conditions are only checked when a row is added or modified in the table where the constraint exists.</p>
 <p>Example:</p>
 <p class="notranslate">CREATE TABLE TEST(ID INT PRIMARY KEY, NAME VARCHAR(255) DEFAULT &#39;&#39;);<br />CREATE TABLE TEST(ID BIGINT IDENTITY);<br />CREATE TABLE TEST(QUANTITY INT, PRICE DECIMAL, AMOUNT DECIMAL AS QUANTITY*PRICE);</p>
 
@@ -1841,66 +1739,50 @@ syntax-end -->
 <h3 id="condition" class="notranslate" onclick="switchBnf(this)">Condition</h3>
 <!-- railroad-start -->
 <pre name="bnf" style="display: none">
-<a href="grammar.html#operand">operand</a> [ <a href="grammar.html#condition_right_hand_side">conditionRightHandSide</a> ]
-| NOT <a href="grammar.html#condition">condition</a>
-| EXISTS ( <a href="grammar.html#query">query</a> )
-| UNIQUE ( <a href="grammar.html#query">query</a> )
-| INTERSECTS (<a href="grammar.html#operand">operand</a>, <a href="grammar.html#operand">operand</a>)
+<a href="grammar.html#operand">operand</a> [ <a href="grammar.html#condition_right_hand_side">conditionRightHandSide</a> ] | NOT <a href="grammar.html#condition">condition</a> | EXISTS ( <a href="commands.html#select">select</a> )
 </pre>
 <div name="railroad">
-<table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><code class="c"><a href="grammar.html#operand">operand</a></code></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><code class="c"><a href="grammar.html#condition_right_hand_side">conditionRightHandSide</a></code></td><td class="le"></td></tr></table></td></tr></table></td><td class="te"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><code class="c">NOT <a href="grammar.html#condition">condition</a></code></td></tr></table></td><td class="ke"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><code class="c">EXISTS ( <a href="grammar.html#query">query</a> )</code></td></tr></table></td><td class="ke"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><code class="c">UNIQUE ( <a href="grammar.html#query">query</a> )</code></td></tr></table></td><td class="ke"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><code class="c">INTERSECTS ( <a href="grammar.html#operand">operand</a> , <a href="grammar.html#operand">operand</a> )</code></td></tr></table></td><td class="le"></td></tr></table>
+<table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><code class="c"><a href="grammar.html#operand">operand</a></code></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><code class="c"><a href="grammar.html#condition_right_hand_side">conditionRightHandSide</a></code></td><td class="le"></td></tr></table></td></tr></table></td><td class="te"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><code class="c">NOT <a href="grammar.html#condition">condition</a></code></td></tr></table></td><td class="ke"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><code class="c">EXISTS ( <a href="commands.html#select">select</a> )</code></td></tr></table></td><td class="le"></td></tr></table>
 </div>
 <!-- railroad-end -->
 <!-- syntax-start
 <pre>
-<a href="grammar.html#operand">operand</a> [ <a href="grammar.html#condition_right_hand_side">conditionRightHandSide</a> ]
-| NOT <a href="grammar.html#condition">condition</a>
-| EXISTS ( <a href="grammar.html#query">query</a> )
-| UNIQUE ( <a href="grammar.html#query">query</a> )
-| INTERSECTS (<a href="grammar.html#operand">operand</a>, <a href="grammar.html#operand">operand</a>)
+<a href="grammar.html#operand">operand</a> [ <a href="grammar.html#condition_right_hand_side">conditionRightHandSide</a> ] | NOT <a href="grammar.html#condition">condition</a> | EXISTS ( <a href="commands.html#select">select</a> )
 </pre>
 syntax-end -->
-<p>Boolean value or condition.</p><p><code>NOT</code> condition negates the result of subcondition and returns <code>TRUE, FALSE</code>, or <code>UNKNOWN</code> (<code>NULL</code>).</p><p><code>EXISTS</code> predicate tests whether the result of the specified subquery is not empty and returns <code>TRUE</code> or <code>FALSE</code>.</p><p><code>UNIQUE</code> predicate tests absence of duplicate rows in the specified subquery and returns <code>TRUE</code> or <code>FALSE</code>. Rows with <code>NULL</code> value in any column are ignored.</p><p><code>INTERSECTS</code> checks whether 2D bounding boxes of specified geometries intersects with each other and returns <code>TRUE</code> or <code>FALSE</code>.</p>
+<p>Boolean value or condition.</p>
 <p>Example:</p>
-<p class="notranslate">ID&lt;&gt;2<br />NOT(A OR B)<br />EXISTS (SELECT NULL FROM TEST T WHERE T.GROUP_ID = P.ID)<br />UNIQUE (SELECT A, B FROM TEST T WHERE T.CATEGORY = CAT)<br />INTERSECTS(GEOM1, GEOM2)</p>
+<p class="notranslate">ID&lt;&gt;2</p>
 
 <h3 id="condition_right_hand_side" class="notranslate" onclick="switchBnf(this)">Condition Right Hand Side</h3>
 <!-- railroad-start -->
 <pre name="bnf" style="display: none">
-<a href="grammar.html#compare">compare</a> { { { ALL | ANY | SOME } ( <a href="grammar.html#query">query</a> ) } | <a href="grammar.html#operand">operand</a> }
+<a href="grammar.html#compare">compare</a> { { { ALL | ANY | SOME } ( <a href="commands.html#select">select</a> ) } | <a href="grammar.html#operand">operand</a> }
 | IS [ NOT ] NULL
 | IS [ NOT ] [ DISTINCT FROM ] <a href="grammar.html#operand">operand</a>
-| IS [ NOT ] { TRUE | FALSE | UNKNOWN }
-| IS [ NOT ] OF (<a href="grammar.html#data_type">dataType</a> [,...])
-| IS [ NOT ] JSON [ VALUE | ARRAY | OBJECT | SCALAR ]
-    [ [ WITH | WITHOUT ] UNIQUE [ KEYS ] ]
 | BETWEEN <a href="grammar.html#operand">operand</a> AND <a href="grammar.html#operand">operand</a>
-| IN ( { <a href="grammar.html#query">query</a> | <a href="grammar.html#expression">expression</a> [,...] } )
+| IN ( { <a href="commands.html#select">select</a> | <a href="grammar.html#expression">expression</a> [,...] } )
 | [ NOT ] [ LIKE | ILIKE ] <a href="grammar.html#operand">operand</a> [ ESCAPE <a href="grammar.html#string">string</a> ]
 | [ NOT ] REGEXP <a href="grammar.html#operand">operand</a>
 </pre>
 <div name="railroad">
-<table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><code class="c"><a href="grammar.html#compare">compare</a></code></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d"><code class="c">ALL</code></td><td class="te"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><code class="c">ANY</code></td><td class="ke"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><code class="c">SOME</code></td><td class="le"></td></tr></table></td><td class="d"><code class="c">( <a href="grammar.html#query">query</a> )</code></td></tr></table></td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><code class="c"><a href="grammar.html#operand">operand</a></code></td><td class="le"></td></tr></table></td></tr></table></td><td class="te"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><code class="c">IS</code></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><code class="c">NOT</code></td><td class="le"></td></tr></table></td><td class="d"><code class="c">NULL</code></td></tr></table></td><td class="ke"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><code class="c">IS</code></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><code class="c">NOT</code></td><td class="le"></td></tr></table></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><code class="c">DISTINCT FROM</code></td></tr></table></td><td class="le"></td></tr></table></td><td class="d"><code class="c"><a href="grammar.html#operand">operand</a></code></td></tr></table></td><td class="ke"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><code class="c">IS</code></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><code class="c">NOT</code></td><td class="le"></td></tr></table></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d"><code class="c">TRUE</code></td><td class="te"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><code class="c">FALSE</code></td><td class="ke"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><code class="c">UNKNOWN</code></td><td class="le"></td></tr></table></td></tr></table></td><td class="ke"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><code class="c">IS</code></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><code class="c">NOT</code></td><td class="le"></td></tr></table></td><td class="d"><code class="c">OF ( <a href="grammar.html#data_type">dataType</a></code></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><code class="c">, ...</code></td><td class="le"></td></tr></table></td><td class="d"><code class="c">)</code></td></tr></table></td><td class="ke"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><code class="c">IS</code></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><code class="c">NOT</code></td><td class="le"></td></tr></table></td><td class="d"><code class="c">JSON</code></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d"><code class="c">VALUE</code></td><td class="te"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><code class="c">ARRAY</code></td><td class="ke"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><code class="c">OBJECT</code></td><td class="ke"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><code class="c">SCALAR</code></td><td class="le"></td></tr></table></td><td class="le"></td></tr></table></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d"><code class="c">WITH</code></td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><code class="c">WITHOUT</code></td><td class="le"></td></tr></table></td><td class="le"></td></tr></table></td><td class="d"><code class="c">UNIQUE</code></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><code class="c">KEYS</code></td><td class="le"></td></tr></table></td></tr></table></td><td class="le"></td></tr></table></td></tr></table></td><td class="ke"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><code class="c">BETWEEN <a href="grammar.html#operand">operand</a> AND <a href="grammar.html#operand">operand</a></code></td></tr></table></td><td class="ke"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><code class="c">IN (</code></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d"><code class="c"><a href="grammar.html#query">query</a></code></td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><code class="c"><a href="grammar.html#expression">expression</a></code></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><code class="c">, ...</code></td><td class="le"></td></tr></table></td></tr></table></td><td class="le"></td></tr></table></td><td class="d"><code class="c">)</code></td></tr></table></td><td class="ke"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><code class="c">NOT</code></td><td class="le"></td></tr></table></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d"><code class="c">LIKE</code></td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><code class="c">ILIKE</code></td><td class="le"></td></tr></table></td><td class="le"></td></tr></table></td><td class="d"><code class="c"><a href="grammar.html#operand">operand</a></code></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><code class="c">ESCAPE <a href="grammar.html#string">string</a></code></td></tr></table></td><td class="le"></td></tr></table></td></tr></table></td><td class="ke"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><code class="c">NOT</code></td><td class="le"></td></tr></table></td><td class="d"><code class="c">REGEXP <a href="grammar.html#operand">operand</a></code></td></tr></table></td><td class="le"></td></tr></table>
+<table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><code class="c"><a href="grammar.html#compare">compare</a></code></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d"><code class="c">ALL</code></td><td class="te"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><code class="c">ANY</code></td><td class="ke"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><code class="c">SOME</code></td><td class="le"></td></tr></table></td><td class="d"><code class="c">( <a href="commands.html#select">select</a> )</code></td></tr></table></td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><code class="c"><a href="grammar.html#operand">operand</a></code></td><td class="le"></td></tr></table></td></tr></table></td><td class="te"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><code class="c">IS</code></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><code class="c">NOT</code></td><td class="le"></td></tr></table></td><td class="d"><code class="c">NULL</code></td></tr></table></td><td class="ke"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><code class="c">IS</code></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><code class="c">NOT</code></td><td class="le"></td></tr></table></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><code class="c">DISTINCT FROM</code></td></tr></table></td><td class="le"></td></tr></table></td><td class="d"><code class="c"><a href="grammar.html#operand">operand</a></code></td></tr></table></td><td class="ke"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><code class="c">BETWEEN <a href="grammar.html#operand">operand</a> AND <a href="grammar.html#operand">operand</a></code></td></tr></table></td><td class="ke"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><code class="c">IN (</code></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d"><code class="c"><a href="commands.html#select">select</a></code></td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><code class="c"><a href="grammar.html#expression">expression</a></code></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><code class="c">, ...</code></td><td class="le"></td></tr></table></td></tr></table></td><td class="le"></td></tr></table></td><td class="d"><code class="c">)</code></td></tr></table></td><td class="ke"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><code class="c">NOT</code></td><td class="le"></td></tr></table></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d"><code class="c">LIKE</code></td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><code class="c">ILIKE</code></td><td class="le"></td></tr></table></td><td class="le"></td></tr></table></td><td class="d"><code class="c"><a href="grammar.html#operand">operand</a></code></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><code class="c">ESCAPE <a href="grammar.html#string">string</a></code></td></tr></table></td><td class="le"></td></tr></table></td></tr></table></td><td class="ke"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><code class="c">NOT</code></td><td class="le"></td></tr></table></td><td class="d"><code class="c">REGEXP <a href="grammar.html#operand">operand</a></code></td></tr></table></td><td class="le"></td></tr></table>
 </div>
 <!-- railroad-end -->
 <!-- syntax-start
 <pre>
-<a href="grammar.html#compare">compare</a> { { { ALL | ANY | SOME } ( <a href="grammar.html#query">query</a> ) } | <a href="grammar.html#operand">operand</a> }
+<a href="grammar.html#compare">compare</a> { { { ALL | ANY | SOME } ( <a href="commands.html#select">select</a> ) } | <a href="grammar.html#operand">operand</a> }
 | IS [ NOT ] NULL
 | IS [ NOT ] [ DISTINCT FROM ] <a href="grammar.html#operand">operand</a>
-| IS [ NOT ] { TRUE | FALSE | UNKNOWN }
-| IS [ NOT ] OF (<a href="grammar.html#data_type">dataType</a> [,...])
-| IS [ NOT ] JSON [ VALUE | ARRAY | OBJECT | SCALAR ]
-    [ [ WITH | WITHOUT ] UNIQUE [ KEYS ] ]
 | BETWEEN <a href="grammar.html#operand">operand</a> AND <a href="grammar.html#operand">operand</a>
-| IN ( { <a href="grammar.html#query">query</a> | <a href="grammar.html#expression">expression</a> [,...] } )
+| IN ( { <a href="commands.html#select">select</a> | <a href="grammar.html#expression">expression</a> [,...] } )
 | [ NOT ] [ LIKE | ILIKE ] <a href="grammar.html#operand">operand</a> [ ESCAPE <a href="grammar.html#string">string</a> ]
 | [ NOT ] REGEXP <a href="grammar.html#operand">operand</a>
 </pre>
 syntax-end -->
-<p>The right hand side of a condition.</p><p>Quantified comparison predicate <code>ALL</code> returns <code>TRUE</code> if specified comparison operation between left size of condition and each row from a subquery returns <code>TRUE</code>, including case when there are no rows. <code>ALL</code> predicate returns <code>FALSE</code> if at least one such comparison returns <code>FALSE</code>. Otherwise it returns <code>NULL</code>.</p><p>Quantified comparison predicates <code>ANY</code> and <code>SOME</code> return <code>TRUE</code> if specified comparison operation between left size of condition and at least one row from a subquery returns <code>TRUE</code>. <code>ANY</code> and <code>SOME</code> predicates return <code>FALSE</code> if all such comparisons return <code>FALSE</code>. Otherwise it returns <code>NULL</code>. Note that these predicates have priority over <code>ANY</code> and <code>SOME</code> aggregate functions with subquery on the right side. Use parentheses around aggregate function.</p><p>The conditions <code>IS [ NOT ] NULL</code> check whether the specified value(s) are <code>NULL</code> values. To test multiple values a row value must be specified. <code>IS NULL</code> returns <code>TRUE</code> if and only if all values are <code>NULL</code> values; otherwise it returns <code>FALSE</code>. <code>IS NOT NULL</code> returns <code>TRUE</code> if and only if all values are not <code>NULL</code> values; otherwise it returns <code>FALSE</code>.</p><p>The conditions <code>IS [ NOT ] DISTINCT FROM</code> are null-safe, meaning <code>NULL</code> is considered the same as <code>NULL</code>, and the condition never evaluates to <code>NULL</code>.</p><p>Boolean tests <code>IS [ NOT ] { TRUE | FALSE | UNKNOWN }</code> check whether the specified value is (not) <code>TRUE, FALSE</code>, or <code>UNKNOWN</code> (<code>NULL</code>) and return <code>TRUE</code> or <code>FALSE</code>.</p><p>The conditions <code>IS [ NOT ] OF</code> check whether the data type of the specified operand is one of the specified data types. Some data types have multiple names, these names are considered as equal here. Domains and their base data types are currently not distinguished from each other. Precision and scale are also ignored. If operand is <code>NULL</code>, the result is <code>NULL</code>.</p><p>The conditions <code>IS [ NOT ] JSON</code> check whether value of the specified string, binary data, or a <code>JSON</code> is a valid <code>JSON</code>. If <code>ARRAY, OBJECT</code>, or <code>SCALAR</code> is specified, only <code>JSON</code> items of the specified type are considered as valid. If <code>WITH UNIQUE [ KEYS ]</code> is specified only <code>JSON</code> with unique keys is considered as valid. These conditions aren&#39;t null-safe, they return <code>NULL</code> if operand is <code>NULL</code>.</p><p>When comparing with <code>LIKE</code>, the wildcards characters are <code>_</code> (any one character) and <code>%</code> (any characters). The database uses an index when comparing with <code>LIKE</code> except if the operand starts with a wildcard. To search for the characters <code>%</code> and <code>_</code>, the characters need to be escaped. The default escape character is <code> \ </code> (backslash). To select no escape character, use <code>ESCAPE &#39;&#39;</code> (empty string). At most one escape character is allowed. Each character that follows the escape character in the pattern needs to match exactly. Patterns that end with an escape character are invalid and the expression returns <code>NULL</code>.</p><p><code>ILIKE</code> does a case-insensitive compare.</p><p>When comparing with <code>REGEXP</code>, regular expression matching is used. See Java <code>Matcher.find</code> for details.</p>
+<p>The right hand side of a condition.</p><p>Quantified comparison predicate <code>ALL</code> returns <code>TRUE</code> if specified comparison operation between left size of condition and each row from a subquery returns <code>TRUE</code>, including case when there are no rows. <code>ALL</code> predicate returns <code>FALSE</code> if at least one such comparison returns <code>FALSE</code>. Otherwise it returns <code>NULL</code>.</p><p>Quantified comparison predicates <code>ANY</code> and <code>SOME</code> return <code>TRUE</code> if specified comparison operation between left size of condition and at least one row from a subquery returns <code>TRUE</code>. <code>ANY</code> and <code>SOME</code> predicates return <code>FALSE</code> if all such comparisons return <code>FALSE</code>. Otherwise it returns <code>NULL</code>. Note that these predicates have priority over <code>ANY</code> and <code>SOME</code> aggregate functions with subquery on the right side. Use parentheses around aggregate function.</p><p>The conditions <code>IS [ NOT ]</code> and <code>IS [ NOT ] DISTINCT FROM</code> are null-safe, meaning <code>NULL</code> is considered the same as <code>NULL</code>, and the condition never evaluates to <code>NULL</code>.</p><p>When comparing with <code>LIKE</code>, the wildcards characters are <code>_</code> (any one character) and <code>%</code> (any characters). The database uses an index when comparing with <code>LIKE</code> except if the operand starts with a wildcard. To search for the characters <code>%</code> and <code>_</code>, the characters need to be escaped. The default escape character is <code> \ </code> (backslash). To select no escape character, use <code>ESCAPE &#39;&#39;</code> (empty string). At most one escape character is allowed. Each character that follows the escape character in the pattern needs to match exactly. Patterns that end with an escape character are invalid and the expression returns <code>NULL</code>.</p><p><code>ILIKE</code> does a case-insensitive compare.</p><p>When comparing with <code>REGEXP</code>, regular expression matching is used. See Java <code>Matcher.find</code> for details.</p>
 <p>Example:</p>
-<p class="notranslate">VALUE &gt; 10<br />A IS NULL<br />(A, B) IS NOT NULL<br />A IS NOT DISTINCT FROM B<br />T IS OF (DATE, TIMESTAMP, TIMESTAMP WITH TIME ZONE)<br />T IS JSON OBJECT WITH UNIQUE KEYS<br />LIKE &#39;Jo%&#39;</p>
+<p class="notranslate">VALUE &gt; 10<br />A IS NOT DISTINCT FROM B<br />LIKE &#39;Jo%&#39;</p>
 
 <h3 id="constraint" class="notranslate" onclick="switchBnf(this)">Constraint</h3>
 <!-- railroad-start -->
@@ -1966,46 +1848,26 @@ syntax-end -->
 <p>Example:</p>
 <p class="notranslate">CALL CSVWRITE(&#39;test2.csv&#39;, &#39;SELECT * FROM TEST&#39;, &#39;charset=UTF-8 fieldSeparator=|&#39;);</p>
 
-<h3 id="data_change_delta_table" class="notranslate" onclick="switchBnf(this)">Data Change Delta Table</h3>
-<!-- railroad-start -->
-<pre name="bnf" style="display: none">
-{ OLD | NEW | FINAL } TABLE
-( { <a href="commands.html#insert">insert</a> | <a href="commands.html#update">update</a> | <a href="commands.html#delete">delete</a> | <a href="commands.html#merge_into">mergeInto</a> | <a href="commands.html#merge_using">mergeUsing</a> } )
-</pre>
-<div name="railroad">
-<table class="railroad"><tr class="railroad"><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d"><code class="c">OLD</code></td><td class="te"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><code class="c">NEW</code></td><td class="ke"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><code class="c">FINAL</code></td><td class="le"></td></tr></table></td><td class="d"><code class="c">TABLE</code></td></tr></table><br /><table class="railroad"><tr class="railroad"><td class="d"><code class="c">(</code></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d"><code class="c"><a href="commands.html#insert">insert</a></code></td><td class="te"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><code class="c"><a href="commands.html#update">update</a></code></td><td class="ke"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><code class="c"><a href="commands.html#delete">delete</a></code></td><td class="ke"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><code class="c"><a href="commands.html#merge_into">mergeInto</a></code></td><td class="ke"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><code class="c"><a href="commands.html#merge_using">mergeUsing</a></code></td><td class="le"></td></tr></table></td><td class="d"><code class="c">)</code></td></tr></table>
-</div>
-<!-- railroad-end -->
-<!-- syntax-start
-<pre>
-{ OLD | NEW | FINAL } TABLE
-( { <a href="commands.html#insert">insert</a> | <a href="commands.html#update">update</a> | <a href="commands.html#delete">delete</a> | <a href="commands.html#merge_into">mergeInto</a> | <a href="commands.html#merge_using">mergeUsing</a> } )
-</pre>
-syntax-end -->
-<p>Executes the inner data change command and returns old, new, or final rows.</p><p><code>OLD</code> is not allowed for <code>INSERT</code> command. It returns old rows.</p><p><code>NEW</code> and <code>FINAL</code> are not allowed for <code>DELETE</code> command.</p><p><code>NEW</code> returns new rows after evaluation of default expressions, but before execution of triggers.</p><p><code>FINAL</code> returns new rows after execution of triggers. If table or view has <code>INSTEAD OF</code> triggers <code>FINAL</code> is not allowed.</p>
-<p>Example:</p>
-<p class="notranslate">SELECT ID FROM FINAL TABLE (INSERT INTO TEST (A, B) VALUES (1, 2))</p>
-
 <h3 id="data_type" class="notranslate" onclick="switchBnf(this)">Data Type</h3>
 <!-- railroad-start -->
 <pre name="bnf" style="display: none">
 <a href="datatypes.html#int_type">intType</a> | <a href="datatypes.html#boolean_type">booleanType</a> | <a href="datatypes.html#tinyint_type">tinyintType</a> | <a href="datatypes.html#smallint_type">smallintType</a> | <a href="datatypes.html#bigint_type">bigintType</a> | <a href="datatypes.html#identity_type">identityType</a>
-| <a href="datatypes.html#decimal_type">decimalType</a> | <a href="datatypes.html#double_type">doubleType</a> | <a href="datatypes.html#real_type">realType</a> | <a href="datatypes.html#date_type">dateType</a> | <a href="datatypes.html#time_type">timeType</a>
-| <a href="datatypes.html#time_with_time_zone_type">timeWithTimeZoneType</a> | <a href="datatypes.html#timestamp_type">timestampType</a> | <a href="datatypes.html#timestamp_with_time_zone_type">timestampWithTimeZoneType</a>
-| <a href="datatypes.html#binary_type">binaryType</a> | <a href="datatypes.html#other_type">otherType</a> | <a href="datatypes.html#varchar_type">varcharType</a> | <a href="datatypes.html#varchar_ignorecase_type">varcharIgnorecaseType</a> | <a href="datatypes.html#char_type">charType</a>
-| <a href="datatypes.html#blob_type">blobType</a> | <a href="datatypes.html#clob_type">clobType</a> | <a href="datatypes.html#uuid_type">uuidType</a> | <a href="datatypes.html#array_type">arrayType</a> | <a href="datatypes.html#enum_type">enumType</a> | <a href="datatypes.html#interval_type">intervalType</a>
+| <a href="datatypes.html#decimal_type">decimalType</a> | <a href="datatypes.html#double_type">doubleType</a> | <a href="datatypes.html#real_type">realType</a> | <a href="datatypes.html#date_type">dateType</a> | <a href="datatypes.html#time_type">timeType</a> | <a href="datatypes.html#timestamp_type">timestampType</a>
+| <a href="datatypes.html#timestamp_with_time_zone_type">timestampWithTimeZoneType</a> | <a href="datatypes.html#binary_type">binaryType</a> | <a href="datatypes.html#other_type">otherType</a> | <a href="datatypes.html#varchar_type">varcharType</a>
+| <a href="datatypes.html#varchar_ignorecase_type">varcharIgnorecaseType</a> | <a href="datatypes.html#char_type">charType</a> | <a href="datatypes.html#blob_type">blobType</a> | <a href="datatypes.html#clob_type">clobType</a> | <a href="datatypes.html#uuid_type">uuidType</a>
+| <a href="datatypes.html#array_type">arrayType</a> | <a href="datatypes.html#enum_type">enumType</a> | <a href="datatypes.html#interval_type">intervalType</a>
 </pre>
 <div name="railroad">
-<table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d"><code class="c"><a href="datatypes.html#int_type">intType</a></code></td><td class="te"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><code class="c"><a href="datatypes.html#boolean_type">booleanType</a></code></td><td class="ke"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><code class="c"><a href="datatypes.html#tinyint_type">tinyintType</a></code></td><td class="ke"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><code class="c"><a href="datatypes.html#smallint_type">smallintType</a></code></td><td class="ke"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><code class="c"><a href="datatypes.html#bigint_type">bigintType</a></code></td><td class="ke"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><code class="c"><a href="datatypes.html#identity_type">identityType</a></code></td><td class="ke"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><code class="c"><a href="datatypes.html#decimal_type">decimalType</a></code></td><td class="ke"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><code class="c"><a href="datatypes.html#double_type">doubleType</a></code></td><td class="ke"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><code class="c"><a href="datatypes.html#real_type">realType</a></code></td><td class="ke"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><code class="c"><a href="datatypes.html#date_type">dateType</a></code></td><td class="ke"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><code class="c"><a href="datatypes.html#time_type">timeType</a></code></td><td class="ke"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><code class="c"><a href="datatypes.html#time_with_time_zone_type">timeWithTimeZoneType</a></code></td><td class="ke"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><code class="c"><a href="datatypes.html#timestamp_type">timestampType</a></code></td><td class="ke"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><code class="c"><a href="datatypes.html#timestamp_with_time_zone_type">timestampWithTimeZoneType</a></code></td><td class="ke"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><code class="c"><a href="datatypes.html#binary_type">binaryType</a></code></td><td class="ke"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><code class="c"><a href="datatypes.html#other_type">otherType</a></code></td><td class="ke"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><code class="c"><a href="datatypes.html#varchar_type">varcharType</a></code></td><td class="ke"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><code class="c"><a href="datatypes.html#varchar_ignorecase_type">varcharIgnorecaseType</a></code></td><td class="ke"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><code class="c"><a href="datatypes.html#char_type">charType</a></code></td><td class="ke"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><code class="c"><a href="datatypes.html#blob_type">blobType</a></code></td><td class="ke"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><code class="c"><a href="datatypes.html#clob_type">clobType</a></code></td><td class="ke"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><code class="c"><a href="datatypes.html#uuid_type">uuidType</a></code></td><td class="ke"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><code class="c"><a href="datatypes.html#array_type">arrayType</a></code></td><td class="ke"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><code class="c"><a href="datatypes.html#enum_type">enumType</a></code></td><td class="ke"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><code class="c"><a href="datatypes.html#interval_type">intervalType</a></code></td><td class="le"></td></tr></table>
+<table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d"><code class="c"><a href="datatypes.html#int_type">intType</a></code></td><td class="te"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><code class="c"><a href="datatypes.html#boolean_type">booleanType</a></code></td><td class="ke"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><code class="c"><a href="datatypes.html#tinyint_type">tinyintType</a></code></td><td class="ke"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><code class="c"><a href="datatypes.html#smallint_type">smallintType</a></code></td><td class="ke"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><code class="c"><a href="datatypes.html#bigint_type">bigintType</a></code></td><td class="ke"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><code class="c"><a href="datatypes.html#identity_type">identityType</a></code></td><td class="ke"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><code class="c"><a href="datatypes.html#decimal_type">decimalType</a></code></td><td class="ke"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><code class="c"><a href="datatypes.html#double_type">doubleType</a></code></td><td class="ke"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><code class="c"><a href="datatypes.html#real_type">realType</a></code></td><td class="ke"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><code class="c"><a href="datatypes.html#date_type">dateType</a></code></td><td class="ke"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><code class="c"><a href="datatypes.html#time_type">timeType</a></code></td><td class="ke"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><code class="c"><a href="datatypes.html#timestamp_type">timestampType</a></code></td><td class="ke"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><code class="c"><a href="datatypes.html#timestamp_with_time_zone_type">timestampWithTimeZoneType</a></code></td><td class="ke"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><code class="c"><a href="datatypes.html#binary_type">binaryType</a></code></td><td class="ke"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><code class="c"><a href="datatypes.html#other_type">otherType</a></code></td><td class="ke"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><code class="c"><a href="datatypes.html#varchar_type">varcharType</a></code></td><td class="ke"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><code class="c"><a href="datatypes.html#varchar_ignorecase_type">varcharIgnorecaseType</a></code></td><td class="ke"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><code class="c"><a href="datatypes.html#char_type">charType</a></code></td><td class="ke"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><code class="c"><a href="datatypes.html#blob_type">blobType</a></code></td><td class="ke"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><code class="c"><a href="datatypes.html#clob_type">clobType</a></code></td><td class="ke"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><code class="c"><a href="datatypes.html#uuid_type">uuidType</a></code></td><td class="ke"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><code class="c"><a href="datatypes.html#array_type">arrayType</a></code></td><td class="ke"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><code class="c"><a href="datatypes.html#enum_type">enumType</a></code></td><td class="ke"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><code class="c"><a href="datatypes.html#interval_type">intervalType</a></code></td><td class="le"></td></tr></table>
 </div>
 <!-- railroad-end -->
 <!-- syntax-start
 <pre>
 <a href="datatypes.html#int_type">intType</a> | <a href="datatypes.html#boolean_type">booleanType</a> | <a href="datatypes.html#tinyint_type">tinyintType</a> | <a href="datatypes.html#smallint_type">smallintType</a> | <a href="datatypes.html#bigint_type">bigintType</a> | <a href="datatypes.html#identity_type">identityType</a>
-| <a href="datatypes.html#decimal_type">decimalType</a> | <a href="datatypes.html#double_type">doubleType</a> | <a href="datatypes.html#real_type">realType</a> | <a href="datatypes.html#date_type">dateType</a> | <a href="datatypes.html#time_type">timeType</a>
-| <a href="datatypes.html#time_with_time_zone_type">timeWithTimeZoneType</a> | <a href="datatypes.html#timestamp_type">timestampType</a> | <a href="datatypes.html#timestamp_with_time_zone_type">timestampWithTimeZoneType</a>
-| <a href="datatypes.html#binary_type">binaryType</a> | <a href="datatypes.html#other_type">otherType</a> | <a href="datatypes.html#varchar_type">varcharType</a> | <a href="datatypes.html#varchar_ignorecase_type">varcharIgnorecaseType</a> | <a href="datatypes.html#char_type">charType</a>
-| <a href="datatypes.html#blob_type">blobType</a> | <a href="datatypes.html#clob_type">clobType</a> | <a href="datatypes.html#uuid_type">uuidType</a> | <a href="datatypes.html#array_type">arrayType</a> | <a href="datatypes.html#enum_type">enumType</a> | <a href="datatypes.html#interval_type">intervalType</a>
+| <a href="datatypes.html#decimal_type">decimalType</a> | <a href="datatypes.html#double_type">doubleType</a> | <a href="datatypes.html#real_type">realType</a> | <a href="datatypes.html#date_type">dateType</a> | <a href="datatypes.html#time_type">timeType</a> | <a href="datatypes.html#timestamp_type">timestampType</a>
+| <a href="datatypes.html#timestamp_with_time_zone_type">timestampWithTimeZoneType</a> | <a href="datatypes.html#binary_type">binaryType</a> | <a href="datatypes.html#other_type">otherType</a> | <a href="datatypes.html#varchar_type">varcharType</a>
+| <a href="datatypes.html#varchar_ignorecase_type">varcharIgnorecaseType</a> | <a href="datatypes.html#char_type">charType</a> | <a href="datatypes.html#blob_type">blobType</a> | <a href="datatypes.html#clob_type">clobType</a> | <a href="datatypes.html#uuid_type">uuidType</a>
+| <a href="datatypes.html#array_type">arrayType</a> | <a href="datatypes.html#enum_type">enumType</a> | <a href="datatypes.html#interval_type">intervalType</a>
 </pre>
 syntax-end -->
 <p>A data type definition.</p>
@@ -2066,41 +1928,23 @@ syntax-end -->
 <p>Example:</p>
 <p class="notranslate">ID * 10</p>
 
-<h3 id="grouping_element" class="notranslate" onclick="switchBnf(this)">Grouping element</h3>
-<!-- railroad-start -->
-<pre name="bnf" style="display: none">
-<a href="grammar.html#expression">expression</a> | (<a href="grammar.html#expression">expression</a> [, ...]) | ()
-</pre>
-<div name="railroad">
-<table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d"><code class="c"><a href="grammar.html#expression">expression</a></code></td><td class="te"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><code class="c">( <a href="grammar.html#expression">expression</a></code></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><code class="c">, ...</code></td></tr></table></td><td class="le"></td></tr></table></td><td class="d"><code class="c">)</code></td></tr></table></td><td class="ke"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><code class="c">( )</code></td></tr></table></td><td class="le"></td></tr></table>
-</div>
-<!-- railroad-end -->
-<!-- syntax-start
-<pre>
-<a href="grammar.html#expression">expression</a> | (<a href="grammar.html#expression">expression</a> [, ...]) | ()
-</pre>
-syntax-end -->
-<p>A grouping element of <code>GROUP BY</code> clause.</p>
-<p>Example:</p>
-<p class="notranslate">A<br />(B, C)<br />()</p>
-
 <h3 id="hex" class="notranslate" onclick="switchBnf(this)">Hex</h3>
 <!-- railroad-start -->
 <pre name="bnf" style="display: none">
-[&#39; &#39; [...]] { { <a href="grammar.html#digit">digit</a> | a-f | A-F } [&#39; &#39; [...]] { <a href="grammar.html#digit">digit</a> | a-f | A-F } [&#39; &#39; [...]] } [...]
+{ { <a href="grammar.html#digit">digit</a> | a-f | A-F } { <a href="grammar.html#digit">digit</a> | a-f | A-F } } [...]
 </pre>
 <div name="railroad">
-<table class="railroad"><tr class="railroad"><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><code class="c">&#39; &#39;</code></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><code class="c">...</code></td><td class="le"></td></tr></table></td></tr></table></td><td class="le"></td></tr></table></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d"><code class="c"><a href="grammar.html#digit">digit</a></code></td><td class="te"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><code class="c">a - f</code></td></tr></table></td><td class="ke"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><code class="c">A-F</code></td><td class="le"></td></tr></table></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><code class="c">&#39; &#39;</code></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><code class="c">...</code></td><td class="le"></td></tr></table></td></tr></table></td><td class="le"></td></tr></table></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d"><code class="c"><a href="grammar.html#digit">digit</a></code></td><td class="te"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><code class="c">a - f</code></td></tr></table></td><td class="ke"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><code class="c">A-F</code></td><td class="le"></td></tr></table></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><code class="c">&#39; &#39;</code></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><code class="c">...</code></td><td class="le"></td></tr></table></td></tr></table></td><td class="le"></td></tr></table></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><code class="c">...</code></td><td class="le"></td></tr></table></td></tr></table>
+<table class="railroad"><tr class="railroad"><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d"><code class="c"><a href="grammar.html#digit">digit</a></code></td><td class="te"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><code class="c">a - f</code></td></tr></table></td><td class="ke"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><code class="c">A-F</code></td><td class="le"></td></tr></table></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d"><code class="c"><a href="grammar.html#digit">digit</a></code></td><td class="te"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><code class="c">a - f</code></td></tr></table></td><td class="ke"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><code class="c">A-F</code></td><td class="le"></td></tr></table></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><code class="c">...</code></td><td class="le"></td></tr></table></td></tr></table>
 </div>
 <!-- railroad-end -->
 <!-- syntax-start
 <pre>
-[&#39; &#39; [...]] { { <a href="grammar.html#digit">digit</a> | a-f | A-F } [&#39; &#39; [...]] { <a href="grammar.html#digit">digit</a> | a-f | A-F } [&#39; &#39; [...]] } [...]
+{ { <a href="grammar.html#digit">digit</a> | a-f | A-F } { <a href="grammar.html#digit">digit</a> | a-f | A-F } } [...]
 </pre>
 syntax-end -->
-<p>The hexadecimal representation of a number or of bytes with optional space characters. Two hexadecimal digit characters are one byte.</p>
+<p>The hexadecimal representation of a number or of bytes. Two characters are one byte.</p>
 <p>Example:</p>
-<p class="notranslate">cafe<br />11 22 33<br />a b &nbsp;c d</p>
+<p class="notranslate">cafe</p>
 
 <h3 id="index_column" class="notranslate" onclick="switchBnf(this)">Index Column</h3>
 <!-- railroad-start -->
@@ -2124,17 +1968,17 @@ syntax-end -->
 <!-- railroad-start -->
 <pre name="bnf" style="display: none">
 { [ ( <a href="grammar.html#name">columnName</a> [,...] ) ]
-{ <a href="grammar.html#insert_values">insertValues</a> | [ DIRECT ] [ SORTED ] <a href="grammar.html#query">query</a> | DEFAULT VALUES } }
+{ <a href="grammar.html#insert_values">insertValues</a> | [ DIRECT ] [ SORTED ] <a href="commands.html#select">select</a> | DEFAULT VALUES } }
 | { SET { <a href="grammar.html#name">columnName</a> = { DEFAULT | <a href="grammar.html#expression">expression</a> } } [,...] }
 </pre>
 <div name="railroad">
-<table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><code class="c">( <a href="grammar.html#name">columnName</a></code></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><code class="c">, ...</code></td><td class="le"></td></tr></table></td><td class="d"><code class="c">)</code></td></tr></table></td><td class="le"></td></tr></table></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d"><code class="c"><a href="grammar.html#insert_values">insertValues</a></code></td><td class="te"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><code class="c">DIRECT</code></td><td class="le"></td></tr></table></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><code class="c">SORTED</code></td><td class="le"></td></tr></table></td><td class="d"><code class="c"><a href="grammar.html#query">query</a></code></td></tr></table></td><td class="ke"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><code class="c">DEFAULT VALUES</code></td></tr></table></td><td class="le"></td></tr></table></td></tr></table></td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><code class="c">SET <a href="grammar.html#name">columnName</a> =</code></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d"><code class="c">DEFAULT</code></td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><code class="c"><a href="grammar.html#expression">expression</a></code></td><td class="le"></td></tr></table></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><code class="c">, ...</code></td><td class="le"></td></tr></table></td></tr></table></td><td class="le"></td></tr></table>
+<table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><code class="c">( <a href="grammar.html#name">columnName</a></code></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><code class="c">, ...</code></td><td class="le"></td></tr></table></td><td class="d"><code class="c">)</code></td></tr></table></td><td class="le"></td></tr></table></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d"><code class="c"><a href="grammar.html#insert_values">insertValues</a></code></td><td class="te"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><code class="c">DIRECT</code></td><td class="le"></td></tr></table></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><code class="c">SORTED</code></td><td class="le"></td></tr></table></td><td class="d"><code class="c"><a href="commands.html#select">select</a></code></td></tr></table></td><td class="ke"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><code class="c">DEFAULT VALUES</code></td></tr></table></td><td class="le"></td></tr></table></td></tr></table></td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><code class="c">SET <a href="grammar.html#name">columnName</a> =</code></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d"><code class="c">DEFAULT</code></td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><code class="c"><a href="grammar.html#expression">expression</a></code></td><td class="le"></td></tr></table></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><code class="c">, ...</code></td><td class="le"></td></tr></table></td></tr></table></td><td class="le"></td></tr></table>
 </div>
 <!-- railroad-end -->
 <!-- syntax-start
 <pre>
 { [ ( <a href="grammar.html#name">columnName</a> [,...] ) ]
-{ <a href="grammar.html#insert_values">insertValues</a> | [ DIRECT ] [ SORTED ] <a href="grammar.html#query">query</a> | DEFAULT VALUES } }
+{ <a href="grammar.html#insert_values">insertValues</a> | [ DIRECT ] [ SORTED ] <a href="commands.html#select">select</a> | DEFAULT VALUES } }
 | { SET { <a href="grammar.html#name">columnName</a> = { DEFAULT | <a href="grammar.html#expression">expression</a> } } [,...] }
 </pre>
 syntax-end -->
@@ -2159,24 +2003,6 @@ syntax-end -->
 <p>Values for <code>INSERT</code> statement.</p>
 <p>Example:</p>
 <p class="notranslate">VALUES (1, &#39;Test&#39;)</p>
-
-<h3 id="join_specification" class="notranslate" onclick="switchBnf(this)">Join specification</h3>
-<!-- railroad-start -->
-<pre name="bnf" style="display: none">
-ON <a href="grammar.html#expression">expression</a> | USING (<a href="grammar.html#name">columnName</a> [,...])
-</pre>
-<div name="railroad">
-<table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><code class="c">ON <a href="grammar.html#expression">expression</a></code></td></tr></table></td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><code class="c">USING ( <a href="grammar.html#name">columnName</a></code></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><code class="c">, ...</code></td><td class="le"></td></tr></table></td><td class="d"><code class="c">)</code></td></tr></table></td><td class="le"></td></tr></table>
-</div>
-<!-- railroad-end -->
-<!-- syntax-start
-<pre>
-ON <a href="grammar.html#expression">expression</a> | USING (<a href="grammar.html#name">columnName</a> [,...])
-</pre>
-syntax-end -->
-<p>Specifies a join condition or column names.</p>
-<p>Example:</p>
-<p class="notranslate">ON B.ID = A.PARENT_ID<br />USING (ID)</p>
 
 <h3 id="merge_when_clause" class="notranslate" onclick="switchBnf(this)">Merge when clause</h3>
 <!-- railroad-start -->
@@ -2216,7 +2042,7 @@ UPDATE SET <a href="grammar.html#set_clause_list">setClauseList</a>
 | {UPDATE SET <a href="grammar.html#set_clause_list">setClauseList</a> [ WHERE <a href="grammar.html#expression">expression</a> ] DELETE [ WHERE <a href="grammar.html#expression">expression</a> ]}
 </pre>
 syntax-end -->
-<p><code>WHEN MATCHED</code> clause for <code>MERGE USING</code> command.</p><p>If both <code>UPDATE</code> and <code>DELETE</code> are specified, <code>DELETE</code> can delete only rows that were updated, <code>WHERE</code> condition in <code>DELETE</code> clause can be used to specify which updated rows should be deleted. This condition checks values in updated row. Such combination of <code>UPDATE</code> and <code>DELETE</code> clauses in single <code>WHEN MATCHED</code> clause is not allowed when <code>MERGE</code> statement is included into data change delta table.</p>
+<p><code>WHEN MATCHED</code> clause for <code>MERGE USING</code> command.</p><p>If both <code>UPDATE</code> and <code>DELETE</code> are specified, <code>DELETE</code> can delete only rows that were updated, <code>WHERE</code> condition in <code>DELETE</code> clause can be used to specify which updated rows should be deleted. This condition checks values in updated row.</p>
 <p>Example:</p>
 <p class="notranslate">WHEN MATCHED THEN UPDATE SET VALUE = S.VALUE<br />WHEN MATCHED THEN DELETE</p>
 
@@ -2252,7 +2078,7 @@ syntax-end -->
 { { A-Z|_ } [ { A-Z|_|0-9 } [...] ] } | <a href="grammar.html#quoted_name">quotedName</a>
 </pre>
 syntax-end -->
-<p>With default settings unquoted names are converted to upper case. There is no maximum name length.</p><p>Identifiers in H2 are case sensitive by default. Because unquoted names are converted to upper case, they can be written in any case anyway. When both quoted and unquoted names are used for the same identifier the quoted names must be written in upper case. Identifiers with lowercase characters can be written only as a quoted name, they aren&#39;t accessible with unquoted names.</p><p>If <code>DATABASE_TO_UPPER</code> setting is set to <code>FALSE</code> the unquoted names aren&#39;t converted to upper case.</p><p>If <code>DATABASE_TO_LOWER</code> setting is set to <code>TRUE</code> the unquoted names are converted to lower case instead.</p><p>If <code>CASE_INSENSITIVE_IDENTIFIERS</code> setting is set to <code>TRUE</code> all identifiers are case insensitive.</p>
+<p>Names are not case sensitive. There is no maximum name length.</p>
 <p>Example:</p>
 <p class="notranslate">TEST</p>
 
@@ -2270,9 +2096,9 @@ syntax-end -->
 <a href="grammar.html#summand">summand</a> [ { || <a href="grammar.html#summand">summand</a> } [...] ]
 </pre>
 syntax-end -->
-<p>Performs the concatenation of character string, binary string, or array values. In the default mode, the result is <code>NULL</code> if either parameter is <code>NULL</code>. In compatibility modes result of string concatenation with <code>NULL</code> parameter can be different.</p>
+<p>A value or a concatenation of values. In the default mode, the result is <code>NULL</code> if either parameter is <code>NULL</code>.</p>
 <p>Example:</p>
-<p class="notranslate">&#39;Hi&#39; || &#39; Eva&#39;<br />X&#39;AB&#39; || X&#39;CD&#39;<br />ARRAY[1, 2] || 3<br />1 || ARRAY[2, 3]<br />ARRAY[1, 2] || ARRAY[3, 4]</p>
+<p class="notranslate">&#39;Hi&#39; || &#39; Eva&#39;</p>
 
 <h3 id="order" class="notranslate" onclick="switchBnf(this)">Order</h3>
 <!-- railroad-start -->
@@ -2292,24 +2118,6 @@ syntax-end -->
 <p>Example:</p>
 <p class="notranslate">NAME DESC NULLS LAST</p>
 
-<h3 id="query" class="notranslate" onclick="switchBnf(this)">Query</h3>
-<!-- railroad-start -->
-<pre name="bnf" style="display: none">
-<a href="commands.html#select">select</a> | <a href="commands.html#explicit_table">explicitTable</a> | <a href="commands.html#table_value">tableValue</a>
-</pre>
-<div name="railroad">
-<table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d"><code class="c"><a href="commands.html#select">select</a></code></td><td class="te"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><code class="c"><a href="commands.html#explicit_table">explicitTable</a></code></td><td class="ke"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><code class="c"><a href="commands.html#table_value">tableValue</a></code></td><td class="le"></td></tr></table>
-</div>
-<!-- railroad-end -->
-<!-- syntax-start
-<pre>
-<a href="commands.html#select">select</a> | <a href="commands.html#explicit_table">explicitTable</a> | <a href="commands.html#table_value">tableValue</a>
-</pre>
-syntax-end -->
-<p>A query, such as <code>SELECT</code>, explicit table, or table value.</p>
-<p>Example:</p>
-<p class="notranslate">SELECT ID FROM TEST;<br />TABLE TEST;<br />VALUES (1, 2), (3, 4);</p>
-
 <h3 id="quoted_name" class="notranslate" onclick="switchBnf(this)">Quoted Name</h3>
 <!-- railroad-start -->
 <pre name="bnf" style="display: none">
@@ -2324,7 +2132,7 @@ syntax-end -->
 &quot;anything&quot;
 </pre>
 syntax-end -->
-<p>Case of characters in quoted names is preserved as is. Such names can contain spaces. There is no maximum name length. Two double quotes can be used to create a single double quote inside an identifier. With default settings identifiers in H2 are case sensitive.</p>
+<p>Quoted names are case sensitive, and can contain spaces. There is no maximum name length. Two double quotes can be used to create a single double quote inside an identifier.</p>
 <p>Example:</p>
 <p class="notranslate">&quot;FirstName&quot;</p>
 
@@ -2428,89 +2236,53 @@ syntax-end -->
 <p>Example:</p>
 <p class="notranslate">ID AS VALUE</p>
 
-<h3 id="sequence_value_expression" class="notranslate" onclick="switchBnf(this)">Sequence value expression</h3>
-<!-- railroad-start -->
-<pre name="bnf" style="display: none">
-{ NEXT | CURRENT } VALUE FOR [<a href="grammar.html#name">schemaName</a>.]<a href="grammar.html#name">sequenceName</a>
-</pre>
-<div name="railroad">
-<table class="railroad"><tr class="railroad"><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d"><code class="c">NEXT</code></td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><code class="c">CURRENT</code></td><td class="le"></td></tr></table></td><td class="d"><code class="c">VALUE FOR</code></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><code class="c"><a href="grammar.html#name">schemaName</a> .</code></td></tr></table></td><td class="le"></td></tr></table></td><td class="d"><code class="c"><a href="grammar.html#name">sequenceName</a></code></td></tr></table>
-</div>
-<!-- railroad-end -->
-<!-- syntax-start
-<pre>
-{ NEXT | CURRENT } VALUE FOR [<a href="grammar.html#name">schemaName</a>.]<a href="grammar.html#name">sequenceName</a>
-</pre>
-syntax-end -->
-<p>The next or current value of a sequence.</p><p>When the next value is requested the sequence is incremented and the current value of the sequence and the last identity in the current session are updated with the generated value. Used values are never re-used, even when the transaction is rolled back.</p><p>Current value may only be requested after generation of the sequence value in the current session. It returns the latest generated value for the current session.</p><p>If a single command contains next and current value expressions for the same sequence there is no guarantee that the next value expression will be evaluated before the evaluation of current value expression.</p>
-<p>Example:</p>
-<p class="notranslate">NEXT VALUE FOR SEQ1<br />CURRENT VALUE FOR SCHEMA2.SEQ2</p>
-
 <h3 id="sequence_options" class="notranslate" onclick="switchBnf(this)">Sequence options</h3>
 <!-- railroad-start -->
 <pre name="bnf" style="display: none">
-<a href="grammar.html#sequence_option">sequenceOption</a> [...]
+[ START WITH <a href="grammar.html#long">long</a> ]
+[ INCREMENT BY <a href="grammar.html#long">long</a> ]
+[ MINVALUE <a href="grammar.html#long">long</a> | NOMINVALUE | NO MINVALUE ]
+[ MAXVALUE <a href="grammar.html#long">long</a> | NOMAXVALUE | NO MAXVALUE ]
+[ CYCLE <a href="grammar.html#long">long</a> | NOCYCLE | NO CYCLE ]
+[ CACHE <a href="grammar.html#long">long</a> | NOCACHE | NO CACHE ]
 </pre>
 <div name="railroad">
-<table class="railroad"><tr class="railroad"><td class="d"><code class="c"><a href="grammar.html#sequence_option">sequenceOption</a></code></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><code class="c">...</code></td><td class="le"></td></tr></table></td></tr></table>
+<table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><code class="c">START WITH <a href="grammar.html#long">long</a></code></td></tr></table></td><td class="le"></td></tr></table><br /><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><code class="c">INCREMENT BY <a href="grammar.html#long">long</a></code></td></tr></table></td><td class="le"></td></tr></table><br /><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><code class="c">MINVALUE <a href="grammar.html#long">long</a></code></td></tr></table></td><td class="te"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><code class="c">NOMINVALUE</code></td><td class="ke"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><code class="c">NO MINVALUE</code></td></tr></table></td><td class="le"></td></tr></table></td><td class="le"></td></tr></table><br /><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><code class="c">MAXVALUE <a href="grammar.html#long">long</a></code></td></tr></table></td><td class="te"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><code class="c">NOMAXVALUE</code></td><td class="ke"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><code class="c">NO MAXVALUE</code></td></tr></table></td><td class="le"></td></tr></table></td><td class="le"></td></tr></table><br /><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><code class="c">CYCLE <a href="grammar.html#long">long</a></code></td></tr></table></td><td class="te"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><code class="c">NOCYCLE</code></td><td class="ke"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><code class="c">NO CYCLE</code></td></tr></table></td><td class="le"></td></tr></table></td><td class="le"></td></tr></table><br /><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><code class="c">CACHE <a href="grammar.html#long">long</a></code></td></tr></table></td><td class="te"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><code class="c">NOCACHE</code></td><td class="ke"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><code class="c">NO CACHE</code></td></tr></table></td><td class="le"></td></tr></table></td><td class="le"></td></tr></table>
 </div>
 <!-- railroad-end -->
 <!-- syntax-start
 <pre>
-<a href="grammar.html#sequence_option">sequenceOption</a> [...]
+[ START WITH <a href="grammar.html#long">long</a> ]
+[ INCREMENT BY <a href="grammar.html#long">long</a> ]
+[ MINVALUE <a href="grammar.html#long">long</a> | NOMINVALUE | NO MINVALUE ]
+[ MAXVALUE <a href="grammar.html#long">long</a> | NOMAXVALUE | NO MAXVALUE ]
+[ CYCLE <a href="grammar.html#long">long</a> | NOCYCLE | NO CYCLE ]
+[ CACHE <a href="grammar.html#long">long</a> | NOCACHE | NO CACHE ]
 </pre>
 syntax-end -->
 <p>Options of a sequence.</p>
 <p>Example:</p>
-<p class="notranslate">START WITH 1<br />START WITH 10 INCREMENT BY 10</p>
-
-<h3 id="sequence_option" class="notranslate" onclick="switchBnf(this)">Sequence option</h3>
-<!-- railroad-start -->
-<pre name="bnf" style="display: none">
-{ START | RESTART } WITH <a href="grammar.html#long">long</a>
-| INCREMENT BY <a href="grammar.html#long">long</a>
-| MINVALUE <a href="grammar.html#long">long</a> | NO MINVALUE | NOMINVALUE
-| MAXVALUE <a href="grammar.html#long">long</a> | NO MAXVALUE | NOMAXVALUE
-| CYCLE | NO CYCLE | NOCYCLE
-| CACHE <a href="grammar.html#long">long</a> | NO CACHE | NOCACHE
-</pre>
-<div name="railroad">
-<table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d"><code class="c">START</code></td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><code class="c">RESTART</code></td><td class="le"></td></tr></table></td><td class="d"><code class="c">WITH <a href="grammar.html#long">long</a></code></td></tr></table></td><td class="te"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><code class="c">INCREMENT BY <a href="grammar.html#long">long</a></code></td></tr></table></td><td class="ke"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><code class="c">MINVALUE <a href="grammar.html#long">long</a></code></td></tr></table></td><td class="ke"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><code class="c">NO MINVALUE</code></td></tr></table></td><td class="ke"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><code class="c">NOMINVALUE</code></td><td class="ke"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><code class="c">MAXVALUE <a href="grammar.html#long">long</a></code></td></tr></table></td><td class="ke"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><code class="c">NO MAXVALUE</code></td></tr></table></td><td class="ke"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><code class="c">NOMAXVALUE</code></td><td class="ke"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><code class="c">CYCLE</code></td><td class="ke"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><code class="c">NO CYCLE</code></td></tr></table></td><td class="ke"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><code class="c">NOCYCLE</code></td><td class="ke"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><code class="c">CACHE <a href="grammar.html#long">long</a></code></td></tr></table></td><td class="ke"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><code class="c">NO CACHE</code></td></tr></table></td><td class="ke"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><code class="c">NOCACHE</code></td><td class="le"></td></tr></table>
-</div>
-<!-- railroad-end -->
-<!-- syntax-start
-<pre>
-{ START | RESTART } WITH <a href="grammar.html#long">long</a>
-| INCREMENT BY <a href="grammar.html#long">long</a>
-| MINVALUE <a href="grammar.html#long">long</a> | NO MINVALUE | NOMINVALUE
-| MAXVALUE <a href="grammar.html#long">long</a> | NO MAXVALUE | NOMAXVALUE
-| CYCLE | NO CYCLE | NOCYCLE
-| CACHE <a href="grammar.html#long">long</a> | NO CACHE | NOCACHE
-</pre>
-syntax-end -->
-<p>Option of a sequence.</p><p><code>START WITH</code> and <code>RESTART WITH</code> are used to set the first generated value of the sequence. <code>START WITH</code> may only be used in <code>CREATE SEQUENCE</code> command and it column definition, <code>RESTART WITH</code> may only be used in <code>ALTER SEQUENCE</code> command. The default is <code>MINVALUE</code> for incrementing sequences and <code>MAXVALUE</code> for decrementing sequences.</p><p><code>INCREMENT BY</code> specifies the step of the sequence, may be positive or negative, but may not be zero. The default is 1.</p><p><code>MINVALUE</code> and <code>MAXVALUE</code> specify the bounds of the sequence.</p><p>Sequences with <code>CYCLE</code> option start the generation again from <code>MINVALUE</code> (incrementing sequences) or <code>MAXVALUE</code> (decrementing sequences) instead of exhausting with an error.</p><p>The <code>CACHE</code> option sets the number of pre-allocated numbers. If the system crashes without closing the database, at most this many numbers are lost. The default cache size is 32. <code>NO CACHE</code> option or the cache size 1 or lower disable the cache.</p>
-<p>Example:</p>
-<p class="notranslate">START WITH 10000<br />CYCLE<br />NO CACHE</p>
+<p class="notranslate">START WITH 1</p>
 
 <h3 id="set_clause_list" class="notranslate" onclick="switchBnf(this)">Set clause list</h3>
 <!-- railroad-start -->
 <pre name="bnf" style="display: none">
-{ { <a href="grammar.html#name">columnName</a> = { DEFAULT | <a href="grammar.html#expression">expression</a> } }
-| { ( <a href="grammar.html#name">columnName</a> [,...] ) = { <a href="grammar.html#row_value_expression">rowValueExpression</a> | (<a href="grammar.html#query">query</a>) } } } [,...]
+{ { <a href="grammar.html#name">columnName</a> = { DEFAULT | <a href="grammar.html#expression">expression</a> } } [,...] }
+| { ( <a href="grammar.html#name">columnName</a> [,...] ) = {<a href="grammar.html#row_value_expression">rowValueExpression</a>|(<a href="commands.html#select">select</a>)} }
 </pre>
 <div name="railroad">
-<table class="railroad"><tr class="railroad"><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><code class="c"><a href="grammar.html#name">columnName</a> =</code></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d"><code class="c">DEFAULT</code></td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><code class="c"><a href="grammar.html#expression">expression</a></code></td><td class="le"></td></tr></table></td></tr></table></td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><code class="c">( <a href="grammar.html#name">columnName</a></code></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><code class="c">, ...</code></td><td class="le"></td></tr></table></td><td class="d"><code class="c">) =</code></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d"><code class="c"><a href="grammar.html#row_value_expression">rowValueExpression</a></code></td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><code class="c">( <a href="grammar.html#query">query</a> )</code></td></tr></table></td><td class="le"></td></tr></table></td></tr></table></td><td class="le"></td></tr></table></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><code class="c">, ...</code></td><td class="le"></td></tr></table></td></tr></table>
+<table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><code class="c"><a href="grammar.html#name">columnName</a> =</code></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d"><code class="c">DEFAULT</code></td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><code class="c"><a href="grammar.html#expression">expression</a></code></td><td class="le"></td></tr></table></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><code class="c">, ...</code></td><td class="le"></td></tr></table></td></tr></table></td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><code class="c">( <a href="grammar.html#name">columnName</a></code></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><code class="c">, ...</code></td><td class="le"></td></tr></table></td><td class="d"><code class="c">) =</code></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d"><code class="c"><a href="grammar.html#row_value_expression">rowValueExpression</a></code></td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><code class="c">( <a href="commands.html#select">select</a> )</code></td></tr></table></td><td class="le"></td></tr></table></td></tr></table></td><td class="le"></td></tr></table>
 </div>
 <!-- railroad-end -->
 <!-- syntax-start
 <pre>
-{ { <a href="grammar.html#name">columnName</a> = { DEFAULT | <a href="grammar.html#expression">expression</a> } }
-| { ( <a href="grammar.html#name">columnName</a> [,...] ) = { <a href="grammar.html#row_value_expression">rowValueExpression</a> | (<a href="grammar.html#query">query</a>) } } } [,...]
+{ { <a href="grammar.html#name">columnName</a> = { DEFAULT | <a href="grammar.html#expression">expression</a> } } [,...] }
+| { ( <a href="grammar.html#name">columnName</a> [,...] ) = {<a href="grammar.html#row_value_expression">rowValueExpression</a>|(<a href="commands.html#select">select</a>)} }
 </pre>
 syntax-end -->
 <p>List of <code>SET</code> clauses.</p>
 <p>Example:</p>
-<p class="notranslate">NAME = &#39;Test&#39;, VALUE = 2<br />(A, B) = (1, 2)<br />(A, B) = (1, 2), C = 3<br />(A, B) = (SELECT X, Y FROM OTHER T2 WHERE T1.ID = T2.ID)</p>
+<p class="notranslate">NAME = &#39;Test&#39;, VALUE = 2<br />(A, B) = (1, 2)<br />(A, B) = (SELECT X, Y FROM OTHER T2 WHERE T1.ID = T2.ID)</p>
 
 <h3 id="summand" class="notranslate" onclick="switchBnf(this)">Summand</h3>
 <!-- railroad-start -->
@@ -2533,36 +2305,28 @@ syntax-end -->
 <h3 id="table_expression" class="notranslate" onclick="switchBnf(this)">Table Expression</h3>
 <!-- railroad-start -->
 <pre name="bnf" style="display: none">
-{ [ <a href="grammar.html#name">schemaName</a>. ] <a href="grammar.html#name">tableName</a>
-| ( <a href="grammar.html#query">query</a> )
-| <a href="functions.html#unnest">unnest</a>
-| <a href="functions.html#table">table</a>
-| <a href="grammar.html#data_change_delta_table">dataChangeDeltaTable</a> }
+{ [ <a href="grammar.html#name">schemaName</a>. ] <a href="grammar.html#name">tableName</a> | ( <a href="commands.html#select">select</a> ) | <a href="grammar.html#expression">valuesExpression</a> }
 [ [ AS ] <a href="grammar.html#alias">newTableAlias</a> [ ( <a href="grammar.html#name">columnName</a> [,...] ) ] ]
 [ USE INDEX ([ <a href="grammar.html#name">indexName</a> [,...] ]) ]
 [ { { LEFT | RIGHT } [ OUTER ] | [ INNER ] | CROSS | NATURAL }
-JOIN <a href="grammar.html#table_expression">tableExpression</a> [ <a href="grammar.html#join_specification">joinSpecification</a> ] ]
+JOIN <a href="grammar.html#table_expression">tableExpression</a> [ ON <a href="grammar.html#expression">expression</a> ] ]
 </pre>
 <div name="railroad">
-<table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><code class="c"><a href="grammar.html#name">schemaName</a> .</code></td></tr></table></td><td class="le"></td></tr></table></td><td class="d"><code class="c"><a href="grammar.html#name">tableName</a></code></td></tr></table></td><td class="te"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><code class="c">( <a href="grammar.html#query">query</a> )</code></td></tr></table></td><td class="ke"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><code class="c"><a href="functions.html#unnest">unnest</a></code></td><td class="ke"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><code class="c"><a href="functions.html#table">table</a></code></td><td class="ke"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><code class="c"><a href="grammar.html#data_change_delta_table">dataChangeDeltaTable</a></code></td><td class="le"></td></tr></table><br /><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><code class="c">AS</code></td><td class="le"></td></tr></table></td><td class="d"><code class="c"><a href="grammar.html#alias">newTableAlias</a></code></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><code class="c">( <a href="grammar.html#name">columnName</a></code></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><code class="c">, ...</code></td><td class="le"></td></tr></table></td><td class="d"><code class="c">)</code></td></tr></table></td><td class="le"></td></tr></table></td></tr></table></td><td class="le"></td></tr></table><br /><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><code class="c">USE INDEX (</code></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><code class="c"><a href="grammar.html#name">indexName</a></code></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><code class="c">, ...</code></td><td class="le"></td></tr></table></td></tr></table></td><td class="le"></td></tr></table></td><td class="d"><code class="c">)</code></td></tr></table></td><td class="le"></td></tr></table><br /><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d"><code class="c">LEFT</code></td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><code class="c">RIGHT</code></td><td class="le"></td></tr></table></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><code class="c">OUTER</code></td><td class="le"></td></tr></table></td></tr></table></td><td class="te"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><code class="c">INNER</code></td><td class="le"></td></tr></table></td><td class="ke"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><code class="c">CROSS</code></td><td class="ke"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><code class="c">NATURAL</code></td><td class="le"></td></tr></table></td><td class="d"><code class="c">JOIN <a href="grammar.html#table_expression">tableExpression</a></code></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><code class="c"><a href="grammar.html#join_specification">joinSpecification</a></code></td><td class="le"></td></tr></table></td></tr></table></td><td class="le"></td></tr></table>
+<table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><code class="c"><a href="grammar.html#name">schemaName</a> .</code></td></tr></table></td><td class="le"></td></tr></table></td><td class="d"><code class="c"><a href="grammar.html#name">tableName</a></code></td></tr></table></td><td class="te"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><code class="c">( <a href="commands.html#select">select</a> )</code></td></tr></table></td><td class="ke"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><code class="c"><a href="grammar.html#expression">valuesExpression</a></code></td><td class="le"></td></tr></table><br /><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><code class="c">AS</code></td><td class="le"></td></tr></table></td><td class="d"><code class="c"><a href="grammar.html#alias">newTableAlias</a></code></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><code class="c">( <a href="grammar.html#name">columnName</a></code></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><code class="c">, ...</code></td><td class="le"></td></tr></table></td><td class="d"><code class="c">)</code></td></tr></table></td><td class="le"></td></tr></table></td></tr></table></td><td class="le"></td></tr></table><br /><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><code class="c">USE INDEX (</code></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><code class="c"><a href="grammar.html#name">indexName</a></code></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><code class="c">, ...</code></td><td class="le"></td></tr></table></td></tr></table></td><td class="le"></td></tr></table></td><td class="d"><code class="c">)</code></td></tr></table></td><td class="le"></td></tr></table><br /><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d"><code class="c">LEFT</code></td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><code class="c">RIGHT</code></td><td class="le"></td></tr></table></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><code class="c">OUTER</code></td><td class="le"></td></tr></table></td></tr></table></td><td class="te"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><code class="c">INNER</code></td><td class="le"></td></tr></table></td><td class="ke"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><code class="c">CROSS</code></td><td class="ke"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><code class="c">NATURAL</code></td><td class="le"></td></tr></table></td><td class="d"><code class="c">JOIN <a href="grammar.html#table_expression">tableExpression</a></code></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><code class="c">ON <a href="grammar.html#expression">expression</a></code></td></tr></table></td><td class="le"></td></tr></table></td></tr></table></td><td class="le"></td></tr></table>
 </div>
 <!-- railroad-end -->
 <!-- syntax-start
 <pre>
-{ [ <a href="grammar.html#name">schemaName</a>. ] <a href="grammar.html#name">tableName</a>
-| ( <a href="grammar.html#query">query</a> )
-| <a href="functions.html#unnest">unnest</a>
-| <a href="functions.html#table">table</a>
-| <a href="grammar.html#data_change_delta_table">dataChangeDeltaTable</a> }
+{ [ <a href="grammar.html#name">schemaName</a>. ] <a href="grammar.html#name">tableName</a> | ( <a href="commands.html#select">select</a> ) | <a href="grammar.html#expression">valuesExpression</a> }
 [ [ AS ] <a href="grammar.html#alias">newTableAlias</a> [ ( <a href="grammar.html#name">columnName</a> [,...] ) ] ]
 [ USE INDEX ([ <a href="grammar.html#name">indexName</a> [,...] ]) ]
 [ { { LEFT | RIGHT } [ OUTER ] | [ INNER ] | CROSS | NATURAL }
-JOIN <a href="grammar.html#table_expression">tableExpression</a> [ <a href="grammar.html#join_specification">joinSpecification</a> ] ]
+JOIN <a href="grammar.html#table_expression">tableExpression</a> [ ON <a href="grammar.html#expression">expression</a> ] ]
 </pre>
 syntax-end -->
-<p>Joins a table. The join specification is not supported for cross and natural joins. A natural join is an inner join, where the condition is automatically on the columns with the same name.</p>
+<p>Joins a table. The join expression is not supported for cross and natural joins. A natural join is an inner join, where the condition is automatically on the columns with the same name.</p>
 <p>Example:</p>
-<p class="notranslate">TEST1 AS T1 LEFT JOIN TEST2 AS T2 ON T1.ID = T2.PARENT_ID</p>
+<p class="notranslate">TEST AS T LEFT JOIN TEST AS T1 ON T.ID = T1.ID</p>
 
 <h3 id="within_group_specification" class="notranslate" onclick="switchBnf(this)">Within group specification</h3>
 <!-- railroad-start -->
@@ -2703,60 +2467,40 @@ syntax-end -->
 <h3 id="term" class="notranslate" onclick="switchBnf(this)">Term</h3>
 <!-- railroad-start -->
 <pre name="bnf" style="display: none">
-{ <a href="grammar.html#value">value</a>
+<a href="grammar.html#value">value</a>
 | <a href="grammar.html#column">column</a>
 | ?[ <a href="grammar.html#int">int</a> ]
-| <a href="grammar.html#sequence_value_expression">sequenceValueExpression</a>
+| NEXT VALUE FOR <a href="grammar.html#name">sequenceName</a>
 | function
 | { - | + } <a href="grammar.html#term">term</a>
 | ( <a href="grammar.html#expression">expression</a> )
-| <a href="grammar.html#query">query</a>
+| <a href="commands.html#select">select</a>
 | <a href="grammar.html#case">case</a>
 | <a href="grammar.html#case_when">caseWhen</a>
-| <a href="grammar.html#name">userDefinedFunctionName</a> }
-[ <a href="grammar.html#time_zone">timeZone</a> ]
+| <a href="grammar.html#name">userDefinedFunctionName</a>
 </pre>
 <div name="railroad">
-<table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d"><code class="c"><a href="grammar.html#value">value</a></code></td><td class="te"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><code class="c"><a href="grammar.html#column">column</a></code></td><td class="ke"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><code class="c">?</code></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><code class="c"><a href="grammar.html#int">int</a></code></td><td class="le"></td></tr></table></td></tr></table></td><td class="ke"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><code class="c"><a href="grammar.html#sequence_value_expression">sequenceValueExpression</a></code></td><td class="ke"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><code class="c"><a href="functions.html">Function</a></code></td><td class="ke"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d"><code class="c">-</code></td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><code class="c">+</code></td><td class="le"></td></tr></table></td><td class="d"><code class="c"><a href="grammar.html#term">term</a></code></td></tr></table></td><td class="ke"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><code class="c">( <a href="grammar.html#expression">expression</a> )</code></td></tr></table></td><td class="ke"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><code class="c"><a href="grammar.html#query">query</a></code></td><td class="ke"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><code class="c"><a href="grammar.html#case">case</a></code></td><td class="ke"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><code class="c"><a href="grammar.html#case_when">caseWhen</a></code></td><td class="ke"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><code class="c"><a href="grammar.html#name">userDefinedFunctionName</a></code></td><td class="le"></td></tr></table><br /><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><code class="c"><a href="grammar.html#time_zone">timeZone</a></code></td><td class="le"></td></tr></table>
+<table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d"><code class="c"><a href="grammar.html#value">value</a></code></td><td class="te"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><code class="c"><a href="grammar.html#column">column</a></code></td><td class="ke"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><code class="c">?</code></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><code class="c"><a href="grammar.html#int">int</a></code></td><td class="le"></td></tr></table></td></tr></table></td><td class="ke"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><code class="c">NEXT VALUE FOR <a href="grammar.html#name">sequenceName</a></code></td></tr></table></td><td class="ke"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><code class="c"><a href="functions.html">Function</a></code></td><td class="ke"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d"><code class="c">-</code></td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><code class="c">+</code></td><td class="le"></td></tr></table></td><td class="d"><code class="c"><a href="grammar.html#term">term</a></code></td></tr></table></td><td class="ke"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><code class="c">( <a href="grammar.html#expression">expression</a> )</code></td></tr></table></td><td class="ke"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><code class="c"><a href="commands.html#select">select</a></code></td><td class="ke"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><code class="c"><a href="grammar.html#case">case</a></code></td><td class="ke"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><code class="c"><a href="grammar.html#case_when">caseWhen</a></code></td><td class="ke"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><code class="c"><a href="grammar.html#name">userDefinedFunctionName</a></code></td><td class="le"></td></tr></table>
 </div>
 <!-- railroad-end -->
 <!-- syntax-start
 <pre>
-{ <a href="grammar.html#value">value</a>
+<a href="grammar.html#value">value</a>
 | <a href="grammar.html#column">column</a>
 | ?[ <a href="grammar.html#int">int</a> ]
-| <a href="grammar.html#sequence_value_expression">sequenceValueExpression</a>
+| NEXT VALUE FOR <a href="grammar.html#name">sequenceName</a>
 | function
 | { - | + } <a href="grammar.html#term">term</a>
 | ( <a href="grammar.html#expression">expression</a> )
-| <a href="grammar.html#query">query</a>
+| <a href="commands.html#select">select</a>
 | <a href="grammar.html#case">case</a>
 | <a href="grammar.html#case_when">caseWhen</a>
-| <a href="grammar.html#name">userDefinedFunctionName</a> }
-[ <a href="grammar.html#time_zone">timeZone</a> ]
+| <a href="grammar.html#name">userDefinedFunctionName</a>
 </pre>
 syntax-end -->
 <p>A value. Parameters can be indexed, for example <code>?1</code> meaning the first parameter.</p>
 <p>Example:</p>
 <p class="notranslate">&#39;Hello&#39;</p>
-
-<h3 id="time_zone" class="notranslate" onclick="switchBnf(this)">Time zone</h3>
-<!-- railroad-start -->
-<pre name="bnf" style="display: none">
-AT { TIME ZONE { <a href="grammar.html#interval_hour_to_minute">intervalHourToMinute</a> | <a href="grammar.html#interval_hour_to_second">intervalHourToSecond</a> | <a href="grammar.html#string">string</a> } | LOCAL }
-</pre>
-<div name="railroad">
-<table class="railroad"><tr class="railroad"><td class="d"><code class="c">AT</code></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><code class="c">TIME ZONE</code></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d"><code class="c"><a href="grammar.html#interval_hour_to_minute">intervalHourToMinute</a></code></td><td class="te"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><code class="c"><a href="grammar.html#interval_hour_to_second">intervalHourToSecond</a></code></td><td class="ke"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><code class="c"><a href="grammar.html#string">string</a></code></td><td class="le"></td></tr></table></td></tr></table></td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><code class="c">LOCAL</code></td><td class="le"></td></tr></table></td></tr></table>
-</div>
-<!-- railroad-end -->
-<!-- syntax-start
-<pre>
-AT { TIME ZONE { <a href="grammar.html#interval_hour_to_minute">intervalHourToMinute</a> | <a href="grammar.html#interval_hour_to_second">intervalHourToSecond</a> | <a href="grammar.html#string">string</a> } | LOCAL }
-</pre>
-syntax-end -->
-<p>A time zone. Converts the timestamp with or without time zone into timestamp with time zone at specified time zone. If a day-time interval is specified as a time zone, it may not have fractional seconds and must be between -18 to 18 hours inclusive.</p>
-<p>Example:</p>
-<p class="notranslate">AT LOCAL<br />AT TIME ZONE &#39;2&#39;<br />AT TIME ZONE &#39;-6:00&#39;<br />AT TIME ZONE INTERVAL &#39;10:00&#39; HOUR TO MINUTE<br />AT TIME ZONE INTERVAL &#39;10:00:00&#39; HOUR TO SECOND<br />AT TIME ZONE &#39;UTC&#39;<br />AT TIME ZONE &#39;Europe/London&#39;</p>
 
 <h3 id="column" class="notranslate" onclick="switchBnf(this)">Column</h3>
 <!-- railroad-start -->
@@ -2787,7 +2531,7 @@ function startTranslate() {
     document.getElementById('translate').style.display='';
     var script=document.createElement('script');
     script.setAttribute("type","text/javascript");
-    script.setAttribute("src", "https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit");
+    script.setAttribute("src", "http://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit");
     document.getElementsByTagName("head")[0].appendChild(script);
 }
 function googleTranslateElementInit() {

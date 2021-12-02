@@ -1,5 +1,5 @@
 -- Copyright 2004-2019 H2 Group. Multiple-Licensed under the MPL 2.0,
--- and the EPL 1.0 (https://h2database.com/html/license.html).
+-- and the EPL 1.0 (http://h2database.com/html/license.html).
 -- Initial Developer: H2 Group
 --
 
@@ -213,10 +213,10 @@ SELECT * FROM TEST FETCH FIRST 1 ROW WITH TIES;
 > exception WITH_TIES_WITHOUT_ORDER_BY
 
 EXPLAIN SELECT * FROM TEST ORDER BY A, B OFFSET 3 ROWS FETCH NEXT 1 ROW WITH TIES;
->> SELECT "PUBLIC"."TEST"."A", "PUBLIC"."TEST"."B", "PUBLIC"."TEST"."C" FROM "PUBLIC"."TEST" /* PUBLIC.TEST_A_B_IDX */ ORDER BY 1, 2 OFFSET 3 ROWS FETCH NEXT ROW WITH TIES /* index sorted */
+>> SELECT "TEST"."A", "TEST"."B", "TEST"."C" FROM "PUBLIC"."TEST" /* PUBLIC.TEST_A_B_IDX */ ORDER BY 1, 2 OFFSET 3 ROWS FETCH NEXT ROW WITH TIES /* index sorted */
 
 EXPLAIN SELECT * FROM TEST ORDER BY A, B OFFSET 3 ROWS FETCH NEXT 1 PERCENT ROWS WITH TIES;
->> SELECT "PUBLIC"."TEST"."A", "PUBLIC"."TEST"."B", "PUBLIC"."TEST"."C" FROM "PUBLIC"."TEST" /* PUBLIC.TEST_A_B_IDX */ ORDER BY 1, 2 OFFSET 3 ROWS FETCH NEXT 1 PERCENT ROWS WITH TIES /* index sorted */
+>> SELECT "TEST"."A", "TEST"."B", "TEST"."C" FROM "PUBLIC"."TEST" /* PUBLIC.TEST_A_B_IDX */ ORDER BY 1, 2 OFFSET 3 ROWS FETCH NEXT 1 PERCENT ROWS WITH TIES /* index sorted */
 
 DROP TABLE TEST;
 > ok
@@ -248,24 +248,6 @@ SELECT A, COUNT(B) FROM TEST GROUP BY A ORDER BY A OFFSET 1;
 > A COUNT(B)
 > - --------
 > 2 3
-> rows (ordered): 1
-
-DROP TABLE TEST;
-> ok
-
-CREATE TABLE TEST(ID INT PRIMARY KEY, VALUE VARCHAR) AS VALUES (1, 'A'), (2, 'B'), (3, 'C');
-> ok
-
-SELECT * FROM TEST ORDER BY ID DESC OFFSET 2 ROWS FETCH FIRST 2147483646 ROWS ONLY;
-> ID VALUE
-> -- -----
-> 1  A
-> rows (ordered): 1
-
-SELECT * FROM TEST ORDER BY ID DESC OFFSET 2 ROWS FETCH FIRST 2147483647 ROWS ONLY;
-> ID VALUE
-> -- -----
-> 1  A
 > rows (ordered): 1
 
 DROP TABLE TEST;
@@ -720,271 +702,14 @@ CREATE TABLE TEST(ID INT PRIMARY KEY, V INT UNIQUE);
 > ok
 
 EXPLAIN SELECT * FROM TEST ORDER BY ID FOR UPDATE;
->> SELECT "PUBLIC"."TEST"."ID", "PUBLIC"."TEST"."V" FROM "PUBLIC"."TEST" /* PUBLIC.PRIMARY_KEY_2 */ ORDER BY 1 FOR UPDATE /* index sorted */
+>> SELECT "TEST"."ID", "TEST"."V" FROM "PUBLIC"."TEST" /* PUBLIC.PRIMARY_KEY_2 */ ORDER BY 1 FOR UPDATE /* index sorted */
 
 EXPLAIN SELECT * FROM TEST ORDER BY V;
->> SELECT "PUBLIC"."TEST"."ID", "PUBLIC"."TEST"."V" FROM "PUBLIC"."TEST" /* PUBLIC.CONSTRAINT_INDEX_2 */ ORDER BY 2 /* index sorted */
+>> SELECT "TEST"."ID", "TEST"."V" FROM "PUBLIC"."TEST" /* PUBLIC.CONSTRAINT_INDEX_2 */ ORDER BY 2 /* index sorted */
 
 EXPLAIN SELECT * FROM TEST ORDER BY V FOR UPDATE;
-#+mvStore#>> SELECT "PUBLIC"."TEST"."ID", "PUBLIC"."TEST"."V" FROM "PUBLIC"."TEST" /* PUBLIC.CONSTRAINT_INDEX_2 */ ORDER BY 2 FOR UPDATE
-#-mvStore#>> SELECT "PUBLIC"."TEST"."ID", "PUBLIC"."TEST"."V" FROM "PUBLIC"."TEST" /* PUBLIC.CONSTRAINT_INDEX_2 */ ORDER BY 2 FOR UPDATE /* index sorted */
+#+mvStore#>> SELECT "TEST"."ID", "TEST"."V" FROM "PUBLIC"."TEST" /* PUBLIC.CONSTRAINT_INDEX_2 */ ORDER BY 2 FOR UPDATE
+#-mvStore#>> SELECT "TEST"."ID", "TEST"."V" FROM "PUBLIC"."TEST" /* PUBLIC.CONSTRAINT_INDEX_2 */ ORDER BY 2 FOR UPDATE /* index sorted */
 
 DROP TABLE TEST;
 > ok
-
--- The next tests should be at the of this file
-
-SET MAX_MEMORY_ROWS = 1;
-> ok
-
-CREATE TABLE TEST(I INT) AS SELECT * FROM SYSTEM_RANGE(1, 10);
-> ok
-
-SELECT COUNT(*) FROM (SELECT I, SUM(I) S, COUNT(I) C FROM TEST GROUP BY I HAVING S + C <= 9 ORDER BY I);
->> 8
-
-DROP TABLE TEST;
-> ok
-
-CREATE TABLE TEST(A INT, B INT);
-> ok
-
-EXPLAIN SELECT * FROM TEST WHERE A = 1 AND B = 1 OR A = 2 AND B = 2;
->> SELECT "PUBLIC"."TEST"."A", "PUBLIC"."TEST"."B" FROM "PUBLIC"."TEST" /* PUBLIC.TEST.tableScan */ WHERE (("A" = 1) AND ("B" = 1)) OR (("A" = 2) AND ("B" = 2))
-
-DROP TABLE TEST;
-> ok
-
-CREATE TABLE TEST(A INT, B INT) AS VALUES (1, 2), (1, 3), (5, 5);
-> ok
-
-SELECT (SELECT A, B FROM TEST ORDER BY A + B FETCH FIRST ROW ONLY);
->> ROW (1, 2)
-
-SELECT * FROM TEST UNION ALL SELECT * FROM TEST OFFSET 2 ROWS;
-> A B
-> - -
-> 1 2
-> 1 3
-> 5 5
-> 5 5
-> rows: 4
-
-SELECT (1, 2) IN (SELECT * FROM TEST UNION ALL SELECT * FROM TEST OFFSET 2 ROWS);
->> TRUE
-
-SELECT * FROM TEST UNION ALL SELECT * FROM TEST ORDER BY A DESC, B DESC OFFSET 2 ROWS;
-> A B
-> - -
-> 1 3
-> 1 3
-> 1 2
-> 1 2
-> rows (ordered): 4
-
-SELECT (1, 2) IN (SELECT * FROM TEST UNION ALL SELECT * FROM TEST ORDER BY A DESC, B DESC OFFSET 2 ROWS);
->> TRUE
-
-SELECT (1, 2) IN (SELECT * FROM TEST UNION ALL SELECT * FROM TEST ORDER BY A DESC, B DESC OFFSET 2 ROWS FETCH NEXT 1 ROW ONLY);
->> FALSE
-
-DROP TABLE TEST;
-> ok
-
-CREATE TABLE TEST(ID INT, NAME VARCHAR, DATA VARCHAR);
-> ok
-
--- This ORDER BY condition is currently forbidden
-SELECT DISTINCT DATA FROM TEST ORDER BY (CASE WHEN EXISTS(SELECT * FROM TEST T WHERE T.NAME = 'A') THEN 1 ELSE 2 END);
-> exception ORDER_BY_NOT_IN_RESULT
-
-SELECT DISTINCT DATA FROM TEST X ORDER BY (CASE WHEN EXISTS(SELECT * FROM TEST T WHERE T.ID = X.ID + 1) THEN 1 ELSE 2 END);
-> exception ORDER_BY_NOT_IN_RESULT
-
-DROP TABLE TEST;
-> ok
-
--- Additional GROUP BY tests
-
-CREATE TABLE TEST(A INT, B INT, C INT) AS (VALUES
-    (NULL, NULL, NULL), (NULL, NULL, 1), (NULL, NULL, 2),
-    (NULL, 1, NULL), (NULL, 1, 1), (NULL, 1, 2),
-    (NULL, 2, NULL), (NULL, 2, 1), (NULL, 2, 2),
-    (1, NULL, NULL), (1, NULL, 1), (1, NULL, 2),
-    (1, 1, NULL), (1, 1, 1), (1, 1, 2),
-    (1, 2, NULL), (1, 2, 1), (1, 2, 2),
-    (2, NULL, NULL), (2, NULL, 1), (2, NULL, 2),
-    (2, 1, NULL), (2, 1, 1), (2, 1, 2),
-    (2, 2, NULL), (2, 2, 1), (2, 2, 2));
-> ok
-
-SELECT SUM(A), B, C FROM TEST GROUP BY B, C;
-> SUM(A) B    C
-> ------ ---- ----
-> 3      1    1
-> 3      1    2
-> 3      1    null
-> 3      2    1
-> 3      2    2
-> 3      2    null
-> 3      null 1
-> 3      null 2
-> 3      null null
-> rows: 9
-
-EXPLAIN SELECT SUM(A), B, C FROM TEST GROUP BY B, C;
->> SELECT SUM("A"), "B", "C" FROM "PUBLIC"."TEST" /* PUBLIC.TEST.tableScan */ GROUP BY "B", "C"
-
-SELECT SUM(A), B, C FROM TEST GROUP BY (B), C, ();
-> SUM(A) B    C
-> ------ ---- ----
-> 3      1    1
-> 3      1    2
-> 3      1    null
-> 3      2    1
-> 3      2    2
-> 3      2    null
-> 3      null 1
-> 3      null 2
-> 3      null null
-> rows: 9
-
-EXPLAIN SELECT SUM(A), B, C FROM TEST GROUP BY (B), C, ();
->> SELECT SUM("A"), "B", "C" FROM "PUBLIC"."TEST" /* PUBLIC.TEST.tableScan */ GROUP BY "B", "C"
-
-SELECT SUM(A), B, C FROM TEST GROUP BY (B, C);
-> SUM(A) B    C
-> ------ ---- ----
-> 3      1    1
-> 3      1    2
-> 3      1    null
-> 3      2    1
-> 3      2    2
-> 3      2    null
-> 3      null 1
-> 3      null 2
-> 3      null null
-> rows: 9
-
-EXPLAIN SELECT SUM(A), B, C FROM TEST GROUP BY (B, C);
->> SELECT SUM("A"), "B", "C" FROM "PUBLIC"."TEST" /* PUBLIC.TEST.tableScan */ GROUP BY "B", "C"
-
-SELECT COUNT(*) FROM TEST;
->> 27
-
-EXPLAIN SELECT COUNT(*) FROM TEST;
->> SELECT COUNT(*) FROM "PUBLIC"."TEST" /* PUBLIC.TEST.tableScan */ /* direct lookup */
-
-SELECT COUNT(*) FROM TEST GROUP BY ();
->> 27
-
-EXPLAIN SELECT COUNT(*) FROM TEST GROUP BY ();
->> SELECT COUNT(*) FROM "PUBLIC"."TEST" /* PUBLIC.TEST.tableScan */ /* direct lookup */
-
-SELECT COUNT(*) FROM TEST WHERE FALSE;
->> 0
-
-EXPLAIN SELECT COUNT(*) FROM TEST WHERE FALSE;
->> SELECT COUNT(*) FROM "PUBLIC"."TEST" /* PUBLIC.TEST.tableScan: FALSE */ WHERE FALSE
-
-SELECT COUNT(*) FROM TEST WHERE FALSE GROUP BY ();
->> 0
-
-EXPLAIN SELECT COUNT(*) FROM TEST WHERE FALSE GROUP BY ();
->> SELECT COUNT(*) FROM "PUBLIC"."TEST" /* PUBLIC.TEST.tableScan: FALSE */ WHERE FALSE
-
-SELECT COUNT(*) FROM TEST WHERE FALSE GROUP BY (), ();
->> 0
-
-EXPLAIN SELECT COUNT(*) FROM TEST WHERE FALSE GROUP BY (), ();
->> SELECT COUNT(*) FROM "PUBLIC"."TEST" /* PUBLIC.TEST.tableScan: FALSE */ WHERE FALSE
-
-SELECT 1 FROM TEST GROUP BY ();
->> 1
-
-EXPLAIN SELECT 1 FROM TEST GROUP BY ();
->> SELECT 1 FROM "PUBLIC"."TEST" /* PUBLIC.TEST.tableScan */ GROUP BY () /* direct lookup */
-
-EXPLAIN SELECT FALSE AND MAX(A) > 0 FROM TEST;
->> SELECT FALSE FROM "PUBLIC"."TEST" /* PUBLIC.TEST.tableScan */ GROUP BY () /* direct lookup */
-
-DROP TABLE TEST;
-> ok
-
-CREATE TABLE TEST(A INT PRIMARY KEY) AS (VALUES 1, 2, 3);
-> ok
-
-SELECT A AS A1, A AS A2 FROM TEST GROUP BY A;
-> A1 A2
-> -- --
-> 1  1
-> 2  2
-> 3  3
-> rows: 3
-
-DROP TABLE TEST;
-> ok
-
--- Tests for SELECT without columns
-
-EXPLAIN SELECT *;
->> SELECT
-
-SELECT;
->
->
->
-> rows: 1
-
-SELECT FROM DUAL;
->
->
->
-> rows: 1
-
-SELECT * FROM DUAL JOIN (SELECT * FROM DUAL) ON 1 = 1;
->
->
->
-> rows: 1
-
-EXPLAIN SELECT * FROM DUAL JOIN (SELECT * FROM DUAL) ON 1 = 1;
->> SELECT FROM DUAL /* dual index */ INNER JOIN ( SELECT ) "_51" /* SELECT */ ON 1=1 WHERE TRUE
-
-SELECT WHERE FALSE;
->
->
-> rows: 0
-
-SELECT GROUP BY ();
->
->
->
-> rows: 1
-
-SELECT HAVING FALSE;
->
->
-> rows: 0
-
-SELECT QUALIFY FALSE;
->
->
-> rows: 0
-
-SELECT ORDER BY (SELECT 1);
->
->
->
-> rows (ordered): 1
-
-SELECT OFFSET 0 ROWS;
->
->
->
-> rows: 1
-
-SELECT FETCH FIRST 0 ROWS ONLY;
->
->
-> rows: 0

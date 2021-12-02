@@ -1,39 +1,36 @@
 /*
  * Copyright 2004-2019 H2 Group. Multiple-Licensed under the MPL 2.0,
- * and the EPL 1.0 (https://h2database.com/html/license.html).
+ * and the EPL 1.0 (http://h2database.com/html/license.html).
  * Initial Developer: H2 Group
  */
 package org.h2.command.dml;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map.Entry;
 
 import org.h2.api.ErrorCode;
 import org.h2.api.Trigger;
 import org.h2.command.Command;
 import org.h2.command.CommandInterface;
-import org.h2.engine.DbObject;
+import org.h2.engine.GeneratedKeys;
+import org.h2.engine.Mode;
 import org.h2.engine.Right;
 import org.h2.engine.Session;
 import org.h2.engine.UndoLogRecord;
 import org.h2.expression.Expression;
 import org.h2.expression.ExpressionColumn;
-import org.h2.expression.ExpressionVisitor;
 import org.h2.expression.Parameter;
 import org.h2.expression.ValueExpression;
 import org.h2.expression.condition.Comparison;
 import org.h2.expression.condition.ConditionAndOr;
 import org.h2.index.Index;
+import org.h2.index.PageDataIndex;
 import org.h2.message.DbException;
 import org.h2.mvstore.db.MVPrimaryIndex;
-import org.h2.pagestore.db.PageDataIndex;
 import org.h2.result.ResultInterface;
 import org.h2.result.ResultTarget;
 import org.h2.result.Row;
 import org.h2.table.Column;
-import org.h2.table.DataChangeDeltaTable.ResultOption;
 import org.h2.table.Table;
 import org.h2.table.TableFilter;
 import org.h2.value.Value;
@@ -43,7 +40,7 @@ import org.h2.value.ValueNull;
  * This class represents the statement
  * INSERT
  */
-public class Insert extends CommandWithValues implements ResultTarget, DataChangeStatement {
+public class Insert extends CommandWithValues implements ResultTarget {
 
     private Table table;
     private Column[] columns;
@@ -62,14 +59,9 @@ public class Insert extends CommandWithValues implements ResultTarget, DataChang
     private HashMap<Column, Expression> duplicateKeyAssignmentMap;
 
     /**
-     * For MySQL-style INSERT IGNORE and PostgreSQL-style ON CONFLICT DO
-     * NOTHING.
+     * For MySQL-style INSERT IGNORE
      */
     private boolean ignore;
-
-    private ResultTarget deltaChangeCollector;
-
-    private ResultOption deltaChangeCollectionMode;
 
     public Insert(Session session) {
         super(session);
@@ -83,11 +75,6 @@ public class Insert extends CommandWithValues implements ResultTarget, DataChang
         }
     }
 
-    @Override
-    public Table getTable() {
-        return table;
-    }
-
     public void setTable(Table table) {
         this.table = table;
     }
@@ -97,10 +84,8 @@ public class Insert extends CommandWithValues implements ResultTarget, DataChang
     }
 
     /**
-     * Sets MySQL-style INSERT IGNORE mode or PostgreSQL-style ON CONFLICT
-     * DO NOTHING.
-     *
-     * @param ignore ignore duplicates
+     * Sets MySQL-style INSERT IGNORE mode
+     * @param ignore ignore errors
      */
     public void setIgnore(boolean ignore) {
         this.ignore = ignore;
@@ -121,15 +106,11 @@ public class Insert extends CommandWithValues implements ResultTarget, DataChang
         if (duplicateKeyAssignmentMap == null) {
             duplicateKeyAssignmentMap = new HashMap<>();
         }
-        if (duplicateKeyAssignmentMap.put(column, expression) != null) {
-            throw DbException.get(ErrorCode.DUPLICATE_COLUMN_NAME_1, column.getName());
+        if (duplicateKeyAssignmentMap.containsKey(column)) {
+            throw DbException.get(ErrorCode.DUPLICATE_COLUMN_NAME_1,
+                    column.getName());
         }
-    }
-
-    @Override
-    public void setDeltaChangeCollector(ResultTarget deltaChangeCollector, ResultOption deltaChangeCollectionMode) {
-        this.deltaChangeCollector = deltaChangeCollector;
-        this.deltaChangeCollectionMode = deltaChangeCollectionMode;
+        duplicateKeyAssignmentMap.put(column, expression);
     }
 
     @Override
@@ -161,10 +142,14 @@ public class Insert extends CommandWithValues implements ResultTarget, DataChang
         setCurrentRowNumber(0);
         table.fire(session, Trigger.INSERT, true);
         rowNumber = 0;
+        GeneratedKeys generatedKeys = session.getGeneratedKeys();
+        generatedKeys.initialize(table);
         int listSize = valuesExpressionList.size();
         if (listSize > 0) {
+            Mode mode = session.getDatabase().getMode();
             int columnLen = columns.length;
             for (int x = 0; x < listSize; x++) {
+                generatedKeys.nextRow();
                 Row newRow = table.getTemplateRow();
                 Expression[] expr = valuesExpressionList.get(x);
                 setCurrentRowNumber(x + 1);
@@ -176,8 +161,11 @@ public class Insert extends CommandWithValues implements ResultTarget, DataChang
                         // e can be null (DEFAULT)
                         e = e.optimize(session);
                         try {
-                            Value v = e.getValue(session);
+                            Value v = c.convert(e.getValue(session), mode);
                             newRow.setValue(index, v);
+                            if (e.isGeneratedKey()) {
+                                generatedKeys.add(c);
+                            }
                         } catch (DbException ex) {
                             throw setRow(ex, x, getSimpleSQL(expr));
                         }
@@ -185,9 +173,6 @@ public class Insert extends CommandWithValues implements ResultTarget, DataChang
                 }
                 rowNumber++;
                 table.validateConvertUpdateSequence(session, newRow);
-                if (deltaChangeCollectionMode == ResultOption.NEW) {
-                    deltaChangeCollector.addRow(newRow.getValueList().clone());
-                }
                 boolean done = table.fireBeforeRow(session, null, newRow);
                 if (!done) {
                     table.lock(session, true, false);
@@ -204,9 +189,7 @@ public class Insert extends CommandWithValues implements ResultTarget, DataChang
                         }
                         continue;
                     }
-                    if (deltaChangeCollectionMode == ResultOption.FINAL) {
-                        deltaChangeCollector.addRow(newRow.getValueList());
-                    }
+                    generatedKeys.confirmRow(newRow);
                     session.log(table, UndoLogRecord.INSERT, newRow);
                     table.fireAfterRow(session, null, newRow, false);
                 }
@@ -218,9 +201,13 @@ public class Insert extends CommandWithValues implements ResultTarget, DataChang
             } else {
                 ResultInterface rows = query.query(0);
                 while (rows.next()) {
+                    generatedKeys.nextRow();
                     Value[] r = rows.currentRow();
                     try {
-                        addRow(r);
+                        Row newRow = addRowImpl(r);
+                        if (newRow != null) {
+                            generatedKeys.confirmRow(newRow);
+                        }
                     } catch (DbException de) {
                         if (handleOnDuplicate(de, r)) {
                             // MySQL returns 2 for updated row
@@ -240,25 +227,33 @@ public class Insert extends CommandWithValues implements ResultTarget, DataChang
     }
 
     @Override
-    public void addRow(Value... values) {
+    public void addRow(Value[] values) {
+        addRowImpl(values);
+    }
+
+    private Row addRowImpl(Value[] values) {
         Row newRow = table.getTemplateRow();
         setCurrentRowNumber(++rowNumber);
+        Mode mode = session.getDatabase().getMode();
         for (int j = 0, len = columns.length; j < len; j++) {
-            newRow.setValue(columns[j].getColumnId(), values[j]);
+            Column c = columns[j];
+            int index = c.getColumnId();
+            try {
+                Value v = c.convert(values[j], mode);
+                newRow.setValue(index, v);
+            } catch (DbException ex) {
+                throw setRow(ex, rowNumber, getSQL(values));
+            }
         }
         table.validateConvertUpdateSequence(session, newRow);
-        if (deltaChangeCollectionMode == ResultOption.NEW) {
-            deltaChangeCollector.addRow(newRow.getValueList().clone());
-        }
         boolean done = table.fireBeforeRow(session, null, newRow);
         if (!done) {
             table.addRow(session, newRow);
-            if (deltaChangeCollectionMode == ResultOption.FINAL) {
-                deltaChangeCollector.addRow(newRow.getValueList());
-            }
             session.log(table, UndoLogRecord.INSERT, newRow);
             table.fireAfterRow(session, null, newRow, false);
+            return newRow;
         }
+        return null;
     }
 
     @Override
@@ -360,18 +355,14 @@ public class Insert extends CommandWithValues implements ResultTarget, DataChang
         return CommandInterface.INSERT;
     }
 
-    @Override
-    public String getStatementName() {
-        return "INSERT";
-    }
-
     public void setInsertFromSelect(boolean value) {
         this.insertFromSelect = value;
     }
 
     @Override
     public boolean isCacheable() {
-        return duplicateKeyAssignmentMap == null;
+        return duplicateKeyAssignmentMap == null ||
+                duplicateKeyAssignmentMap.isEmpty();
     }
 
     /**
@@ -383,18 +374,19 @@ public class Insert extends CommandWithValues implements ResultTarget, DataChang
         if (de.getErrorCode() != ErrorCode.DUPLICATE_KEY_1) {
             throw de;
         }
-        if (duplicateKeyAssignmentMap == null) {
+        if (duplicateKeyAssignmentMap == null ||
+                duplicateKeyAssignmentMap.isEmpty()) {
             if (ignore) {
                 return false;
             }
             throw de;
         }
 
-        int columnCount = columns.length;
-        ArrayList<String> variableNames = new ArrayList<>(columnCount);
+        ArrayList<String> variableNames = new ArrayList<>(
+                duplicateKeyAssignmentMap.size());
         Expression[] row = (currentRow == null) ? valuesExpressionList.get((int) getCurrentRowNumber() - 1)
-                : new Expression[columnCount];
-        for (int i = 0; i < columnCount; i++) {
+                : new Expression[columns.length];
+        for (int i = 0; i < columns.length; i++) {
             StringBuilder builder = table.getSQL(new StringBuilder(), true).append('.');
             String key = columns[i].getSQL(builder, true).toString();
             variableNames.add(key);
@@ -411,13 +403,14 @@ public class Insert extends CommandWithValues implements ResultTarget, DataChang
         StringBuilder builder = new StringBuilder("UPDATE ");
         table.getSQL(builder, true).append(" SET ");
         boolean f = false;
-        for (Entry<Column, Expression> entry : duplicateKeyAssignmentMap.entrySet()) {
+        for (Column column : duplicateKeyAssignmentMap.keySet()) {
             if (f) {
                 builder.append(", ");
             }
             f = true;
-            entry.getKey().getSQL(builder, true).append('=');
-            entry.getValue().getSQL(builder, true);
+            Expression ex = duplicateKeyAssignmentMap.get(column);
+            column.getSQL(builder, true).append('=');
+            ex.getSQL(builder, true);
         }
         builder.append(" WHERE ");
         Index foundIndex = (Index) de.getSource();
@@ -486,17 +479,4 @@ public class Insert extends CommandWithValues implements ResultTarget, DataChang
         this.sourceTableFilter = sourceTableFilter;
     }
 
-    @Override
-    public void collectDependencies(HashSet<DbObject> dependencies) {
-        ExpressionVisitor visitor = ExpressionVisitor.getDependenciesVisitor(dependencies);
-        if (query != null) {
-            query.isEverything(visitor);
-        }
-        if (sourceTableFilter != null) {
-            Select select = sourceTableFilter.getSelect();
-            if (select != null) {
-                select.isEverything(visitor);
-            }
-        }
-    }
 }

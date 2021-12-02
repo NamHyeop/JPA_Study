@@ -1,19 +1,16 @@
 /*
  * Copyright 2004-2019 H2 Group. Multiple-Licensed under the MPL 2.0,
- * and the EPL 1.0 (https://h2database.com/html/license.html).
+ * and the EPL 1.0 (http://h2database.com/html/license.html).
  * Initial Developer: H2 Group
  */
 package org.h2.value;
 
 import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.math.MathContext;
 import java.math.RoundingMode;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 import org.h2.api.ErrorCode;
-import org.h2.engine.CastDataProvider;
 import org.h2.message.DbException;
 import org.h2.util.MathUtils;
 
@@ -56,6 +53,7 @@ public class ValueDecimal extends Value {
 
     private final BigDecimal value;
     private TypeInfo type;
+    private String valueString;
 
     private ValueDecimal(BigDecimal value) {
         if (value == null) {
@@ -142,7 +140,7 @@ public class ValueDecimal extends Value {
     }
 
     @Override
-    public int compareTypeSafe(Value o, CompareMode mode, CastDataProvider provider) {
+    public int compareTypeSafe(Value o, CompareMode mode) {
         return value.compareTo(((ValueDecimal) o).value);
     }
 
@@ -158,7 +156,15 @@ public class ValueDecimal extends Value {
 
     @Override
     public String getString() {
-        return value.toString();
+        if (valueString == null) {
+            String p = value.toPlainString();
+            if (p.length() < 40) {
+                valueString = p;
+            } else {
+                valueString = value.toString();
+            }
+        }
+        return valueString;
     }
 
     @Override
@@ -200,21 +206,22 @@ public class ValueDecimal extends Value {
     }
 
     @Override
-    public Value convertPrecision(long precision) {
-        int p = MathUtils.convertLongToInt(precision);
-        if (value.precision() <= p) {
+    public Value convertPrecision(long precision, boolean force) {
+        if (value.precision() <= precision) {
             return this;
         }
-        if (p > 0) {
-            return get(value.round(new MathContext(p)));
+        if (force) {
+            return get(BigDecimal.valueOf(value.doubleValue()));
         }
-        throw DbException.get(ErrorCode.NUMERIC_VALUE_OUT_OF_RANGE_1, getString());
+        throw DbException.get(
+                ErrorCode.NUMERIC_VALUE_OUT_OF_RANGE_1,
+                Long.toString(precision));
     }
 
     /**
      * Get or create big decimal value for the given big decimal.
      *
-     * @param dec the big decimal
+     * @param dec the bit decimal
      * @return the value
      */
     public static ValueDecimal get(BigDecimal dec) {
@@ -224,21 +231,6 @@ public class ValueDecimal extends Value {
             return (ValueDecimal) ONE;
         }
         return (ValueDecimal) Value.cache(new ValueDecimal(dec));
-    }
-
-    /**
-     * Get or create big decimal value for the given big integer.
-     *
-     * @param bigInteger the big integer
-     * @return the value
-     */
-    public static ValueDecimal get(BigInteger bigInteger) {
-        if (bigInteger.signum() == 0) {
-            return (ValueDecimal) ZERO;
-        } else if (BigInteger.ONE.equals(bigInteger)) {
-            return (ValueDecimal) ONE;
-        }
-        return (ValueDecimal) Value.cache(new ValueDecimal(new BigDecimal(bigInteger)));
     }
 
     @Override

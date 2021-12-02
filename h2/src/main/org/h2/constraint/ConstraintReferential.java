@@ -1,6 +1,6 @@
 /*
  * Copyright 2004-2019 H2 Group. Multiple-Licensed under the MPL 2.0,
- * and the EPL 1.0 (https://h2database.com/html/license.html).
+ * and the EPL 1.0 (http://h2database.com/html/license.html).
  * Initial Developer: H2 Group
  */
 package org.h2.constraint;
@@ -313,7 +313,7 @@ public class ConstraintReferential extends Constraint {
             Value v = newRow.getValue(idx);
             Column refCol = refColumns[i].column;
             int refIdx = refCol.getColumnId();
-            check.setValue(refIdx, refCol.convert(v, true));
+            check.setValue(refIdx, refCol.convert(v));
         }
         if (!existsRow(session, refIndex, check, null)) {
             throw DbException.get(ErrorCode.REFERENTIAL_INTEGRITY_VIOLATED_PARENT_MISSING_1,
@@ -361,7 +361,7 @@ public class ConstraintReferential extends Constraint {
             Column refCol = refColumns[i].column;
             int refIdx = refCol.getColumnId();
             Column col = columns[i].column;
-            Value v = col.convert(oldRow.getValue(refIdx), true);
+            Value v = col.convert(oldRow.getValue(refIdx));
             if (v == ValueNull.INSTANCE) {
                 return;
             }
@@ -606,6 +606,7 @@ public class ConstraintReferential extends Constraint {
             // don't check at startup
             return;
         }
+        session.startStatementWithinTransaction();
         StringBuilder builder = new StringBuilder("SELECT 1 FROM (SELECT ");
         IndexColumn.writeColumns(builder, columns, true);
         builder.append(" FROM ");
@@ -624,16 +625,10 @@ public class ConstraintReferential extends Constraint {
             refColumns[i].getSQL(builder, true);
         }
         builder.append(')');
-
-        session.startStatementWithinTransaction(null);
-        try {
-            ResultInterface r = session.prepare(builder.toString()).query(1);
-            if (r.next()) {
-                throw DbException.get(ErrorCode.REFERENTIAL_INTEGRITY_VIOLATED_PARENT_MISSING_1,
-                        getShortDescription(null, null));
-            }
-        } finally {
-            session.endStatement();
+        ResultInterface r = session.prepare(builder.toString()).query(1);
+        if (r.next()) {
+            throw DbException.get(ErrorCode.REFERENTIAL_INTEGRITY_VIOLATED_PARENT_MISSING_1,
+                    getShortDescription(null, null));
         }
     }
 

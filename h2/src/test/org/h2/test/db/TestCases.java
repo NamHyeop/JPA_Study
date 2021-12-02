@@ -1,6 +1,6 @@
 /*
  * Copyright 2004-2019 H2 Group. Multiple-Licensed under the MPL 2.0,
- * and the EPL 1.0 (https://h2database.com/html/license.html).
+ * and the EPL 1.0 (http://h2database.com/html/license.html).
  * Initial Developer: H2 Group
  */
 package org.h2.test.db;
@@ -55,6 +55,7 @@ public class TestCases extends TestDb {
         testSelfReferentialColumn();
         testCountDistinctNotNull();
         testDependencies();
+        testDropTable();
         testConvertType();
         testSortedSelect();
         testMaxMemoryRows();
@@ -284,6 +285,71 @@ public class TestCases extends TestDb {
         conn.close();
     }
 
+    private void testDropTable() throws SQLException {
+        trace("testDropTable");
+        final boolean[] booleans = new boolean[] { true, false };
+        for (final boolean stdDropTableRestrict : booleans) {
+            for (final boolean restrict : booleans) {
+                testDropTableNoReference(stdDropTableRestrict, restrict);
+                testDropTableViewReference(stdDropTableRestrict, restrict);
+                testDropTableForeignKeyReference(stdDropTableRestrict, restrict);
+            }
+        }
+    }
+
+    private Statement createTable(final boolean stdDropTableRestrict) throws SQLException {
+        deleteDb("cases");
+        Connection conn = getConnection("cases;STANDARD_DROP_TABLE_RESTRICT=" + stdDropTableRestrict);
+        Statement stat = conn.createStatement();
+        stat.execute("create table test(id int)");
+        return stat;
+    }
+
+    private void dropTable(final boolean restrict, Statement stat, final boolean expectedDropSuccess)
+            throws SQLException {
+        assertThrows(expectedDropSuccess ? 0 : ErrorCode.CANNOT_DROP_2, stat)
+                .execute("drop table test " + (restrict ? "restrict" : "cascade"));
+        assertThrows(expectedDropSuccess ? ErrorCode.TABLE_OR_VIEW_NOT_FOUND_1 : 0, stat)
+                .execute("select * from test");
+    }
+
+    private void testDropTableNoReference(final boolean stdDropTableRestrict, final boolean restrict)
+            throws SQLException {
+        Statement stat = createTable(stdDropTableRestrict);
+        // always succeed as there's no reference to the table
+        dropTable(restrict, stat, true);
+        stat.getConnection().close();
+    }
+
+    private void testDropTableViewReference(final boolean stdDropTableRestrict, final boolean restrict)
+            throws SQLException {
+        Statement stat = createTable(stdDropTableRestrict);
+        stat.execute("create view abc as select * from test");
+        // drop allowed only if cascade
+        final boolean expectedDropSuccess = !restrict;
+        dropTable(restrict, stat, expectedDropSuccess);
+        // missing view if the drop succeeded
+        assertThrows(expectedDropSuccess ? ErrorCode.TABLE_OR_VIEW_NOT_FOUND_1 : 0, stat).execute("select * from abc");
+        stat.getConnection().close();
+    }
+
+    private void testDropTableForeignKeyReference(final boolean stdDropTableRestrict, final boolean restrict)
+            throws SQLException {
+        Statement stat = createTable(stdDropTableRestrict);
+        stat.execute("create table ref(id int, id_test int, foreign key (id_test) references test (id)) ");
+        // test table is empty, so the foreign key forces ref table to be also
+        // empty
+        assertThrows(ErrorCode.REFERENTIAL_INTEGRITY_VIOLATED_PARENT_MISSING_1, stat)
+                .execute("insert into ref values(1,2)");
+        // drop allowed if cascade or old style
+        final boolean expectedDropSuccess = !stdDropTableRestrict || !restrict;
+        dropTable(restrict, stat, expectedDropSuccess);
+        // insertion succeeds if the foreign key was dropped
+        assertThrows(expectedDropSuccess ? 0 : ErrorCode.REFERENTIAL_INTEGRITY_VIOLATED_PARENT_MISSING_1, stat)
+                .execute("insert into ref values(1,2)");
+        stat.getConnection().close();
+    }
+
     private void testConvertType() throws SQLException {
         deleteDb("cases");
         Connection conn = getConnection("cases");
@@ -314,9 +380,9 @@ public class TestCases extends TestDb {
         Statement stat = conn.createStatement();
         stat.execute("create table test(id int primary key)");
         stat.execute("insert into test values(1), (2)");
-        stat.execute("select * from system_range(1, 1) where x not in " +
+        stat.execute("select * from dual where x not in " +
                 "(select id from test order by id)");
-        stat.execute("select * from system_range(1, 1) where x not in " +
+        stat.execute("select * from dual where x not in " +
                 "(select id from test union select id from test)");
         stat.execute("(select id from test order by id) " +
                 "intersect (select id from test order by id)");
@@ -931,30 +997,30 @@ public class TestCases extends TestDb {
 
         checkExplain(stat, "EXPLAIN SELECT * FROM PERSON WHERE id = ?",
             "SELECT\n" +
-                "    \"PUBLIC\".\"PERSON\".\"ID\",\n" +
-                "    \"PUBLIC\".\"PERSON\".\"ORGID\",\n" +
-                "    \"PUBLIC\".\"PERSON\".\"NAME\",\n" +
-                "    \"PUBLIC\".\"PERSON\".\"SALARY\"\n" +
+                "    \"PERSON\".\"ID\",\n" +
+                "    \"PERSON\".\"ORGID\",\n" +
+                "    \"PERSON\".\"NAME\",\n" +
+                "    \"PERSON\".\"SALARY\"\n" +
                 "FROM \"PUBLIC\".\"PERSON\"\n" +
                 "    /* PUBLIC.PRIMARY_KEY_8: ID = ?1 */\n" +
                 "WHERE \"ID\" = ?1");
 
         checkExplain(stat, "EXPLAIN SELECT * FROM PERSON WHERE id = 50",
             "SELECT\n" +
-                "    \"PUBLIC\".\"PERSON\".\"ID\",\n" +
-                "    \"PUBLIC\".\"PERSON\".\"ORGID\",\n" +
-                "    \"PUBLIC\".\"PERSON\".\"NAME\",\n" +
-                "    \"PUBLIC\".\"PERSON\".\"SALARY\"\n" +
+                "    \"PERSON\".\"ID\",\n" +
+                "    \"PERSON\".\"ORGID\",\n" +
+                "    \"PERSON\".\"NAME\",\n" +
+                "    \"PERSON\".\"SALARY\"\n" +
                 "FROM \"PUBLIC\".\"PERSON\"\n" +
                 "    /* PUBLIC.PRIMARY_KEY_8: ID = 50 */\n" +
                 "WHERE \"ID\" = 50");
 
         checkExplain(stat, "EXPLAIN SELECT * FROM PERSON WHERE salary > ? and salary < ?",
             "SELECT\n" +
-                "    \"PUBLIC\".\"PERSON\".\"ID\",\n" +
-                "    \"PUBLIC\".\"PERSON\".\"ORGID\",\n" +
-                "    \"PUBLIC\".\"PERSON\".\"NAME\",\n" +
-                "    \"PUBLIC\".\"PERSON\".\"SALARY\"\n" +
+                "    \"PERSON\".\"ID\",\n" +
+                "    \"PERSON\".\"ORGID\",\n" +
+                "    \"PERSON\".\"NAME\",\n" +
+                "    \"PERSON\".\"SALARY\"\n" +
                 "FROM \"PUBLIC\".\"PERSON\"\n" +
                 "    /* PUBLIC.PERSON.tableScan */\n" +
                 "WHERE (\"SALARY\" > ?1)\n" +
@@ -962,10 +1028,10 @@ public class TestCases extends TestDb {
 
         checkExplain(stat, "EXPLAIN SELECT * FROM PERSON WHERE salary > 1000 and salary < 2000",
             "SELECT\n" +
-                "    \"PUBLIC\".\"PERSON\".\"ID\",\n" +
-                "    \"PUBLIC\".\"PERSON\".\"ORGID\",\n" +
-                "    \"PUBLIC\".\"PERSON\".\"NAME\",\n" +
-                "    \"PUBLIC\".\"PERSON\".\"SALARY\"\n" +
+                "    \"PERSON\".\"ID\",\n" +
+                "    \"PERSON\".\"ORGID\",\n" +
+                "    \"PERSON\".\"NAME\",\n" +
+                "    \"PERSON\".\"SALARY\"\n" +
                 "FROM \"PUBLIC\".\"PERSON\"\n" +
                 "    /* PUBLIC.PERSON.tableScan */\n" +
                 "WHERE (\"SALARY\" > 1000)\n" +
@@ -973,20 +1039,20 @@ public class TestCases extends TestDb {
 
         checkExplain(stat, "EXPLAIN SELECT * FROM PERSON WHERE name = lower(?)",
             "SELECT\n" +
-                "    \"PUBLIC\".\"PERSON\".\"ID\",\n" +
-                "    \"PUBLIC\".\"PERSON\".\"ORGID\",\n" +
-                "    \"PUBLIC\".\"PERSON\".\"NAME\",\n" +
-                "    \"PUBLIC\".\"PERSON\".\"SALARY\"\n" +
+                "    \"PERSON\".\"ID\",\n" +
+                "    \"PERSON\".\"ORGID\",\n" +
+                "    \"PERSON\".\"NAME\",\n" +
+                "    \"PERSON\".\"SALARY\"\n" +
                 "FROM \"PUBLIC\".\"PERSON\"\n" +
                 "    /* PUBLIC.PERSON.tableScan */\n" +
                 "WHERE \"NAME\" = LOWER(?1)");
 
         checkExplain(stat, "EXPLAIN SELECT * FROM PERSON WHERE name = lower('Smith')",
             "SELECT\n" +
-                "    \"PUBLIC\".\"PERSON\".\"ID\",\n" +
-                "    \"PUBLIC\".\"PERSON\".\"ORGID\",\n" +
-                "    \"PUBLIC\".\"PERSON\".\"NAME\",\n" +
-                "    \"PUBLIC\".\"PERSON\".\"SALARY\"\n" +
+                "    \"PERSON\".\"ID\",\n" +
+                "    \"PERSON\".\"ORGID\",\n" +
+                "    \"PERSON\".\"NAME\",\n" +
+                "    \"PERSON\".\"SALARY\"\n" +
                 "FROM \"PUBLIC\".\"PERSON\"\n" +
                 "    /* PUBLIC.PERSON.tableScan */\n" +
                 "WHERE \"NAME\" = 'smith'");
@@ -1108,6 +1174,8 @@ public class TestCases extends TestDb {
                 "    \"O\".\"NAME\"\n" +
                 "FROM \"PUBLIC\".\"PERSON\" \"P\"\n" +
                 "    /* PUBLIC.PRIMARY_KEY_8: ID = ?1 */\n" +
+                "    /* WHERE P.ID = ?1\n" +
+                "    */\n" +
                 "    /* scanCount: 2 */\n" +
                 "INNER JOIN \"PUBLIC\".\"ORGANIZATION\" \"O\"\n" +
                 "    /* PUBLIC.PRIMARY_KEY_D: ID = ?1\n" +
@@ -1115,8 +1183,9 @@ public class TestCases extends TestDb {
                 "     */\n" +
                 "    ON 1=1\n" +
                 "    /* scanCount: 2 */\n" +
-                "WHERE (\"O\".\"ID\" = ?1)\n" +
-                "    AND (\"O\".\"ID\" = \"P\".\"ID\")",
+                "WHERE ((\"O\".\"ID\" = ?1)\n" +
+                "    AND (\"O\".\"ID\" = \"P\".\"ID\"))\n" +
+                "    AND (\"P\".\"ID\" = ?1)",
             rs.getString(1));
 
         conn.close();

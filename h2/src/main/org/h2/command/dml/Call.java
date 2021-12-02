@@ -1,6 +1,6 @@
 /*
  * Copyright 2004-2019 H2 Group. Multiple-Licensed under the MPL 2.0,
- * and the EPL 1.0 (https://h2database.com/html/license.html).
+ * and the EPL 1.0 (http://h2database.com/html/license.html).
  * Initial Developer: H2 Group
  */
 package org.h2.command.dml;
@@ -33,10 +33,9 @@ public class Call extends Prepared {
         LocalResult result;
         if (isResultSet) {
             Expression[] expr = expression.getExpressionColumns(session);
-            int count = expr.length;
-            result = session.getDatabase().getResultFactory().create(session, expr, count, count);
+            result = session.getDatabase().getResultFactory().create(session, expr, expr.length);
         } else {
-            result = session.getDatabase().getResultFactory().create(session, expressions, 1, 1);
+            result = session.getDatabase().getResultFactory().create(session, expressions, 1);
         }
         result.done();
         return result;
@@ -66,8 +65,9 @@ public class Call extends Prepared {
         if (isResultSet) {
             return v.getResult();
         }
-        LocalResult result = session.getDatabase().getResultFactory().create(session, expressions, 1, 1);
-        result.addRow(v);
+        LocalResult result = session.getDatabase().getResultFactory().create(session, expressions, 1);
+        Value[] row = { v };
+        result.addRow(row);
         result.done();
         return result;
     }

@@ -1,6 +1,6 @@
 /*
  * Copyright 2004-2019 H2 Group. Multiple-Licensed under the MPL 2.0,
- * and the EPL 1.0 (https://h2database.com/html/license.html).
+ * and the EPL 1.0 (http://h2database.com/html/license.html).
  * Initial Developer: H2 Group
  */
 package org.h2.engine;
@@ -10,7 +10,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Set;
 import java.util.regex.Pattern;
-
 import org.h2.util.StringUtils;
 import org.h2.value.DataType;
 import org.h2.value.Value;
@@ -62,6 +61,14 @@ public class Mode {
     public boolean aliasColumnName;
 
     /**
+     * When inserting data, if a column is defined to be NOT NULL and NULL is
+     * inserted, then a 0 (or empty string, or the current timestamp for
+     * timestamp columns) value is used. Usually, this operation is not allowed
+     * and an exception is thrown.
+     */
+    public boolean convertInsertNullToZero;
+
+    /**
      * When converting the scale of decimal data, the number is only converted
      * if the new scale is smaller than the current scale. Usually, the scale is
      * converted and 0s are added if required.
@@ -75,6 +82,11 @@ public class Mode {
      * key idx_name(name));</code>
      */
     public boolean indexDefinitionInCreateTable;
+
+    /**
+     * Meta data calls return identifiers in lower case.
+     */
+    public boolean lowerCaseIdentifiers;
 
     /**
      * Concatenation with NULL results in NULL. Usually, NULL is treated as an
@@ -115,14 +127,9 @@ public class Mode {
     public boolean allowPlusForStringConcat;
 
     /**
-     * The single-argument function LOG() uses base 10 instead of E.
+     * The function LOG() uses base 10 instead of E.
      */
     public boolean logIsLogBase10;
-
-    /**
-     * Swap the parameters of LOG() function.
-     */
-    public boolean swapLogFunctionParameters;
 
     /**
      * The function REGEXP_REPLACE() uses \ for back-references.
@@ -145,19 +152,9 @@ public class Mode {
     public boolean isolationLevelInSelectOrInsertStatement;
 
     /**
-     * MySQL style INSERT ... ON DUPLICATE KEY UPDATE ... and INSERT IGNORE.
+     * MySQL style INSERT ... ON DUPLICATE KEY UPDATE ... and INSERT IGNORE
      */
     public boolean onDuplicateKeyUpdate;
-
-    /**
-     * MySQL style REPLACE INTO.
-     */
-    public boolean replaceInto;
-
-    /**
-     * PostgreSQL style INSERT ... ON CONFLICT DO NOTHING.
-     */
-    public boolean insertOnConflict;
 
     /**
      * Pattern describing the keys the java.sql.Connection.setClientInfo()
@@ -171,9 +168,9 @@ public class Mode {
     public boolean supportPoundSymbolForColumnNames;
 
     /**
-     * Whether IN predicate may have an empty value list.
+     * Whether an empty list as in "NAME IN()" results in a syntax error.
      */
-    public boolean allowEmptyInPredicate;
+    public boolean prohibitEmptyInPredicate;
 
     /**
      * Whether AFFINITY KEY keywords are supported.
@@ -213,46 +210,6 @@ public class Mode {
     public boolean dateTimeValueWithinTransaction;
 
     /**
-     * If {@code true} {@code 0x}-prefixed numbers are parsed as binary string
-     * literals, if {@code false} they are parsed as hexadecimal numeric values.
-     */
-    public boolean zeroExLiteralsAreBinaryStrings;
-
-    /**
-     * If {@code true} unrelated ORDER BY expression are allowed in DISTINCT
-     * queries, if {@code false} they are disallowed.
-     */
-    public boolean allowUnrelatedOrderByExpressionsInDistinctQueries;
-
-    /**
-     * If {@code true} some additional non-standard ALTER TABLE commands are allowed.
-     */
-    public boolean alterTableExtensionsMySQL;
-
-    /**
-     * If {@code true} non-standard ALTER TABLE MODIFY COLUMN is allowed.
-     */
-    public boolean alterTableModifyColumn;
-
-    /**
-     * If {@code true} TRUNCATE TABLE uses RESTART IDENTITY by default.
-     */
-    public boolean truncateTableRestartIdentity;
-
-    /**
-     * If {@code true} NEXT VALUE FOR SEQUENCE, CURRENT VALUE FOR SEQUENCE,
-     * SEQUENCE.NEXTVAL, and SEQUENCE.CURRVAL return values with DECIMAL/NUMERIC
-     * data type instead of BIGINT.
-     */
-    public boolean decimalSequences;
-
-    /**
-     * If {@code true} constructs like 'CREATE TABLE CATALOG..TABLE_NAME' are allowed,
-     * the default schema is used.
-     */
-    public boolean allowEmptySchemaValuesAsDefaultSchema;
-
-    /**
      * An optional Set of hidden/disallowed column types.
      * Certain DBMSs don't support all column types provided by H2, such as
      * "NUMBER" when using PostgreSQL mode.
@@ -271,7 +228,6 @@ public class Mode {
     static {
         Mode mode = new Mode(ModeEnum.REGULAR);
         mode.nullConcatIsNull = true;
-        mode.allowEmptyInPredicate = true;
         mode.dateTimeValueWithinTransaction = true;
         add(mode);
 
@@ -285,6 +241,7 @@ public class Mode {
         mode.supportedClientInfoPropertiesRegEx =
                 Pattern.compile("ApplicationName|ClientAccountingInformation|" +
                         "ClientUser|ClientCorrelationToken");
+        mode.prohibitEmptyInPredicate = true;
         mode.allowDB2TimestampFormat = true;
         add(mode);
 
@@ -298,7 +255,10 @@ public class Mode {
         add(mode);
 
         mode = new Mode(ModeEnum.HSQLDB);
+        mode.aliasColumnName = true;
+        mode.convertOnlyToSmallerScale = true;
         mode.nullConcatIsNull = true;
+        mode.uniqueIndexNullsHandling = UniqueIndexNullsHandling.FORBID_ANY_DUPLICATES;
         mode.allowPlusForStringConcat = true;
         // HSQLDB does not support client info properties. See
         // http://hsqldb.org/doc/apidocs/
@@ -312,7 +272,6 @@ public class Mode {
         mode.squareBracketQuotedNames = true;
         mode.uniqueIndexNullsHandling = UniqueIndexNullsHandling.FORBID_ANY_DUPLICATES;
         mode.allowPlusForStringConcat = true;
-        mode.swapLogFunctionParameters = true;
         mode.swapConvertFunctionParameters = true;
         mode.supportPoundSymbolForColumnNames = true;
         mode.discardWithTableHints = true;
@@ -320,8 +279,6 @@ public class Mode {
         // MS SQL Server does not support client info properties. See
         // https://msdn.microsoft.com/en-Us/library/dd571296%28v=sql.110%29.aspx
         mode.supportedClientInfoPropertiesRegEx = null;
-        mode.zeroExLiteralsAreBinaryStrings = true;
-        mode.truncateTableRestartIdentity = true;
         DataType dt = DataType.createNumeric(19, 4, false);
         dt.type = Value.DECIMAL;
         dt.sqlType = Types.NUMERIC;
@@ -332,27 +289,23 @@ public class Mode {
         dt.sqlType = Types.NUMERIC;
         dt.name = "SMALLMONEY";
         mode.typeByNameMap.put("SMALLMONEY", dt);
-        mode.allowEmptySchemaValuesAsDefaultSchema = true;
         add(mode);
 
         mode = new Mode(ModeEnum.MySQL);
+        mode.convertInsertNullToZero = true;
         mode.indexDefinitionInCreateTable = true;
+        mode.lowerCaseIdentifiers = true;
         // Next one is for MariaDB
         mode.regexpReplaceBackslashReferences = true;
         mode.onDuplicateKeyUpdate = true;
-        mode.replaceInto = true;
         // MySQL allows to use any key for client info entries. See
         // http://grepcode.com/file/repo1.maven.org/maven2/mysql/
         //     mysql-connector-java/5.1.24/com/mysql/jdbc/
         //     JDBC4CommentClientInfoProvider.java
         mode.supportedClientInfoPropertiesRegEx =
                 Pattern.compile(".*");
+        mode.prohibitEmptyInPredicate = true;
         mode.charToBinaryInUtf8 = true;
-        mode.zeroExLiteralsAreBinaryStrings = true;
-        mode.allowUnrelatedOrderByExpressionsInDistinctQueries = true;
-        mode.alterTableExtensionsMySQL = true;
-        mode.alterTableModifyColumn = true;
-        mode.truncateTableRestartIdentity = true;
         add(mode);
 
         mode = new Mode(ModeEnum.Oracle);
@@ -366,8 +319,7 @@ public class Mode {
         // https://docs.oracle.com/database/121/JJDBC/jdbcvers.htm#JJDBC29006
         mode.supportedClientInfoPropertiesRegEx =
                 Pattern.compile(".*\\..*");
-        mode.alterTableModifyColumn = true;
-        mode.decimalSequences = true;
+        mode.prohibitEmptyInPredicate = true;
         dt = DataType.createDate(/* 2001-01-01 23:59:59 */ 19, 19, "DATE", false, 0, 0);
         dt.type = Value.TIMESTAMP;
         dt.sqlType = Types.TIMESTAMP;
@@ -382,12 +334,12 @@ public class Mode {
         mode.logIsLogBase10 = true;
         mode.regexpReplaceBackslashReferences = true;
         mode.serialColumnIsNotPK = true;
-        mode.insertOnConflict = true;
         // PostgreSQL only supports the ApplicationName property. See
         // https://github.com/hhru/postgres-jdbc/blob/master/postgresql-jdbc-9.2-1002.src/
         //     org/postgresql/jdbc4/AbstractJdbc4Connection.java
         mode.supportedClientInfoPropertiesRegEx =
                 Pattern.compile("ApplicationName");
+        mode.prohibitEmptyInPredicate = true;
         mode.padFixedLengthStrings = true;
         // Enumerate all H2 types NOT supported by PostgreSQL:
         Set<String> disallowedTypes = new java.util.HashSet<>();
@@ -408,7 +360,6 @@ public class Mode {
         mode.nullConcatIsNull = true;
         mode.allowAffinityKey = true;
         mode.indexDefinitionInCreateTable = true;
-        mode.allowEmptyInPredicate = true;
         mode.dateTimeValueWithinTransaction = true;
         add(mode);
     }

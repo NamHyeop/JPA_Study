@@ -1,6 +1,6 @@
 /*
  * Copyright 2004-2019 H2 Group. Multiple-Licensed under the MPL 2.0,
- * and the EPL 1.0 (https://h2database.com/html/license.html).
+ * and the EPL 1.0 (http://h2database.com/html/license.html).
  * Initial Developer: H2 Group
  */
 ;
@@ -246,6 +246,9 @@ create alias pg_catalog.format_type for "org.h2.server.pg.PgServer.formatType";
 
 drop alias if exists version;
 create alias version for "org.h2.server.pg.PgServer.getVersion";
+
+drop alias if exists current_schema;
+create alias current_schema for "org.h2.server.pg.PgServer.getCurrentSchema";
 
 drop alias if exists pg_encoding_to_char;
 create alias pg_encoding_to_char for "org.h2.server.pg.PgServer.getEncodingName";

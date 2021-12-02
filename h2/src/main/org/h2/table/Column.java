@@ -1,6 +1,6 @@
 /*
  * Copyright 2004-2019 H2 Group. Multiple-Licensed under the MPL 2.0,
- * and the EPL 1.0 (https://h2database.com/html/license.html).
+ * and the EPL 1.0 (http://h2database.com/html/license.html).
  * Initial Developer: H2 Group
  */
 package org.h2.table;
@@ -13,6 +13,7 @@ import org.h2.command.Parser;
 import org.h2.command.ddl.SequenceOptions;
 import org.h2.engine.Constants;
 import org.h2.engine.Domain;
+import org.h2.engine.Mode;
 import org.h2.engine.Session;
 import org.h2.expression.Expression;
 import org.h2.expression.ExpressionVisitor;
@@ -28,8 +29,11 @@ import org.h2.util.StringUtils;
 import org.h2.value.DataType;
 import org.h2.value.TypeInfo;
 import org.h2.value.Value;
+import org.h2.value.ValueInt;
 import org.h2.value.ValueLong;
 import org.h2.value.ValueNull;
+import org.h2.value.ValueString;
+import org.h2.value.ValueTime;
 import org.h2.value.ValueUuid;
 
 /**
@@ -172,18 +176,34 @@ public class Column {
     }
 
     /**
-     * Convert a value to this column's type without precision and scale checks.
+     * Convert a value to this column's type.
      *
      * @param v the value
-     * @param forComparison if {@code true}, perform cast for comparison operation
      * @return the value
      */
-    public Value convert(Value v, boolean forComparison) {
+    public Value convert(Value v) {
+        return convert(v, null);
+    }
+
+    /**
+     * Convert a value to this column's type using the given {@link Mode}.
+     * <p>
+     * Use this method in case the conversion is Mode-dependent.
+     *
+     * @param v the value
+     * @param mode the database {@link Mode} to use
+     * @return the value
+     */
+    public Value convert(Value v, Mode mode) {
         try {
-            return v.convertTo(type, table.getDatabase(), forComparison, this);
+            return v.convertTo(type, mode, this);
         } catch (DbException e) {
             if (e.getErrorCode() == ErrorCode.DATA_CONVERSION_ERROR_1) {
-                e = getDataConversionError(v, e);
+                String target = (table == null ? "" : table.getName() + ": ") +
+                        getCreateSQL();
+                throw DbException.get(
+                        ErrorCode.DATA_CONVERSION_ERROR_1, e,
+                        v.getTraceSQL() + " (" + target + ")");
             }
             throw e;
         }
@@ -356,36 +376,53 @@ public class Column {
         synchronized (this) {
             localDefaultExpression = defaultExpression;
         }
-        boolean addKey = false;
+        Mode mode = session.getDatabase().getMode();
         if (value == null) {
             if (localDefaultExpression == null) {
                 value = ValueNull.INSTANCE;
             } else {
-                value = localDefaultExpression.getValue(session);
-                addKey = true;
+                value = convert(localDefaultExpression.getValue(session), mode);
+                if (!localDefaultExpression.isConstant()) {
+                    session.getGeneratedKeys().add(this);
+                }
+                if (primaryKey) {
+                    session.setLastIdentity(value);
+                }
             }
         }
         if (value == ValueNull.INSTANCE) {
             if (convertNullToDefault) {
-                value = localDefaultExpression.getValue(session);
-                addKey = true;
+                value = convert(localDefaultExpression.getValue(session), mode);
+                if (!localDefaultExpression.isConstant()) {
+                    session.getGeneratedKeys().add(this);
+                }
             }
             if (value == ValueNull.INSTANCE && !nullable) {
-                throw DbException.get(ErrorCode.NULL_NOT_ALLOWED, name);
+                if (mode.convertInsertNullToZero) {
+                    int t = type.getValueType();
+                    DataType dt = DataType.getDataType(t);
+                    if (dt.decimal) {
+                        value = ValueInt.get(0).convertTo(t);
+                    } else if (dt.type == Value.TIMESTAMP) {
+                        value = session.getCurrentCommandStart().convertTo(Value.TIMESTAMP);
+                    } else if (dt.type == Value.TIMESTAMP_TZ) {
+                        value = session.getCurrentCommandStart();
+                    } else if (dt.type == Value.TIME) {
+                        value = ValueTime.fromNanos(0);
+                    } else if (dt.type == Value.DATE) {
+                        value = session.getCurrentCommandStart().convertTo(Value.DATE);
+                    } else {
+                        value = ValueString.get("").convertTo(t);
+                    }
+                } else {
+                    throw DbException.get(ErrorCode.NULL_NOT_ALLOWED, name);
+                }
             }
-        }
-        try {
-            value = type.cast(value, session, false, false, name);
-        } catch (DbException e) {
-            if (e.getErrorCode() == ErrorCode.DATA_CONVERSION_ERROR_1) {
-                e = getDataConversionError(value, e);
-            }
-            throw e;
         }
         if (checkConstraint != null) {
+            resolver.setValue(value);
             Value v;
             synchronized (this) {
-                resolver.setValue(value);
                 v = checkConstraint.getValue(session);
             }
             // Both TRUE and NULL are ok
@@ -393,20 +430,24 @@ public class Column {
                 throw DbException.get(ErrorCode.CHECK_CONSTRAINT_VIOLATED_1, checkConstraint.getSQL(false));
             }
         }
-        if (addKey && !localDefaultExpression.isConstant() && primaryKey) {
-            session.setLastIdentity(value);
+        value = value.convertScale(mode.convertOnlyToSmallerScale, type.getScale());
+        long precision = type.getPrecision();
+        if (precision > 0) {
+            if (!value.checkPrecision(precision)) {
+                String s = value.getTraceSQL();
+                if (s.length() > 127) {
+                    s = s.substring(0, 128) + "...";
+                }
+                throw DbException.get(ErrorCode.VALUE_TOO_LONG_2, getCreateSQL(),
+                        s + " (" + value.getType().getPrecision() + ')');
+            }
+        }
+        if (value != ValueNull.INSTANCE && DataType.isExtInfoType(type.getValueType())
+                && type.getExtTypeInfo() != null) {
+            value = type.getExtTypeInfo().cast(value);
         }
         updateSequenceIfRequired(session, value);
         return value;
-    }
-
-    private DbException getDataConversionError(Value value, DbException cause) {
-        StringBuilder builder = new StringBuilder().append(value.getTraceSQL()).append(" (");
-        if (table != null) {
-            builder.append(table.getName()).append(": ");
-        }
-        builder.append(getCreateSQL()).append(')');
-        return DbException.get(ErrorCode.DATA_CONVERSION_ERROR_1, cause, builder.toString());
     }
 
     private void updateSequenceIfRequired(Session session, Value value) {
@@ -455,11 +496,14 @@ public class Column {
             s = StringUtils.toUpperEnglish(s.replace('-', '_'));
             sequenceName = "SYSTEM_SEQUENCE_" + s;
         } while (schema.findSequence(sequenceName) != null);
-        Sequence seq = new Sequence(session, schema, id, sequenceName, autoIncrementOptions, true);
+        Sequence seq = new Sequence(schema, id, sequenceName, autoIncrementOptions.getStartValue(session),
+                autoIncrementOptions.getIncrement(session), autoIncrementOptions.getCacheSize(session),
+                autoIncrementOptions.getMinValue(null, session), autoIncrementOptions.getMaxValue(null, session),
+                Boolean.TRUE.equals(autoIncrementOptions.getCycle()), true);
         seq.setTemporary(temporary);
         session.getDatabase().addSchemaObject(session, seq);
         setAutoIncrementOptions(null);
-        SequenceValue seqValue = new SequenceValue(seq, false);
+        SequenceValue seqValue = new SequenceValue(seq);
         setDefaultExpression(session, seqValue);
         setSequence(seq);
     }
@@ -582,15 +626,6 @@ public class Column {
         }
     }
 
-    /**
-     * Returns autoincrement options, or {@code null}.
-     *
-     * @return autoincrement options, or {@code null}
-     */
-    public SequenceOptions getAutoIncrementOptions() {
-        return autoIncrementOptions;
-    }
-
     public void setConvertNullToDefault(boolean convert) {
         this.convertNullToDefault = convert;
     }
@@ -645,7 +680,7 @@ public class Column {
             return;
         }
         if (resolver == null) {
-            resolver = new SingleColumnResolver(session.getDatabase(), this);
+            resolver = new SingleColumnResolver(this);
         }
         synchronized (this) {
             String oldName = name;
@@ -754,9 +789,6 @@ public class Column {
             }
         }
         if (defaultExpression != null && !defaultExpression.isEverything(visitor)) {
-            return false;
-        }
-        if (onUpdateExpression != null && !onUpdateExpression.isEverything(visitor)) {
             return false;
         }
         if (checkConstraint != null && !checkConstraint.isEverything(visitor)) {

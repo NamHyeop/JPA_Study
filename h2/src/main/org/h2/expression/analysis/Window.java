@@ -1,6 +1,6 @@
 /*
  * Copyright 2004-2019 H2 Group. Multiple-Licensed under the MPL 2.0,
- * and the EPL 1.0 (https://h2database.com/html/license.html).
+ * and the EPL 1.0 (http://h2database.com/html/license.html).
  * Initial Developer: H2 Group
  */
 package org.h2.expression.analysis;
@@ -193,29 +193,6 @@ public final class Window {
     }
 
     /**
-     * Returns {@code true} if window ordering clause is specified or ROWS unit
-     * is used.
-     *
-     * @return {@code true} if window ordering clause is specified or ROWS unit
-     *         is used
-     */
-    public boolean isOrdered() {
-        if (orderBy != null) {
-            return true;
-        }
-        if (frame != null && frame.getUnits() == WindowFrameUnits.ROWS) {
-            if (frame.getStarting().getType() == WindowFrameBoundType.UNBOUNDED_PRECEDING) {
-                WindowFrameBound following = frame.getFollowing();
-                if (following != null && following.getType() == WindowFrameBoundType.UNBOUNDED_FOLLOWING) {
-                    return false;
-                }
-            }
-            return true;
-        }
-        return false;
-    }
-
-    /**
      * Returns the key for the current group.
      *
      * @param session
@@ -245,8 +222,7 @@ public final class Window {
      *
      * @param builder
      *            string builder
-     * @param alwaysQuote
-     *            quote all identifiers
+     * @param alwaysQuote quote all identifiers
      * @return the specified string builder
      * @see Expression#getSQL(StringBuilder, boolean)
      */

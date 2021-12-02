@@ -1,6 +1,6 @@
 /*
  * Copyright 2004-2019 H2 Group. Multiple-Licensed under the MPL 2.0,
- * and the EPL 1.0 (https://h2database.com/html/license.html).
+ * and the EPL 1.0 (http://h2database.com/html/license.html).
  * Initial Developer: H2 Group
  */
 package org.h2.test.jdbc;
@@ -51,6 +51,7 @@ public class TestStatement extends TestDb {
         testStatement();
         testPreparedStatement();
         testIdentityMerge();
+        testIdentity();
         conn.close();
         deleteDb("statement");
         testIdentifiers();
@@ -350,8 +351,6 @@ public class TestStatement extends TestDb {
         stat.execute("merge into test1(x) key(x) values(5)",
                 Statement.RETURN_GENERATED_KEYS);
         keys = stat.getGeneratedKeys();
-        keys.next();
-        assertEquals(1, keys.getInt(1));
         assertFalse(keys.next());
         stat.execute("merge into test1(x) key(x) values(6)",
                 Statement.RETURN_GENERATED_KEYS);
@@ -359,6 +358,64 @@ public class TestStatement extends TestDb {
         keys.next();
         assertEquals(2, keys.getInt(1));
         stat.execute("drop table test1, test2");
+    }
+
+    private void testIdentity() throws SQLException {
+        Statement stat = conn.createStatement();
+        stat.execute("CREATE SEQUENCE SEQ");
+        stat.execute("CREATE TABLE TEST(ID INT)");
+        stat.execute("INSERT INTO TEST VALUES(NEXT VALUE FOR SEQ)",
+                Statement.RETURN_GENERATED_KEYS);
+        ResultSet rs = stat.getGeneratedKeys();
+        rs.next();
+        assertEquals(1, rs.getInt(1));
+        assertFalse(rs.next());
+        stat.execute("INSERT INTO TEST VALUES(NEXT VALUE FOR SEQ)",
+                Statement.RETURN_GENERATED_KEYS);
+        rs = stat.getGeneratedKeys();
+        rs.next();
+        assertEquals(2, rs.getInt(1));
+        assertFalse(rs.next());
+        stat.execute("INSERT INTO TEST VALUES(NEXT VALUE FOR SEQ)",
+                new int[] { 1 });
+        rs = stat.getGeneratedKeys();
+        rs.next();
+        assertEquals(3, rs.getInt(1));
+        assertFalse(rs.next());
+        stat.execute("INSERT INTO TEST VALUES(NEXT VALUE FOR SEQ)",
+                new String[] { "ID" });
+        rs = stat.getGeneratedKeys();
+        rs.next();
+        assertEquals(4, rs.getInt(1));
+        assertFalse(rs.next());
+        stat.executeUpdate("INSERT INTO TEST VALUES(NEXT VALUE FOR SEQ)",
+                Statement.RETURN_GENERATED_KEYS);
+        rs = stat.getGeneratedKeys();
+        rs.next();
+        assertEquals(5, rs.getInt(1));
+        assertFalse(rs.next());
+        stat.executeUpdate("INSERT INTO TEST VALUES(NEXT VALUE FOR SEQ)",
+                new int[] { 1 });
+        rs = stat.getGeneratedKeys();
+        rs.next();
+        assertEquals(6, rs.getInt(1));
+        assertFalse(rs.next());
+        stat.executeUpdate("INSERT INTO TEST VALUES(NEXT VALUE FOR SEQ)",
+                new String[] { "ID" });
+        rs = stat.getGeneratedKeys();
+        rs.next();
+        assertEquals(7, rs.getInt(1));
+        assertFalse(rs.next());
+
+        stat.execute("CREATE TABLE TEST2(ID identity primary key)");
+        stat.execute("INSERT INTO TEST2 VALUES()");
+        stat.execute("SET @X = IDENTITY()");
+        rs = stat.executeQuery("SELECT @X");
+        rs.next();
+        assertEquals(1, rs.getInt(1));
+
+        stat.execute("DROP TABLE TEST");
+        stat.execute("DROP TABLE TEST2");
     }
 
     private void testPreparedStatement() throws SQLException{
@@ -431,25 +488,11 @@ public class TestStatement extends TestDb {
         assertEquals("\"Test\"", stat.enquoteIdentifier("\"Test\"", false));
         assertEquals("\"Test\"", stat.enquoteIdentifier("\"Test\"", true));
         assertEquals("\"\"\"Test\"", stat.enquoteIdentifier("\"\"\"Test\"", true));
-        assertEquals("\"\"", stat.enquoteIdentifier("", false));
-        assertEquals("\"\"", stat.enquoteIdentifier("", true));
-        try {
-            stat.enquoteIdentifier(null, false);
-            fail();
-        } catch (NullPointerException ex) {
-            // OK
-        }
         try {
             stat.enquoteIdentifier("\"Test", true);
             fail();
         } catch (SQLException ex) {
-            assertEquals(ErrorCode.INVALID_NAME_1, ex.getErrorCode());
-        }
-        try {
-            stat.enquoteIdentifier("\"a\"a\"", true);
-            fail();
-        } catch (SQLException ex) {
-            assertEquals(ErrorCode.INVALID_NAME_1, ex.getErrorCode());
+            // OK
         }
         // Other lower case characters don't have upper case mappings
         assertEquals("\u02B0", stat.enquoteIdentifier("\u02B0", false));
@@ -509,12 +552,6 @@ public class TestStatement extends TestDb {
         assertTrue(stat.isSimpleIdentifier("Test"));
         assertFalse(stat.isSimpleIdentifier("TODAY"));
         assertFalse(stat.isSimpleIdentifier("today"));
-        try {
-            stat.isSimpleIdentifier(null);
-            fail();
-        } catch (NullPointerException ex) {
-            // OK
-        }
 
         conn.close();
     }

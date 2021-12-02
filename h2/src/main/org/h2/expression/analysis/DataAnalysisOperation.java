@@ -1,6 +1,6 @@
 /*
  * Copyright 2004-2019 H2 Group. Multiple-Licensed under the MPL 2.0,
- * and the EPL 1.0 (https://h2database.com/html/license.html).
+ * and the EPL 1.0 (http://h2database.com/html/license.html).
  * Initial Developer: H2 Group
  */
 package org.h2.expression.analysis;
@@ -170,7 +170,9 @@ public abstract class DataAnalysisOperation extends Expression {
                 int n = 0;
                 WindowFrameBound bound = frame.getStarting();
                 if (bound.isParameterized()) {
-                    checkOrderBy(frame.getUnits(), orderBySize);
+                    if (orderBySize != 1) {
+                        throw getSingleSortKeyException();
+                    }
                     if (bound.isVariable()) {
                         bound.setExpressionIndex(index);
                         n++;
@@ -178,7 +180,9 @@ public abstract class DataAnalysisOperation extends Expression {
                 }
                 bound = frame.getFollowing();
                 if (bound != null && bound.isParameterized()) {
-                    checkOrderBy(frame.getUnits(), orderBySize);
+                    if (orderBySize != 1) {
+                        throw getSingleSortKeyException();
+                    }
                     if (bound.isVariable()) {
                         bound.setExpressionIndex(index + n);
                         n++;
@@ -190,24 +194,9 @@ public abstract class DataAnalysisOperation extends Expression {
         return this;
     }
 
-    private void checkOrderBy(WindowFrameUnits units, int orderBySize) {
-        switch (units) {
-        case RANGE:
-            if (orderBySize != 1) {
-                String sql = getSQL(false);
-                throw DbException.getSyntaxError(sql, sql.length() - 1,
-                        "exactly one sort key is required for RANGE units");
-            }
-            break;
-        case GROUPS:
-            if (orderBySize < 1) {
-                String sql = getSQL(false);
-                throw DbException.getSyntaxError(sql, sql.length() - 1,
-                        "a sort key is required for GROUPS units");
-            }
-            break;
-        default:
-        }
+    private DbException getSingleSortKeyException() {
+        String sql = getSQL(false);
+        return DbException.getSyntaxError(sql, sql.length() - 1, "exactly one sort key is required for RANGE units");
     }
 
     @Override
@@ -406,18 +395,18 @@ public abstract class DataAnalysisOperation extends Expression {
     private Value getWindowResult(Session session, SelectGroups groupData) {
         PartitionData partition;
         Object data;
-        boolean isOrdered = over.isOrdered();
+        boolean forOrderBy = over.getOrderBy() != null;
         Value key = over.getCurrentKey(session);
         partition = groupData.getWindowExprData(this, key);
         if (partition == null) {
             // Window aggregates with FILTER clause may have no collected values
-            data = isOrdered ? new ArrayList<>() : createAggregateData();
+            data = forOrderBy ? new ArrayList<>() : createAggregateData();
             partition = new PartitionData(data);
             groupData.setWindowExprData(this, key, partition);
         } else {
             data = partition.getData();
         }
-        if (isOrdered || !isAggregate()) {
+        if (forOrderBy || !isAggregate()) {
             Value result = getOrderedResult(session, groupData, partition, data);
             if (result == null) {
                 return getAggregatedValue(session, null);

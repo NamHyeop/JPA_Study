@@ -1,5 +1,5 @@
 -- Copyright 2004-2019 H2 Group. Multiple-Licensed under the MPL 2.0,
--- and the EPL 1.0 (https://h2database.com/html/license.html).
+-- and the EPL 1.0 (http://h2database.com/html/license.html).
 -- Initial Developer: H2 Group
 --
 
@@ -35,24 +35,6 @@ UPDATE TEST SET (B) = (7);
 
 SELECT B FROM TEST;
 >> 7
-
-UPDATE TEST SET (B) = (2, 3);
-> exception COLUMN_COUNT_DOES_NOT_MATCH
-
-UPDATE TEST SET (A, B) = ARRAY[3, 4];
-> exception COLUMN_COUNT_DOES_NOT_MATCH
-
-EXPLAIN UPDATE TEST SET (A) = ROW(3), B = 4;
->> UPDATE "PUBLIC"."TEST" /* PUBLIC.TEST.tableScan */ SET "A" = 3, "B" = 4
-
-EXPLAIN UPDATE TEST SET A = 3, (B) = 4;
->> UPDATE "PUBLIC"."TEST" /* PUBLIC.TEST.tableScan */ SET "A" = 3, "B" = 4
-
-UPDATE TEST SET (A, B) = (1, 2), (B, A) = (2, 1);
-> exception DUPLICATE_COLUMN_NAME_1
-
-UPDATE TEST SET (A) = A * 3;
-> update count: 1
 
 DROP TABLE TEST;
 > ok

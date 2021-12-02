@@ -1,21 +1,16 @@
 /*
  * Copyright 2004-2019 H2 Group. Multiple-Licensed under the MPL 2.0,
- * and the EPL 1.0 (https://h2database.com/html/license.html).
+ * and the EPL 1.0 (http://h2database.com/html/license.html).
  * Initial Developer: H2 Group
  */
 package org.h2.schema;
 
-import java.math.BigDecimal;
 import org.h2.api.ErrorCode;
-import org.h2.command.ddl.SequenceOptions;
 import org.h2.engine.DbObject;
 import org.h2.engine.Session;
 import org.h2.message.DbException;
 import org.h2.message.Trace;
 import org.h2.table.Table;
-import org.h2.value.Value;
-import org.h2.value.ValueDecimal;
-import org.h2.value.ValueLong;
 
 /**
  * A sequence is created using the statement
@@ -39,39 +34,58 @@ public class Sequence extends SchemaObjectBase {
     private boolean writeWithMargin;
 
     /**
-     * Creates a new sequence.
+     * Creates a new sequence for an auto-increment column.
      *
-     * @param session the session
      * @param schema the schema
      * @param id the object id
      * @param name the sequence name
-     * @param options the sequence options
+     * @param startValue the first value to return
+     * @param increment the increment count
+     */
+    public Sequence(Schema schema, int id, String name, long startValue,
+            long increment) {
+        this(schema, id, name, startValue, increment, null, null, null, false,
+                true);
+    }
+
+    /**
+     * Creates a new sequence.
+     *
+     * @param schema the schema
+     * @param id the object id
+     * @param name the sequence name
+     * @param startValue the first value to return
+     * @param increment the increment count
+     * @param cacheSize the number of entries to pre-fetch
+     * @param minValue the minimum value
+     * @param maxValue the maximum value
+     * @param cycle whether to jump back to the min value if needed
      * @param belongsToTable whether this sequence belongs to a table (for
      *            auto-increment columns)
      */
-    public Sequence(Session session, Schema schema, int id, String name, SequenceOptions options,
-            boolean belongsToTable) {
+    public Sequence(Schema schema, int id, String name, Long startValue,
+            Long increment, Long cacheSize, Long minValue, Long maxValue,
+            boolean cycle, boolean belongsToTable) {
         super(schema, id, name, Trace.SEQUENCE);
-        Long t = options.getIncrement(session);
-        long increment = t != null ? t : 1;
-        Long start = options.getStartValue(session);
-        Long min = options.getMinValue(null, session);
-        Long max = options.getMaxValue(null, session);
-        long minValue = min != null ? min : getDefaultMinValue(start, increment);
-        long maxValue = max != null ? max : getDefaultMaxValue(start, increment);
-        long value = start != null ? start : increment >= 0 ? minValue : maxValue;
-        if (!isValid(value, minValue, maxValue, increment)) {
-            throw DbException.get(ErrorCode.SEQUENCE_ATTRIBUTES_INVALID, name, Long.toString(value),
-                    Long.toString(minValue), Long.toString(maxValue), Long.toString(increment));
-        }
-        this.valueWithMargin = this.value = value;
-        this.increment = increment;
-        t = options.getCacheSize(session);
-        this.cacheSize = t != null ? Math.max(1, t) : DEFAULT_CACHE_SIZE;
-        this.minValue = minValue;
-        this.maxValue = maxValue;
-        this.cycle = Boolean.TRUE.equals(options.getCycle());
+        this.increment = increment != null ?
+                increment : 1;
+        this.minValue = minValue != null ?
+                minValue : getDefaultMinValue(startValue, this.increment);
+        this.maxValue = maxValue != null ?
+                maxValue : getDefaultMaxValue(startValue, this.increment);
+        this.value = startValue != null ?
+                startValue : getDefaultStartValue(this.increment);
+        this.valueWithMargin = value;
+        this.cacheSize = cacheSize != null ?
+                Math.max(1, cacheSize) : DEFAULT_CACHE_SIZE;
+        this.cycle = cycle;
         this.belongsToTable = belongsToTable;
+        if (!isValid(this.value, this.minValue, this.maxValue, this.increment)) {
+            throw DbException.get(ErrorCode.SEQUENCE_ATTRIBUTES_INVALID, name,
+                    Long.toString(this.value), Long.toString(this.minValue),
+                    Long.toString(this.maxValue),
+                    Long.toString(this.increment));
+        }
     }
 
     /**
@@ -164,6 +178,10 @@ public class Sequence extends SchemaObjectBase {
         return v;
     }
 
+    private long getDefaultStartValue(long increment) {
+        return increment >= 0 ? minValue : maxValue;
+    }
+
     public boolean getBelongsToTable() {
         return belongsToTable;
     }
@@ -220,11 +238,7 @@ public class Sequence extends SchemaObjectBase {
             buff.append(" CYCLE");
         }
         if (cacheSize != DEFAULT_CACHE_SIZE) {
-            if (cacheSize == 1) {
-                buff.append(" NO CACHE");
-            } else {
-                buff.append(" CACHE ").append(cacheSize);
-            }
+            buff.append(" CACHE ").append(cacheSize);
         }
         if (belongsToTable) {
             buff.append(" BELONGS_TO_TABLE");
@@ -238,9 +252,9 @@ public class Sequence extends SchemaObjectBase {
      * @param session the session
      * @return the next value
      */
-    public Value getNext(Session session) {
+    public long getNext(Session session) {
         boolean needsFlush = false;
-        long resultAsLong;
+        long result;
         synchronized (this) {
             if ((increment > 0 && value >= valueWithMargin) ||
                     (increment < 0 && value <= valueWithMargin)) {
@@ -257,20 +271,11 @@ public class Sequence extends SchemaObjectBase {
                     throw DbException.get(ErrorCode.SEQUENCE_EXHAUSTED, getName());
                 }
             }
-            resultAsLong = value;
+            result = value;
             value += increment;
         }
         if (needsFlush) {
             flush(session);
-        }
-        Value result;
-        if (database.getMode().decimalSequences) {
-            result = ValueDecimal.get(BigDecimal.valueOf(resultAsLong));
-        } else {
-            result = ValueLong.get(resultAsLong);
-        }
-        if (session != null) {
-            session.setCurrentValueFor(this, result);
         }
         return result;
     }
@@ -299,12 +304,12 @@ public class Sequence extends SchemaObjectBase {
             // locked it) because it must be committed immediately, otherwise
             // other threads can not access the sys table.
             Session sysSession = database.getSystemSession();
-            synchronized (database.isMVStore() ? sysSession : database) {
+            synchronized (database.isMultiThreaded() ?  sysSession : database) {
                 flushInternal(sysSession);
                 sysSession.commit(false);
             }
         } else {
-            synchronized (database.isMVStore() ? session : database) {
+            synchronized (database.isMultiThreaded() ? session : database) {
                 flushInternal(session);
             }
         }

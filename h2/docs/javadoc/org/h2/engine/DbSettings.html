@@ -9,7 +9,7 @@ DbSettings
 <h1>DbSettings</h1>
 This class contains various database-level settings. To override the
  documented default value for a database, append the setting in the database
- URL: "jdbc:h2:./test;ALIAS_COLUMN_NAME=TRUE" when opening the first connection
+ URL: "jdbc:h2:test;ALIAS_COLUMN_NAME=TRUE" when opening the first connection
  to the database. The settings can not be changed once the database is open.
  <p>
  Some settings are a last resort and temporary solution to work around a
@@ -66,9 +66,6 @@ This class contains various database-level settings. To override the
 <tr><td class="return">static boolean</td><td class="method">
 <a href="#FUNCTIONS_IN_SCHEMA">functionsInSchema</a>
 </td></tr>
-<tr><td class="return">static boolean</td><td class="method">
-<a href="#IGNORE_CATALOGS">ignoreCatalogs</a>
-</td></tr>
 <tr><td class="return">static int</td><td class="method">
 <a href="#LOB_TIMEOUT">lobTimeout</a>
 </td></tr>
@@ -123,11 +120,17 @@ This class contains various database-level settings. To override the
 <tr><td class="return">static boolean</td><td class="method">
 <a href="#RECOMPILE_ALWAYS">recompileAlways</a>
 </td></tr>
+<tr><td class="return">static int</td><td class="method">
+<a href="#RECONNECT_CHECK_DELAY">reconnectCheckDelay</a>
+</td></tr>
 <tr><td class="return">static boolean</td><td class="method">
 <a href="#REUSE_SPACE">reuseSpace</a>
 </td></tr>
 <tr><td class="return">static boolean</td><td class="method">
 <a href="#SHARE_LINKED_CONNECTIONS">shareLinkedConnections</a>
+</td></tr>
+<tr><td class="return">static boolean</td><td class="method">
+<a href="#STANDARD_DROP_TABLE_RESTRICT">standardDropTableRestrict</a>
 </td></tr>
 </table>
 <h4 id="ALIAS_COLUMN_NAME"><span class="methodName">aliasColumnName
@@ -260,14 +263,6 @@ This class contains various database-level settings. To override the
  statement will always include the schema name in the CREATE ALIAS
  statement. This is not backward compatible with H2 versions 1.2.134 and
  older.</div>
-<hr />
-<h4 id="IGNORE_CATALOGS"><span class="methodName">ignoreCatalogs
-
-</span></h4>
-<div class="item">Database setting <code>IGNORE_CATALOGS</code>
- (default: false).<br />
- If set, all catalog names in identifiers are silently accepted
- without comparing them with the short name of the database.</div>
 <hr />
 <h4 id="LOB_TIMEOUT"><span class="methodName">lobTimeout
 
@@ -408,6 +403,15 @@ This class contains various database-level settings. To override the
 <div class="item">Database setting <code>RECOMPILE_ALWAYS</code> (default: false).<br />
  Always recompile prepared statements.</div>
 <hr />
+<h4 id="RECONNECT_CHECK_DELAY"><span class="methodName">reconnectCheckDelay
+
+</span></h4>
+<div class="item">Database setting <code>RECONNECT_CHECK_DELAY</code> (default: 200).<br />
+ Check the .lock.db file every this many milliseconds to detect that the
+ database was changed. The process writing to the database must first
+ notify a change in the .lock.db file, then wait twice this many
+ milliseconds before updating the database.</div>
+<hr />
 <h4 id="REUSE_SPACE"><span class="methodName">reuseSpace
 
 </span></h4>
@@ -424,5 +428,15 @@ This class contains various database-level settings. To override the
  Linked connections should be shared, that means connections to the same
  database should be used for all linked tables that connect to the same
  database.</div>
+<hr />
+<h4 id="STANDARD_DROP_TABLE_RESTRICT"><span class="methodName">standardDropTableRestrict
+
+</span></h4>
+<div class="item">Database setting <code>STANDARD_DROP_TABLE_RESTRICT</code> (default:
+ false).<br />
+ <code>true</code> if DROP TABLE RESTRICT should fail if there's any
+ foreign key referencing the table to be dropped. <code>false</code> if
+ foreign keys referencing the table to be dropped should be silently
+ dropped as well.</div>
 <hr />
 </div></td></tr></table></body></html>

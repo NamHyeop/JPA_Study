@@ -1,6 +1,6 @@
 /*
  * Copyright 2004-2019 H2 Group. Multiple-Licensed under the MPL 2.0,
- * and the EPL 1.0 (https://h2database.com/html/license.html).
+ * and the EPL 1.0 (http://h2database.com/html/license.html).
  * Initial Developer: H2 Group
  */
 package org.h2.api;
@@ -289,7 +289,7 @@ public class ErrorCode {
 
     /**
      * The error with code <code>23514</code> is thrown when
-     * evaluation of a check constraint resulted in an error.
+     * evaluation of a check constraint resulted in a error.
      */
     public static final int CHECK_CONSTRAINT_INVALID = 23514;
 
@@ -421,16 +421,6 @@ public class ErrorCode {
      * </pre>
      */
     public static final int IDENTICAL_EXPRESSIONS_SHOULD_BE_USED = 42131;
-
-    /**
-     * The error with code <code>42602</code> is thrown when
-     * invalid name of identifier is used.
-     * Example:
-     * <pre>
-     * statement.enquoteIdentifier("\"", true);
-     * </pre>
-     */
-    public static final int INVALID_NAME_1 = 42602;
 
     // 0A: feature not supported
 
@@ -2031,6 +2021,7 @@ public class ErrorCode {
     /**
      * The error with code <code>90143</code> is thrown when
      * trying to fetch a row from the primary index and the row is not there.
+     * Can happen in MULTI_THREADED=1 case.
      */
     public static final int ROW_NOT_FOUND_IN_PRIMARY_INDEX = 90143;
 
@@ -2058,46 +2049,18 @@ public class ErrorCode {
      */
     public static final int FOR_UPDATE_IS_NOT_ALLOWED_IN_DISTINCT_OR_GROUPED_SELECT = 90145;
 
+
     /**
      * The error with code <code>90146</code> is thrown when trying to open a
-     * database that does not exist using the flag IFEXISTS=TRUE
-     * <pre>
-     * jdbc:h2:./database_that_does_not_exist
-     * </pre>
-     */
-    public static final int DATABASE_NOT_FOUND_WITH_IF_EXISTS_1 = 90146;
-
-    /**
-     * The error with code <code>90147</code> is thrown when trying to execute a
-     * statement which closes the transaction (such as commit and rollback) and
-     * autocommit mode is on.
-     *
-     * @see org.h2.engine.SysProperties#FORCE_AUTOCOMMIT_OFF_ON_COMMIT
-     */
-    public static final int METHOD_DISABLED_ON_AUTOCOMMIT_TRUE = 90147;
-
-    /**
-     * The error with code <code>90148</code> is thrown when trying to access
-     * the current value of a sequence before execution of NEXT VALUE FOR
-     * sequenceName in the current session. Example:
-     *
-     * <pre>
-     * SELECT CURRENT VALUE FOR SEQUENCE XYZ;
-     * </pre>
-     */
-    public static final int CURRENT_SEQUENCE_VALUE_IS_NOT_DEFINED_IN_SESSION_1 = 90148;
-
-    /**
-     * The error with code <code>90149</code> is thrown when trying to open a
      * database that does not exist remotely without enabling remote database
-     * creation first.
+     * creation first, or using the flag IFEXISTS=TRUE
      * <pre>
      * jdbc:h2:./database_that_does_not_exist
      * </pre>
      */
-    public static final int REMOTE_DATABASE_NOT_FOUND_1 = 90149;
+    public static final int DATABASE_NOT_FOUND_2 = 90146;
 
-    // next is 90150
+    // next is 90147
 
     private ErrorCode() {
         // utility class

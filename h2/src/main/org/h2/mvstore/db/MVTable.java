@@ -1,6 +1,6 @@
 /*
  * Copyright 2004-2019 H2 Group. Multiple-Licensed under the MPL 2.0,
- * and the EPL 1.0 (https://h2database.com/html/license.html).
+ * and the EPL 1.0 (http://h2database.com/html/license.html).
  * Initial Developer: H2 Group
  */
 package org.h2.mvstore.db;
@@ -131,7 +131,6 @@ public class MVTable extends RegularTable {
             boolean forceLockEvenInMvcc) {
         int lockMode = database.getLockMode();
         if (lockMode == Constants.LOCK_MODE_OFF) {
-            session.registerTableAsUpdated(this);
             return false;
         }
         if (!forceLockEvenInMvcc) {
@@ -153,7 +152,7 @@ public class MVTable extends RegularTable {
         if (!exclusive && lockSharedSessions.containsKey(session)) {
             return true;
         }
-        synchronized (this) {
+        synchronized (getLockSyncObject()) {
             if (!exclusive && lockSharedSessions.containsKey(session)) {
                 return true;
             }
@@ -173,6 +172,21 @@ public class MVTable extends RegularTable {
             }
         }
         return false;
+    }
+
+    /**
+     * The the object on which to synchronize and wait on. For the
+     * multi-threaded mode, this is this object, but for non-multi-threaded, it
+     * is the database, as in this case all operations are synchronized on the
+     * database object.
+     *
+     * @return the lock sync object
+     */
+    private Object getLockSyncObject() {
+        if (database.isMultiThreaded()) {
+            return this;
+        }
+        return database;
     }
 
     private void doLock1(Session session, int lockMode, boolean exclusive) {
@@ -224,7 +238,7 @@ public class MVTable extends RegularTable {
                 if (sleep == 0) {
                     sleep = 1;
                 }
-                wait(sleep);
+                getLockSyncObject().wait(sleep);
             } catch (InterruptedException e) {
                 // ignore
             }
@@ -236,7 +250,7 @@ public class MVTable extends RegularTable {
             if (exclusive) {
                 if (lockSharedSessions.isEmpty()) {
                     traceLock(session, exclusive, TraceLockEvent.TRACE_LOCK_ADDED_FOR, NO_EXTRA_INFO);
-                    session.registerTableAsLocked(this);
+                    session.addLock(this);
                     lockExclusiveSession = session;
                     if (SysProperties.THREAD_DEADLOCK_DETECTOR) {
                         if (EXCLUSIVE_LOCKS.get() == null) {
@@ -260,7 +274,7 @@ public class MVTable extends RegularTable {
             } else {
                 if (lockSharedSessions.putIfAbsent(session, session) == null) {
                     traceLock(session, exclusive, TraceLockEvent.TRACE_LOCK_OK, NO_EXTRA_INFO);
-                    session.registerTableAsLocked(this);
+                    session.addLock(this);
                     if (SysProperties.THREAD_DEADLOCK_DETECTOR) {
                         ArrayList<String> list = SHARED_LOCKS.get();
                         if (list == null) {
@@ -306,8 +320,9 @@ public class MVTable extends RegularTable {
                 }
             }
             if (wasLocked && !waitingSessions.isEmpty()) {
-                synchronized (this) {
-                    notifyAll();
+                Object lockSyncObject = getLockSyncObject();
+                synchronized (lockSyncObject) {
+                    lockSyncObject.notifyAll();
                 }
             }
         }
@@ -564,11 +579,7 @@ public class MVTable extends RegularTable {
 
     @Override
     public Row lockRow(Session session, Row row) {
-        Row lockedRow = primaryIndex.lockRow(session, row);
-        if (lockedRow == null || !row.hasSharedData(lockedRow)) {
-            syncLastModificationIdWithDatabase();
-        }
-        return lockedRow;
+        return primaryIndex.lockRow(session, row);
     }
 
     private void analyzeIfRequired(Session session) {

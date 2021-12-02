@@ -1,6 +1,6 @@
 /*
  * Copyright 2004-2019 H2 Group. Multiple-Licensed under the MPL 2.0,
- * and the EPL 1.0 (https://h2database.com/html/license.html).
+ * and the EPL 1.0 (http://h2database.com/html/license.html).
  * Initial Developer: H2 Group
  */
 package org.h2.server.pg;
@@ -25,7 +25,6 @@ import org.h2.engine.Constants;
 import org.h2.message.DbException;
 import org.h2.server.Service;
 import org.h2.util.NetUtils;
-import org.h2.util.NetUtils2;
 import org.h2.util.Tool;
 
 /**
@@ -195,12 +194,10 @@ public class PgServer implements Service {
                     trace("Connection not allowed");
                     s.close();
                 } else {
-                    NetUtils2.setTcpQuickack(s, true);
                     PgServerThread c = new PgServerThread(s, this);
                     running.add(c);
-                    int id = pid.incrementAndGet();
-                    c.setProcessId(id);
-                    Thread thread = new Thread(c, threadName + " thread-" + id);
+                    c.setProcessId(pid.incrementAndGet());
+                    Thread thread = new Thread(c, threadName+" thread");
                     thread.setDaemon(isDaemon);
                     c.setThread(thread);
                     thread.start();
@@ -336,6 +333,19 @@ public class PgServer implements Service {
     }
 
     /**
+     * Get the name of the current schema.
+     * This method is called by the database.
+     *
+     * @param conn the connection
+     * @return the schema name
+     */
+    public static String getCurrentSchema(Connection conn) throws SQLException {
+        ResultSet rs = conn.createStatement().executeQuery("call schema()");
+        rs.next();
+        return rs.getString(1);
+    }
+
+    /**
      * Get the OID of an object. This method is called by the database.
      *
      * @param conn the connection
@@ -385,7 +395,7 @@ public class PgServer implements Service {
      */
     public static String getVersion() {
         return "PostgreSQL " + Constants.PG_VERSION + " server protocol using H2 " +
-                Constants.FULL_VERSION;
+                Constants.getFullVersion();
     }
 
     /**

@@ -1,6 +1,6 @@
 /*
  * Copyright 2004-2019 H2 Group. Multiple-Licensed under the MPL 2.0,
- * and the EPL 1.0 (https://h2database.com/html/license.html).
+ * and the EPL 1.0 (http://h2database.com/html/license.html).
  * Initial Developer: H2 Group
  */
 package org.h2.expression.condition;
@@ -13,7 +13,6 @@ import org.h2.expression.Expression;
 import org.h2.expression.ExpressionColumn;
 import org.h2.expression.ExpressionVisitor;
 import org.h2.expression.Parameter;
-import org.h2.expression.TypedValueExpression;
 import org.h2.expression.ValueExpression;
 import org.h2.index.IndexCondition;
 import org.h2.result.ResultInterface;
@@ -137,8 +136,8 @@ public class ConditionInParameter extends Condition {
     @Override
     public Expression optimize(Session session) {
         left = left.optimize(session);
-        if (left.isNullConstant()) {
-            return TypedValueExpression.getUnknown();
+        if (left == ValueExpression.getNull()) {
+            return left;
         }
         return this;
     }

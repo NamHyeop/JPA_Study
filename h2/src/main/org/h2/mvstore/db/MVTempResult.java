@@ -1,6 +1,6 @@
 /*
  * Copyright 2004-2019 H2 Group. Multiple-Licensed under the MPL 2.0,
- * and the EPL 1.0 (https://h2database.com/html/license.html).
+ * and the EPL 1.0 (http://h2database.com/html/license.html).
  * Initial Developer: H2 Group
  */
 package org.h2.mvstore.db;
@@ -71,19 +71,15 @@ public abstract class MVTempResult implements ResultExternal {
      *            indexes of distinct columns for DISTINCT ON results
      * @param visibleColumnCount
      *            count of visible columns
-     * @param resultColumnCount
-     *            the number of columns including visible columns and additional
-     *            virtual columns for ORDER BY and DISTINCT ON clauses
      * @param sort
      *            sort order, or {@code null}
      * @return temporary result
      */
     public static ResultExternal of(Database database, Expression[] expressions, boolean distinct,
-            int[] distinctIndexes, int visibleColumnCount, int resultColumnCount, SortOrder sort) {
+            int[] distinctIndexes, int visibleColumnCount, SortOrder sort) {
         return distinct || distinctIndexes != null || sort != null
-                ? new MVSortedTempResult(database, expressions, distinct, distinctIndexes, visibleColumnCount,
-                        resultColumnCount, sort)
-                : new MVPlainTempResult(database, expressions, visibleColumnCount, resultColumnCount);
+                ? new MVSortedTempResult(database, expressions, distinct, distinctIndexes, visibleColumnCount, sort)
+                : new MVPlainTempResult(database, expressions, visibleColumnCount);
     }
 
     /**
@@ -100,11 +96,6 @@ public abstract class MVTempResult implements ResultExternal {
      * Count of visible columns.
      */
     final int visibleColumnCount;
-
-    /**
-     * Total count of columns.
-     */
-    final int resultColumnCount;
 
     final boolean hasEnum;
 
@@ -154,7 +145,6 @@ public abstract class MVTempResult implements ResultExternal {
         this.store = parent.store;
         this.expressions = parent.expressions;
         this.visibleColumnCount = parent.visibleColumnCount;
-        this.resultColumnCount = parent.resultColumnCount;
         this.hasEnum = parent.hasEnum;
         this.tempFileDeleter = null;
         this.closeable = null;
@@ -170,10 +160,8 @@ public abstract class MVTempResult implements ResultExternal {
      *            column expressions
      * @param visibleColumnCount
      *            count of visible columns
-     * @param resultColumnCount
-     *            total count of columns
      */
-    MVTempResult(Database database, Expression[] expressions, int visibleColumnCount, int resultColumnCount) {
+    MVTempResult(Database database, Expression[] expressions, int visibleColumnCount) {
         try {
             String fileName = FileUtils.createTempFile("h2tmp", Constants.SUFFIX_TEMP_FILE, true);
             Builder builder = new MVStore.Builder().fileName(fileName).cacheSize(0).autoCommitDisabled();
@@ -184,10 +172,8 @@ public abstract class MVTempResult implements ResultExternal {
             store = builder.open();
             this.expressions = expressions;
             this.visibleColumnCount = visibleColumnCount;
-            this.resultColumnCount = resultColumnCount;
             boolean hasEnum = false;
-            for (int i = 0; i < resultColumnCount; i++) {
-                Expression e = expressions[i];
+            for (Expression e : expressions) {
                 if (e.getType().getValueType() == Value.ENUM) {
                     hasEnum = true;
                     break;
@@ -242,7 +228,7 @@ public abstract class MVTempResult implements ResultExternal {
      * @param row the array of values (modified in-place if needed)
      */
     final void fixEnum(Value[] row) {
-        for (int i = 0, l = resultColumnCount; i < l; i++) {
+        for (int i = 0, l = expressions.length; i < l; i++) {
             TypeInfo type = expressions[i].getType();
             if (type.getValueType() == Value.ENUM) {
                 row[i] = type.getExtTypeInfo().cast(row[i]);

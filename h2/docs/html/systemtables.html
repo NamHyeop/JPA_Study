@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <!--
 Copyright 2004-2019 H2 Group. Multiple-Licensed under the MPL 2.0,
-and the EPL 1.0 (https://h2database.com/html/license.html).
+and the EPL 1.0 (http://h2database.com/html/license.html).
 Initial Developer: H2 Group
 -->
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
@@ -21,16 +21,14 @@ System Tables
 <img src="images/h2-logo-2.png"
     alt="H2 database logo"
     onclick="document.location='main.html'"
-    width="136" height="74"/>
-&nbsp;&nbsp;<span id = "goTop" onclick="window.scrollTo(0,0)" style="color: #fff; position:fixed; font-size: 20px; cursor: pointer;">&#x25b2;</span>
-</div>
+    width="136" height="74"/> &nbsp;&nbsp;<span id = "goTop" onclick="window.scrollTo(0,0)" style="color: #fff; position:fixed; font-size: 20px; cursor: pointer;">&#x25b2;</span> </div>
 
 <form action="submit" onsubmit="return goFirst();">
 <table width="100%" class="search">
     <tr class="search">
         <td class="search" colspan="2">
 <!-- translate
-<a href="https://translate.google.com/translate?u=https%3A%2F%2Fh2database.com"
+<a href="http://translate.google.com/translate?u=http%3A%2F%2Fh2database.com"
     onclick="javascript:startTranslate();return false;">Translate</a>
 <div id = "translate" style="display:none"><div id = "google_translate_element"></div></div>
 translate -->
@@ -80,9 +78,6 @@ translate -->
 <b>Reference</b><br />
 <a href="commands.html">Commands</a><br />
 <a href="functions.html">Functions</a><br />
-&#8226;&nbsp;<a href="functions-aggregate.html">Aggregate</a>
-&#8226;&nbsp;<a href="functions-window.html">Window</a>
-<br /><br />
 <a href="datatypes.html">Data Types</a><br />
 <a href="grammar.html">SQL Grammar</a><br />
 <a href="systemtables.html">System Tables</a><br />
@@ -122,10 +117,7 @@ translate -->
 </p>
 
 <h2 id="information_schema" class="notranslate">Information Schema</h2>
-<p>
-The system tables in the schema <code>INFORMATION_SCHEMA</code> contain the meta data
-of all tables in the database as well as the current settings.
-</p>
+<p> The system tables in the schema <code>INFORMATION_SCHEMA</code> contain the meta data of all tables in the database as well as the current settings. </p>
 
 <h3 class="notranslate">CATALOGS</h3>
 <p class="notranslate">CATALOG_NAME</p>
@@ -191,7 +183,7 @@ of all tables in the database as well as the current settings.
 <p class="notranslate">SEQUENCE_CATALOG, SEQUENCE_SCHEMA, SEQUENCE_NAME, CURRENT_VALUE, INCREMENT, IS_GENERATED, REMARKS, CACHE, MIN_VALUE, MAX_VALUE, IS_CYCLE, ID</p>
 
 <h3 class="notranslate">SESSIONS</h3>
-<p class="notranslate">ID, USER_NAME, SERVER, CLIENT_ADDR, CLIENT_INFO, SESSION_START, ISOLATION_LEVEL, STATEMENT, STATEMENT_START, CONTAINS_UNCOMMITTED, STATE, BLOCKER_ID</p>
+<p class="notranslate">ID, USER_NAME, SESSION_START, STATEMENT, STATEMENT_START, CONTAINS_UNCOMMITTED, STATE, BLOCKER_ID</p>
 
 <h3 class="notranslate">SESSION_STATE</h3>
 <p class="notranslate">KEY, SQL</p>
@@ -227,19 +219,7 @@ of all tables in the database as well as the current settings.
 <p class="notranslate">TABLE_CATALOG, TABLE_SCHEMA, TABLE_NAME, VIEW_DEFINITION, CHECK_OPTION, IS_UPDATABLE, STATUS, REMARKS, ID</p>
 
 <h2 id="range_table" class="notranslate">Range Table</h2>
-<p>
-The range table is a dynamic system table that contains all values from a start to an end value.
-Non-zero step value may be also specified, default is 1.
-Start value, end value, and optional step value are converted to BIGINT data type.
-The table contains one column called X.
-If start value is greater than end value and step is positive the result is empty.
-If start value is less than end value and step is negative the result is empty too.
-If start value is equal to end value the result contains only start value.
-Start value, start value plus step, start value plus step multiplied by two and so on are included in result.
-If step is positive the last value is less than or equal to the specified end value.
-If step in negative the last value is greater than or equal to the specified end value.
-The table is used as follows:
-</p>
+<p> The range table is a dynamic system table that contains all values from a start to an end value. Non-zero step value may be also specified, default is 1. Start value, end value, and optional step value are converted to BIGINT data type. The table contains one column called X. If start value is greater than end value and step is positive the result is empty. If start value is less than end value and step is negative the result is empty too. If start value is equal to end value the result contains only start value. Start value, start value plus step, start value plus step multiplied by two and so on are included in result. If step is positive the last value is less than or equal to the specified end value. If step in negative the last value is greater than or equal to the specified end value. The table is used as follows: </p>
 <p>Examples:</p>
 <pre>
 SELECT X FROM SYSTEM_RANGE(1, 10);
@@ -261,7 +241,7 @@ function startTranslate() {
     document.getElementById('translate').style.display='';
     var script=document.createElement('script');
     script.setAttribute("type","text/javascript");
-    script.setAttribute("src", "https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit");
+    script.setAttribute("src", "http://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit");
     document.getElementsByTagName("head")[0].appendChild(script);
 }
 function googleTranslateElementInit() {

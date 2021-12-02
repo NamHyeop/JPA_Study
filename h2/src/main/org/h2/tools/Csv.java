@@ -1,6 +1,6 @@
 /*
  * Copyright 2004-2019 H2 Group. Multiple-Licensed under the MPL 2.0,
- * and the EPL 1.0 (https://h2database.com/html/license.html).
+ * and the EPL 1.0 (http://h2database.com/html/license.html).
  * Initial Developer: H2 Group
  */
 package org.h2.tools;
@@ -81,7 +81,21 @@ public class Csv implements SimpleRowSource {
             }
             while (rs.next()) {
                 for (int i = 0; i < columnCount; i++) {
-                    row[i] = rs.getString(i + 1);
+                    Object o;
+                    switch (sqlTypes[i]) {
+                    case Types.DATE:
+                        o = rs.getDate(i + 1);
+                        break;
+                    case Types.TIME:
+                        o = rs.getTime(i + 1);
+                        break;
+                    case Types.TIMESTAMP:
+                        o = rs.getTimestamp(i + 1);
+                        break;
+                    default:
+                        o = rs.getString(i + 1);
+                    }
+                    row[i] = o == null ? null : o.toString();
                 }
                 writeRow(row);
                 rows++;

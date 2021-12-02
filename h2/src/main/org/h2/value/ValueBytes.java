@@ -1,6 +1,6 @@
 /*
  * Copyright 2004-2019 H2 Group. Multiple-Licensed under the MPL 2.0,
- * and the EPL 1.0 (https://h2database.com/html/license.html).
+ * and the EPL 1.0 (http://h2database.com/html/license.html).
  * Initial Developer: H2 Group
  */
 package org.h2.value;
@@ -9,7 +9,6 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.Arrays;
 
-import org.h2.engine.CastDataProvider;
 import org.h2.engine.SysProperties;
 import org.h2.util.Bits;
 import org.h2.util.MathUtils;
@@ -111,7 +110,7 @@ public class ValueBytes extends Value {
     }
 
     @Override
-    public int compareTypeSafe(Value v, CompareMode mode, CastDataProvider provider) {
+    public int compareTypeSafe(Value v, CompareMode mode) {
         byte[] v2 = ((ValueBytes) v).value;
         if (mode.isBinaryUnsigned()) {
             return Bits.compareNotNullUnsigned(value, v2);
@@ -155,12 +154,12 @@ public class ValueBytes extends Value {
     }
 
     @Override
-    public Value convertPrecision(long precision) {
-        int p = MathUtils.convertLongToInt(precision);
-        if (value.length <= p) {
+    public Value convertPrecision(long precision, boolean force) {
+        if (value.length <= precision) {
             return this;
         }
-        return getNoCopy(Arrays.copyOf(value, p));
+        int len = MathUtils.convertLongToInt(precision);
+        return getNoCopy(Arrays.copyOf(value, len));
     }
 
 }

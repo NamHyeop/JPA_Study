@@ -1,6 +1,6 @@
 /*
  * Copyright 2004-2019 H2 Group. Multiple-Licensed under the MPL 2.0,
- * and the EPL 1.0 (https://h2database.com/html/license.html).
+ * and the EPL 1.0 (http://h2database.com/html/license.html).
  * Initial Developer: H2 Group
  */
 package org.h2.test.mvcc;
@@ -11,7 +11,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.concurrent.CountDownLatch;
 import org.h2.message.DbException;
 import org.h2.test.TestBase;
 import org.h2.test.TestDb;
@@ -26,7 +25,7 @@ public class TestMvccMultiThreaded2 extends TestDb {
     private static final int TEST_TIME_SECONDS = 60;
     private static final boolean DISPLAY_STATS = false;
 
-    private static final String URL = ";LOCK_TIMEOUT=120000";
+    private static final String URL = ";LOCK_TIMEOUT=120000;MULTI_THREADED=TRUE";
 
     /**
      * Run just this test.
@@ -37,6 +36,7 @@ public class TestMvccMultiThreaded2 extends TestDb {
         TestBase test = TestBase.createCaller().init();
         test.config.lockTimeout = 120000;
         test.config.memory = true;
+        test.config.multiThreaded = true;
         test.test();
     }
 
@@ -81,16 +81,16 @@ public class TestMvccMultiThreaded2 extends TestDb {
         ps.executeUpdate();
         conn.commit();
 
-        CountDownLatch latch = new CountDownLatch(TEST_THREAD_COUNT + 1);
         ArrayList<SelectForUpdate> threads = new ArrayList<>();
         for (int i = 0; i < TEST_THREAD_COUNT; i++) {
-            SelectForUpdate sfu = new SelectForUpdate(latch);
+            SelectForUpdate sfu = new SelectForUpdate();
             sfu.setName("Test SelectForUpdate Thread#"+i);
             threads.add(sfu);
             sfu.start();
         }
 
-        latch.countDown();
+        // give any of the 100 threads a chance to start by yielding the processor to them
+        Thread.yield();
 
         // gather stats on threads after they finished
         @SuppressWarnings("unused")
@@ -127,27 +127,26 @@ public class TestMvccMultiThreaded2 extends TestDb {
     /**
      *  Worker test thread selecting for update
      */
-    private class SelectForUpdate extends Thread
-    {
-        private final CountDownLatch latch;
+    private class SelectForUpdate extends Thread {
+
         public int iterationsProcessed;
 
         public boolean ok;
 
-        SelectForUpdate(CountDownLatch latch) {
-            this.latch = latch;
+        SelectForUpdate() {
         }
 
         @Override
         public void run() {
             final long start = System.currentTimeMillis();
             boolean done = false;
-            try (Connection conn = getConnection(getTestName() + URL)) {
+            Connection conn = null;
+            try {
+                conn = getConnection(getTestName() + URL);
                 conn.setAutoCommit(false);
 
                 // give the other threads a chance to start up before going into our work loop
-                latch.countDown();
-                latch.await();
+                Thread.yield();
 
                 PreparedStatement ps = conn.prepareStatement(
                         "SELECT * FROM test WHERE entity_id = ? FOR UPDATE");
@@ -175,8 +174,6 @@ public class TestMvccMultiThreaded2 extends TestDb {
                         done = true;
                     }
                 }
-                ok = true;
-            } catch (InterruptedException ignore) {
             } catch (SQLException e) {
                 TestBase.logError("SQL error from thread "+getName(), e);
                 throw DbException.convert(e);
@@ -184,6 +181,8 @@ public class TestMvccMultiThreaded2 extends TestDb {
                 TestBase.logError("General error from thread "+getName(), e);
                 throw e;
             }
+            IOUtils.closeSilently(conn);
+            ok = true;
         }
     }
 }

@@ -1,7 +1,7 @@
 <!-- can not use doctype -->
 <!--
 Copyright 2004-2019 H2 Group. Multiple-Licensed under the MPL 2.0,
-and the EPL 1.0 (https://h2database.com/html/license.html).
+and the EPL 1.0 (http://h2database.com/html/license.html).
 Initial Developer: H2 Group
 -->
 <html><head>
@@ -67,7 +67,7 @@ function goDetails(code) {
     code = code.replace('HY', '50');
     code = code.replace('C', '1');
     code = code.replace('T', '2');
-    get('more').src = 'https://h2database.com/javadoc/org/h2/constant/ErrorCode.html#c' + code;
+    get('more').src = 'http://h2database.com/javadoc/org/h2/constant/ErrorCode.html#c' + code;
 }
 
 function go(file, line) {
@@ -204,10 +204,7 @@ function sizeTextArea() {
 <h1>Error Analyzer</h1>
 <b><a href="../html/main.html">Home</a></b><br />
 <h2>
-    <a href="javascript:select('input')" id = "inputTab">Input</a>&nbsp;
-    <a href="javascript:select('details')" id = "detailsTab">Details</a>&nbsp;
-    <a href="javascript:select('source')" id = "sourceTab">Source Code</a>
-</h2>
+    <a href="javascript:select('input')" id = "inputTab">Input</a>&nbsp; <a href="javascript:select('details')" id = "detailsTab">Details</a>&nbsp; <a href="javascript:select('source')" id = "sourceTab">Source Code</a> </h2>
 <hr/>
 <div id = "input">
     <p>Paste the error message and stack trace below and click on 'Details' or 'Source Code': </p>
@@ -236,8 +233,7 @@ function sizeTextArea() {
         <p><b>Stack Trace: </b></p>
         <p id = "links"></p>
     </td><td style="border:0px" width="90%">
-        <p><b>Source File: </b><span id = "file"></span><br />
-        Inline <input type="checkbox" id = "rawSource" checked="checked" /></p>
+        <p><b>Source File: </b><span id = "file"></span><br /> Inline <input type="checkbox" id = "rawSource" checked="checked" /></p>
         <iframe id = "code" frameborder="0" marginwidth="0" marginheight="0" width="4000px" height="100px" src="">
         </iframe>
     </td>

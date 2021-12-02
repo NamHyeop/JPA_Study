@@ -1,6 +1,6 @@
 /*
  * Copyright 2004-2019 H2 Group. Multiple-Licensed under the MPL 2.0,
- * and the EPL 1.0 (https://h2database.com/html/license.html).
+ * and the EPL 1.0 (http://h2database.com/html/license.html).
  * Initial Developer: H2 Group
  */
 package org.h2.build.doc;
@@ -31,8 +31,7 @@ public class MergeDocs {
         // the order of pages is important here
         String[] pages = { "quickstart.html", "installation.html",
                 "tutorial.html", "features.html", "performance.html",
-                "advanced.html", "commands.html",
-                "functions.html", "functions-aggregate.html", "functions-window.html",
+                "advanced.html", "commands.html", "functions.html",
                 "datatypes.html", "grammar.html", "systemtables.html",
                 "build.html", "history.html", "faq.html" };
         StringBuilder buff = new StringBuilder();
@@ -56,7 +55,7 @@ public class MergeDocs {
         writer.println("</title><link rel=\"stylesheet\" type=\"text/css\" " +
                 "href=\"stylesheetPdf.css\" /></head><body>");
         writer.println("<p class=\"title\">H2 Database Engine</p>");
-        writer.println("<p>Version " + Constants.FULL_VERSION + "</p>");
+        writer.println("<p>Version " + Constants.getFullVersion() + "</p>");
         writer.println(finalText);
         writer.println("</body></html>");
         writer.close();
@@ -104,8 +103,6 @@ public class MergeDocs {
                 .replaceAll("href=\"commands.html\"", "href=\"#commands_index\"")
                 .replaceAll("href=\"grammar.html\"", "href=\"#grammar_index\"")
                 .replaceAll("href=\"functions.html\"", "href=\"#functions_index\"")
-                .replaceAll("href=\"functions-aggregate.html\"", "href=\"#functions_aggregate_index\"")
-                .replaceAll("href=\"functions-window.html\"", "href=\"#functions_window_index\"")
                 .replaceAll("href=\"tutorial.html\"", "href=\"#tutorial_index\"");
     }
 

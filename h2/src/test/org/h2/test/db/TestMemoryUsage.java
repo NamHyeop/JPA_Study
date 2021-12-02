@@ -1,6 +1,6 @@
 /*
  * Copyright 2004-2019 H2 Group. Multiple-Licensed under the MPL 2.0,
- * and the EPL 1.0 (https://h2database.com/html/license.html).
+ * and the EPL 1.0 (http://h2database.com/html/license.html).
  * Initial Developer: H2 Group
  */
 package org.h2.test.db;
@@ -63,8 +63,7 @@ public class TestMemoryUsage extends TestDb {
             return;
         }
         deleteDb("memoryUsage");
-        // to eliminate background thread interference
-        conn = getConnection("memoryUsage;WRITE_DELAY=0");
+        conn = getConnection("memoryUsage");
         try {
             eatMemory(4000);
             for (int i = 0; i < 4000; i++) {
@@ -128,16 +127,18 @@ public class TestMemoryUsage extends TestDb {
             return;
         }
         deleteDb("memoryUsageClob");
-        conn = getConnection("memoryUsageClob;WRITE_DELAY=0");
+        conn = getConnection("memoryUsageClob");
         Statement stat = conn.createStatement();
         stat.execute("SET MAX_LENGTH_INPLACE_LOB 8192");
         stat.execute("SET CACHE_SIZE 8000");
         stat.execute("CREATE TABLE TEST(ID IDENTITY, DATA CLOB)");
+        freeSoftReferences();
         try {
             int base = Utils.getMemoryUsed();
             for (int i = 0; i < 4; i++) {
                 stat.execute("INSERT INTO TEST(DATA) " +
                         "SELECT SPACE(8000) FROM SYSTEM_RANGE(1, 800)");
+                freeSoftReferences();
                 int used = Utils.getMemoryUsed();
                 if ((used - base) > 3 * 8192) {
                     fail("Used: " + (used - base) + " i: " + i);
@@ -164,6 +165,20 @@ public class TestMemoryUsage extends TestDb {
                 throw e;
             }
         }
+    }
+
+    /**
+     * Eat memory so that all soft references are garbage collected.
+     */
+    void freeSoftReferences() {
+        try {
+            eatMemory(1);
+        } catch (OutOfMemoryError e) {
+            // ignore
+        }
+        System.gc();
+        System.gc();
+        freeMemory();
     }
 
     private void testCreateIndex() throws SQLException {

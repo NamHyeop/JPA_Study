@@ -1,5 +1,5 @@
 -- Copyright 2004-2019 H2 Group. Multiple-Licensed under the MPL 2.0,
--- and the EPL 1.0 (https://h2database.com/html/license.html).
+-- and the EPL 1.0 (http://h2database.com/html/license.html).
 -- Initial Developer: H2 Group
 --
 
@@ -318,25 +318,25 @@ CREATE INDEX T_A_C ON TEST(A, C);
 > ok
 
 EXPLAIN SELECT * FROM TEST WHERE A = 0;
->> SELECT "PUBLIC"."TEST"."A", "PUBLIC"."TEST"."B", "PUBLIC"."TEST"."C" FROM "PUBLIC"."TEST" /* PUBLIC.T_A1: A = 0 */ WHERE "A" = 0
+>> SELECT "TEST"."A", "TEST"."B", "TEST"."C" FROM "PUBLIC"."TEST" /* PUBLIC.T_A1: A = 0 */ WHERE "A" = 0
 
 EXPLAIN SELECT * FROM TEST WHERE A = 0 AND B >= 0;
->> SELECT "PUBLIC"."TEST"."A", "PUBLIC"."TEST"."B", "PUBLIC"."TEST"."C" FROM "PUBLIC"."TEST" /* PUBLIC.T_A_B: A = 0 AND B >= 0 */ WHERE ("A" = 0) AND ("B" >= 0)
+>> SELECT "TEST"."A", "TEST"."B", "TEST"."C" FROM "PUBLIC"."TEST" /* PUBLIC.T_A_B: A = 0 AND B >= 0 */ WHERE ("A" = 0) AND ("B" >= 0)
 
 EXPLAIN SELECT * FROM TEST WHERE A > 0 AND B >= 0;
->> SELECT "PUBLIC"."TEST"."A", "PUBLIC"."TEST"."B", "PUBLIC"."TEST"."C" FROM "PUBLIC"."TEST" /* PUBLIC.T_A_B: A > 0 AND B >= 0 */ WHERE ("A" > 0) AND ("B" >= 0)
+>> SELECT "TEST"."A", "TEST"."B", "TEST"."C" FROM "PUBLIC"."TEST" /* PUBLIC.T_A_B: A > 0 AND B >= 0 */ WHERE ("A" > 0) AND ("B" >= 0)
 
 INSERT INTO TEST (SELECT X / 100, X, X FROM SYSTEM_RANGE(1, 3000));
 > update count: 3000
 
 EXPLAIN SELECT * FROM TEST WHERE A = 0;
->> SELECT "PUBLIC"."TEST"."A", "PUBLIC"."TEST"."B", "PUBLIC"."TEST"."C" FROM "PUBLIC"."TEST" /* PUBLIC.T_A1: A = 0 */ WHERE "A" = 0
+>> SELECT "TEST"."A", "TEST"."B", "TEST"."C" FROM "PUBLIC"."TEST" /* PUBLIC.T_A1: A = 0 */ WHERE "A" = 0
 
 EXPLAIN SELECT * FROM TEST WHERE A = 0 AND B >= 0;
->> SELECT "PUBLIC"."TEST"."A", "PUBLIC"."TEST"."B", "PUBLIC"."TEST"."C" FROM "PUBLIC"."TEST" /* PUBLIC.T_A_B: A = 0 AND B >= 0 */ WHERE ("A" = 0) AND ("B" >= 0)
+>> SELECT "TEST"."A", "TEST"."B", "TEST"."C" FROM "PUBLIC"."TEST" /* PUBLIC.T_A_B: A = 0 AND B >= 0 */ WHERE ("A" = 0) AND ("B" >= 0)
 
 EXPLAIN SELECT * FROM TEST WHERE A > 0 AND B >= 0;
->> SELECT "PUBLIC"."TEST"."A", "PUBLIC"."TEST"."B", "PUBLIC"."TEST"."C" FROM "PUBLIC"."TEST" /* PUBLIC.T_A_B: A > 0 AND B >= 0 */ WHERE ("A" > 0) AND ("B" >= 0)
+>> SELECT "TEST"."A", "TEST"."B", "TEST"."C" FROM "PUBLIC"."TEST" /* PUBLIC.T_A_B: A > 0 AND B >= 0 */ WHERE ("A" > 0) AND ("B" >= 0)
 
 -- Test that creation order of indexes has no effect
 CREATE INDEX T_A2 ON TEST(A);
@@ -346,67 +346,7 @@ DROP INDEX T_A1;
 > ok
 
 EXPLAIN SELECT * FROM TEST WHERE A = 0;
->> SELECT "PUBLIC"."TEST"."A", "PUBLIC"."TEST"."B", "PUBLIC"."TEST"."C" FROM "PUBLIC"."TEST" /* PUBLIC.T_A2: A = 0 */ WHERE "A" = 0
-
-DROP TABLE TEST;
-> ok
-
-CREATE TABLE T(A INT, B INT, C INT);
-> ok
-
-CREATE INDEX T_B_IDX ON T(B);
-> ok
-
-EXPLAIN SELECT * FROM T WHERE A = 1 AND B = A;
->> SELECT "PUBLIC"."T"."A", "PUBLIC"."T"."B", "PUBLIC"."T"."C" FROM "PUBLIC"."T" /* PUBLIC.T_B_IDX: B = 1 */ WHERE ("A" = 1) AND ("B" = "A")
-
-DROP TABLE T;
-> ok
-
--- _ROWID_ tests
-
-CREATE TABLE TEST(ID INT PRIMARY KEY);
-> ok
-
-INSERT INTO TEST VALUES 1, 2, 3, 4;
-> update count: 4
-
-SELECT * FROM TEST WHERE ID >= 2 AND ID <= 3;
-> ID
-> --
-> 2
-> 3
-> rows: 2
-
-SELECT * FROM TEST WHERE _ROWID_ >= 2 AND _ROWID_ <= 3;
-> ID
-> --
-> 2
-> 3
-> rows: 2
-
-DROP TABLE TEST;
-> ok
-
-CREATE TABLE TEST(ID FLOAT PRIMARY KEY);
-> ok
-
-INSERT INTO TEST VALUES 1.0, 2.0, 3.0, 4.0;
-> update count: 4
-
-SELECT * FROM TEST WHERE ID >= 2.0 AND ID <= 3.0;
-> ID
-> ---
-> 2.0
-> 3.0
-> rows: 2
-
-SELECT * FROM TEST WHERE _ROWID_ >= 2 AND _ROWID_ <= 3;
-> ID
-> ---
-> 2.0
-> 3.0
-> rows: 2
+>> SELECT "TEST"."A", "TEST"."B", "TEST"."C" FROM "PUBLIC"."TEST" /* PUBLIC.T_A2: A = 0 */ WHERE "A" = 0
 
 DROP TABLE TEST;
 > ok

@@ -1,6 +1,6 @@
 /*
  * Copyright 2004-2019 H2 Group. Multiple-Licensed under the MPL 2.0,
- * and the EPL 1.0 (https://h2database.com/html/license.html).
+ * and the EPL 1.0 (http://h2database.com/html/license.html).
  * Initial Developer: H2 Group
  */
 package org.h2.test.synth;
@@ -420,8 +420,7 @@ public class TestOuterJoins extends TestDb {
                 "on a.x = c.x");
         assertTrue(rs.next());
         sql = cleanRemarks(rs.getString(1));
-        assertEquals("SELECT \"PUBLIC\".\"A\".\"X\", \"PUBLIC\".\"B\".\"X\", " +
-                "\"PUBLIC\".\"C\".\"X\", \"PUBLIC\".\"C\".\"Y\" FROM \"PUBLIC\".\"A\" " +
+        assertEquals("SELECT \"A\".\"X\", \"B\".\"X\", \"C\".\"X\", \"C\".\"Y\" FROM \"PUBLIC\".\"A\" " +
                 "LEFT OUTER JOIN ( \"PUBLIC\".\"B\" " +
                 "LEFT OUTER JOIN \"PUBLIC\".\"C\" " +
                 "ON \"B\".\"X\" = \"C\".\"Y\" ) " +
@@ -502,8 +501,7 @@ public class TestOuterJoins extends TestDb {
                 "inner join c on c.x = 1) on a.x = b.x");
         assertTrue(rs.next());
         sql = cleanRemarks(rs.getString(1));
-        assertEquals("SELECT \"PUBLIC\".\"A\".\"X\", \"PUBLIC\".\"B\".\"X\", \"PUBLIC\".\"C\".\"X\" " +
-                "FROM \"PUBLIC\".\"A\" " +
+        assertEquals("SELECT \"A\".\"X\", \"B\".\"X\", \"C\".\"X\" FROM \"PUBLIC\".\"A\" " +
                 "LEFT OUTER JOIN ( \"PUBLIC\".\"B\" " +
                 "INNER JOIN \"PUBLIC\".\"C\" ON \"C\".\"X\" = 1 ) ON \"A\".\"X\" = \"B\".\"X\"", sql);
         stat.execute("drop table a, b, c");

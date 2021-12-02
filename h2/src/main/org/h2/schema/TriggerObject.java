@@ -1,6 +1,6 @@
 /*
  * Copyright 2004-2019 H2 Group. Multiple-Licensed under the MPL 2.0,
- * and the EPL 1.0 (https://h2database.com/html/license.html).
+ * and the EPL 1.0 (http://h2database.com/html/license.html).
  * Initial Developer: H2 Group
  */
 package org.h2.schema;
@@ -58,10 +58,6 @@ public class TriggerObject extends SchemaObjectBase {
 
     public void setBefore(boolean before) {
         this.before = before;
-    }
-
-    public boolean isInsteadOf() {
-        return insteadOf;
     }
 
     public void setInsteadOf(boolean insteadOf) {
@@ -172,7 +168,8 @@ public class TriggerObject extends SchemaObjectBase {
         try {
             triggerCallback.fire(c2, null, null);
         } catch (Throwable e) {
-            throw getErrorExecutingTrigger(e);
+            throw DbException.get(ErrorCode.ERROR_EXECUTING_TRIGGER_3, e, getName(),
+                    triggerClassName != null ? triggerClassName : "..source..", e.toString());
         } finally {
             if (session.getLastTriggerIdentity() != null) {
                 session.setLastScopeIdentity(session.getLastTriggerIdentity());
@@ -257,16 +254,14 @@ public class TriggerObject extends SchemaObjectBase {
         Value identity = session.getLastScopeIdentity();
         try {
             session.setAutoCommit(false);
-            try {
-                triggerCallback.fire(c2, oldList, newList);
-            } catch (Throwable e) {
-                throw getErrorExecutingTrigger(e);
-            }
+            triggerCallback.fire(c2, oldList, newList);
             if (newListBackup != null) {
                 for (int i = 0; i < newList.length; i++) {
                     Object o = newList[i];
                     if (o != newListBackup[i]) {
-                        newRow.setValue(i, DataType.convertToValue(session, o, Value.UNKNOWN));
+                        Value v = DataType.convertToValue(session, o, Value.UNKNOWN);
+                        session.getGeneratedKeys().add(table.getColumn(i));
+                        newRow.setValue(i, v);
                     }
                 }
             }
@@ -287,17 +282,6 @@ public class TriggerObject extends SchemaObjectBase {
             session.setAutoCommit(old);
         }
         return insteadOf;
-    }
-
-    private DbException getErrorExecutingTrigger(Throwable e) {
-        if (e instanceof DbException) {
-            return (DbException) e;
-        }
-        if (e instanceof SQLException) {
-            return DbException.convert(e);
-        }
-        return DbException.get(ErrorCode.ERROR_EXECUTING_TRIGGER_3, e, getName(),
-                triggerClassName != null ? triggerClassName : "..source..", e.toString());
     }
 
     /**

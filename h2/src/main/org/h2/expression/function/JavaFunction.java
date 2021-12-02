@@ -1,6 +1,6 @@
 /*
  * Copyright 2004-2019 H2 Group. Multiple-Licensed under the MPL 2.0,
- * and the EPL 1.0 (https://h2database.com/html/license.html).
+ * and the EPL 1.0 (http://h2database.com/html/license.html).
  * Initial Developer: H2 Group
  */
 package org.h2.expression.function;
@@ -165,6 +165,11 @@ public class JavaFunction extends Expression implements FunctionCall {
             return getExpressionColumns(session, (ValueCollectionBase) getValue(session));
         }
         return super.getExpressionColumns(session);
+    }
+
+    @Override
+    public boolean isBufferResultSetToLocalTemp() {
+        return functionAlias.isBufferResultSetToLocalTemp();
     }
 
     @Override

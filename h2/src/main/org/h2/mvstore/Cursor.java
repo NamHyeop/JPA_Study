@@ -1,6 +1,6 @@
 /*
  * Copyright 2004-2019 H2 Group. Multiple-Licensed under the MPL 2.0,
- * and the EPL 1.0 (https://h2database.com/html/license.html).
+ * and the EPL 1.0 (http://h2database.com/html/license.html).
  * Initial Developer: H2 Group
  */
 package org.h2.mvstore;
@@ -63,15 +63,13 @@ public class Cursor<K, V> implements Iterator<K> {
                         }
                         index = 0;
                     }
-                    if (index < page.getKeyCount()) {
-                        K key = (K) page.getKey(index);
-                        if (to != null && page.map.getKeyType().compare(key, to) > 0) {
-                            return false;
-                        }
-                        current = last = key;
-                        lastValue = (V) page.getValue(index);
-                        lastPage = page;
+                    K key = (K) page.getKey(index);
+                    if (to != null && page.map.getKeyType().compare(key, to) > 0) {
+                        return false;
                     }
+                    current = last = key;
+                    lastValue = (V) page.getValue(index);
+                    lastPage = page;
                 }
                 ++cursorPos.index;
             }
@@ -154,10 +152,25 @@ public class Cursor<K, V> implements Iterator<K> {
      * @param key the key to search, null means search for the first key
      */
     private static CursorPos traverseDown(Page p, Object key) {
-        CursorPos cursorPos = key == null ? p.getPrependCursorPos(null) : CursorPos.traverseDown(p, key);
-        if (cursorPos.index < 0) {
-            cursorPos.index = -cursorPos.index - 1;
+        CursorPos cursorPos = null;
+        while (!p.isLeaf()) {
+            int index = 0;
+            if(key != null) {
+                index = p.binarySearch(key) + 1;
+                if (index < 0) {
+                    index = -index;
+                }
+            }
+            cursorPos = new CursorPos(p, index, cursorPos);
+            p = p.getChildPage(index);
         }
-        return cursorPos;
+        int index = 0;
+        if(key != null) {
+            index = p.binarySearch(key);
+            if (index < 0) {
+                index = -index - 1;
+            }
+        }
+        return new CursorPos(p, index, cursorPos);
     }
 }

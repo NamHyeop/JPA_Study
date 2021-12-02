@@ -1,6 +1,6 @@
 /*
  * Copyright 2004-2019 H2 Group. Multiple-Licensed under the MPL 2.0,
- * and the EPL 1.0 (https://h2database.com/html/license.html).
+ * and the EPL 1.0 (http://h2database.com/html/license.html).
  * Initial Developer: H2 Group
  */
 package org.h2.tools;
@@ -42,15 +42,9 @@ import org.h2.mvstore.MVMap;
 import org.h2.mvstore.MVStore;
 import org.h2.mvstore.MVStoreTool;
 import org.h2.mvstore.StreamStore;
-import org.h2.mvstore.db.LobStorageMap;
 import org.h2.mvstore.db.ValueDataType;
 import org.h2.mvstore.tx.TransactionMap;
 import org.h2.mvstore.tx.TransactionStore;
-import org.h2.pagestore.Page;
-import org.h2.pagestore.PageFreeList;
-import org.h2.pagestore.PageLog;
-import org.h2.pagestore.PageStore;
-import org.h2.pagestore.db.LobStorageBackend;
 import org.h2.result.Row;
 import org.h2.result.RowFactory;
 import org.h2.result.SimpleRow;
@@ -61,7 +55,13 @@ import org.h2.store.DataReader;
 import org.h2.store.FileLister;
 import org.h2.store.FileStore;
 import org.h2.store.FileStoreInputStream;
+import org.h2.store.LobStorageBackend;
 import org.h2.store.LobStorageFrontend;
+import org.h2.store.LobStorageMap;
+import org.h2.store.Page;
+import org.h2.store.PageFreeList;
+import org.h2.store.PageLog;
+import org.h2.store.PageStore;
 import org.h2.store.fs.FileUtils;
 import org.h2.util.IOUtils;
 import org.h2.util.IntArray;
@@ -602,19 +602,19 @@ public class Recover extends Tool implements DataHandler {
         resetSchema();
         setDatabaseName(fileName.substring(0, fileName.length() -
                 Constants.SUFFIX_MV_FILE.length()));
-        try (MVStore mv = new MVStore.Builder().
-                fileName(fileName).recoveryMode().readOnly().open()) {
-            dumpLobMaps(writer, mv);
-            writer.println("-- Meta");
-            dumpMeta(writer, mv);
-            writer.println("-- Tables");
-            TransactionStore store = new TransactionStore(mv);
-            try {
-                store.init();
-            } catch (Throwable e) {
-                writeError(writer, e);
-            }
-
+        MVStore mv = new MVStore.Builder().
+                fileName(fileName).readOnly().open();
+        dumpLobMaps(writer, mv);
+        writer.println("-- Meta");
+        dumpMeta(writer, mv);
+        writer.println("-- Tables");
+        TransactionStore store = new TransactionStore(mv);
+        try {
+            store.init();
+        } catch (Throwable e) {
+            writeError(writer, e);
+        }
+        try {
             // extract the metadata so we can dump the settings
             ValueDataType type = new ValueDataType();
             for (String mapName : mv.getMapNames()) {
@@ -695,6 +695,8 @@ public class Recover extends Tool implements DataHandler {
             writer.println("DROP TABLE IF EXISTS INFORMATION_SCHEMA.LOB_BLOCKS;");
         } catch (Throwable e) {
             writeError(writer, e);
+        } finally {
+            mv.close();
         }
     }
 

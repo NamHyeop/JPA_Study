@@ -100,16 +100,12 @@ Represents the meta data for a database.<br /><br />
 <tr id="__7" onclick="return on(7)">
 <td class="return">boolean</td><td class="method">
 <a id="generatedKeyAlwaysReturned" href="#generatedKeyAlwaysReturned">generatedKeyAlwaysReturned</a>()
-<div class="methodText">Returns whether database always returns generated keys if valid names or
- indexes of columns were specified and command was completed successfully.</div>
+<div class="methodText">[Not supported]</div>
 </td></tr>
 <tr onclick="return off(7)" class="detail" id="_7">
 <td class="return">boolean</td><td>
 <a id="generatedKeyAlwaysReturned" href="#generatedKeyAlwaysReturned">generatedKeyAlwaysReturned</a>()
-<div class="methodText">Returns whether database always returns generated keys if valid names or
- indexes of columns were specified and command was completed successfully.</div>
-<div class="itemTitle">Returns:</div>
-<div class="item">true</div>
+<div class="methodText">[Not supported]</div>
 </td></tr>
 <tr id="__8" onclick="return on(8)">
 <td class="return">ResultSet</td><td class="method">
@@ -1086,8 +1082,7 @@ Represents the meta data for a database.<br /><br />
  table/column/index name, in addition to the SQL:2003 keywords. The list
  returned is:
  <pre>
- CURRENT_CATALOG,CURRENT_SCHEMA,
- GROUPS,
+ GROUPS
  IF,ILIKE,INTERSECTS,
  LIMIT,
  MINUS,
@@ -1100,8 +1095,7 @@ Represents the meta data for a database.<br /><br />
  <pre>
  ALL, AND, ARRAY, AS,
  BETWEEN, BOTH
- CASE, CHECK, CONSTRAINT, CROSS, CURRENT_CATALOG, CURRENT_DATE, CURRENT_SCHEMA,
- CURRENT_TIME, CURRENT_TIMESTAMP, CURRENT_USER,
+ CASE, CHECK, CONSTRAINT, CROSS, CURRENT_DATE, CURRENT_TIME, CURRENT_TIMESTAMP, CURRENT_USER,
  DISTINCT,
  EXCEPT, EXISTS,
  FALSE, FETCH, FILTER, FOR, FOREIGN, FROM, FULL,
@@ -1118,7 +1112,7 @@ Represents the meta data for a database.<br /><br />
  RANGE, REGEXP, RIGHT, ROW, _ROWID_, ROWNUM, ROWS,
  SELECT, SYSDATE, SYSTIME, SYSTIMESTAMP,
  TABLE, TODAY, TOP, TRAILING, TRUE,
- UNION, UNIQUE, UNKNOWN, USING
+ UNION, UNIQUE,
  VALUES,
  WHERE, WINDOW, WITH</pre></div>
 <div class="itemTitle">Returns:</div>
@@ -1134,7 +1128,7 @@ Represents the meta data for a database.<br /><br />
 <a id="getSQLStateType" href="#getSQLStateType">getSQLStateType</a>()
 <div class="methodText">Gets the SQL State type.</div>
 <div class="itemTitle">Returns:</div>
-<div class="item">{@link DatabaseMetaData#sqlStateSQL}</div>
+<div class="item">DatabaseMetaData.sqlStateSQL99</div>
 </td></tr>
 <tr id="__66" onclick="return on(66)">
 <td class="return">String</td><td class="method">

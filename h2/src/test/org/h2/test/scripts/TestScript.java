@@ -1,6 +1,6 @@
 /*
  * Copyright 2004-2019 H2 Group. Multiple-Licensed under the MPL 2.0,
- * and the EPL 1.0 (https://h2database.com/html/license.html).
+ * and the EPL 1.0 (http://h2database.com/html/license.html).
  * Initial Developer: H2 Group
  */
 package org.h2.test.scripts;
@@ -130,7 +130,6 @@ public class TestScript extends TestDb {
             testScript("testSimple.sql");
         }
         testScript("comments.sql");
-        testScript("compatibility.sql");
         testScript("derived-column-names.sql");
         testScript("distinct.sql");
         testScript("dual.sql");
@@ -152,33 +151,30 @@ public class TestScript extends TestDb {
 
         for (String s : new String[] { "array", "bigint", "binary", "blob",
                 "boolean", "char", "clob", "date", "decimal", decimal2, "double", "enum",
-                "geometry", "identity", "int", "json", "interval", "other", "real", "row", "smallint",
-                "time-with-time-zone", "time", "timestamp-with-time-zone", "timestamp", "tinyint",
+                "geometry", "identity", "int", "interval", "other", "real", "row", "smallint",
+                "time", "timestamp-with-timezone", "timestamp", "tinyint",
                 "uuid", "varchar", "varchar-ignorecase" }) {
             testScript("datatypes/" + s + ".sql");
         }
         for (String s : new String[] { "alterTableAdd", "alterTableAlterColumn", "alterTableDropColumn",
                 "alterTableRename", "createAlias", "createSequence", "createSynonym", "createTable", "createTrigger",
-                "createView", "dropAllObjects", "dropDomain", "dropIndex", "dropSchema", "dropTable",
-                "truncateTable" }) {
+                "createView", "dropDomain", "dropIndex", "dropSchema", "truncateTable" }) {
             testScript("ddl/" + s + ".sql");
         }
-        for (String s : new String[] { "delete", "error_reporting", "execute_immediate", "insert", "insertIgnore",
-                "merge", "mergeUsing", "replace", "script", "select", "show", "table", "update", "values", "with" }) {
+        for (String s : new String[] { "delete", "error_reporting", "insert", "insertIgnore", "merge", "mergeUsing",
+                "replace", "script", "select", "show", "table", "update", "values", "with" }) {
             testScript("dml/" + s + ".sql");
         }
+        for (String s : new String[] { "help" }) {
+            testScript("other/" + s + ".sql");
+        }
         for (String s : new String[] { "any", "array-agg", "avg", "bit-and", "bit-or", "count", "envelope",
-                "every", "histogram",
-                "json_arrayagg", "json_objectagg",
-                "listagg", "max", "min", "mode", "percentile", "rank", "selectivity",
+                "every", "histogram", "listagg", "max", "min", "mode", "percentile", "rank", "selectivity",
                 "stddev-pop", "stddev-samp", "sum", "var-pop", "var-samp" }) {
             testScript("functions/aggregate/" + s + ".sql");
         }
-        for (String s : new String[] { "json_array", "json_object" }) {
-            testScript("functions/json/" + s + ".sql");
-        }
         for (String s : new String[] { "abs", "acos", "asin", "atan", "atan2",
-                "bitand", "bitget", "bitnot", "bitor", "bitxor", "ceil", "compress",
+                "bitand", "bitget", "bitor", "bitxor", "ceil", "compress",
                 "cos", "cosh", "cot", "decrypt", "degrees", "encrypt", "exp",
                 "expand", "floor", "hash", "length", "log", "mod", "ora-hash", "pi",
                 "power", "radians", "rand", "random-uuid", "round",
@@ -189,7 +185,7 @@ public class TestScript extends TestDb {
         for (String s : new String[] { "ascii", "bit-length", "char", "concat",
                 "concat-ws", "difference", "hextoraw", "insert", "instr",
                 "left", "length", "locate", "lower", "lpad", "ltrim",
-                "octet-length", "position", "quote_ident", "rawtohex", "regexp-like",
+                "octet-length", "position", "rawtohex", "regexp-like",
                 "regex-replace", "repeat", "replace", "right", "rpad", "rtrim",
                 "soundex", "space", "stringdecode", "stringencode",
                 "stringtoutf8", "substring", "to-char", "translate", "trim",
@@ -199,12 +195,12 @@ public class TestScript extends TestDb {
         }
         for (String s : new String[] { "array-cat", "array-contains", "array-get",
                 "array-length","array-slice", "autocommit", "cancel-session", "casewhen",
-                "cast", "coalesce", "convert", "csvread", "csvwrite", "current_catalog", "current_schema", "currval",
-                "database-path", "decode", "disk-space-used",
+                "cast", "coalesce", "convert", "csvread", "csvwrite", "currval",
+                "database-path", "database", "decode", "disk-space-used",
                 "file-read", "file-write", "greatest", "h2version", "identity",
-                "ifnull", "last-insert-id", "least", "link-schema", "lock-mode", "lock-timeout",
+                "ifnull", "least", "link-schema", "lock-mode", "lock-timeout",
                 "memory-free", "memory-used", "nextval", "nullif", "nvl2",
-                "readonly", "rownum", "scope-identity", "session-id",
+                "readonly", "rownum", "schema", "scope-identity", "session-id",
                 "set", "table", "transaction-id", "truncate-value", "unnest", "user" }) {
             testScript("functions/system/" + s + ".sql");
         }
@@ -217,13 +213,6 @@ public class TestScript extends TestDb {
         }
         for (String s : new String[] { "lead", "nth_value", "ntile", "ratio_to_report", "row_number" }) {
             testScript("functions/window/" + s + ".sql");
-        }
-        for (String s : new String[] { "at-time-zone", "boolean-test", "conditions", "data-change-delta-table", "help",
-                "sequence", "set" }) {
-            testScript("other/" + s + ".sql");
-        }
-        for (String s : new String[] { "in", "null", "type", "unique" }) {
-            testScript("predicates/" + s + ".sql");
         }
 
         deleteDb("script");

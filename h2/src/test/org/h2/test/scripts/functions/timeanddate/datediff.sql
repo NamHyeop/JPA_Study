@@ -1,48 +1,54 @@
 -- Copyright 2004-2019 H2 Group. Multiple-Licensed under the MPL 2.0,
--- and the EPL 1.0 (https://h2database.com/html/license.html).
+-- and the EPL 1.0 (http://h2database.com/html/license.html).
 -- Initial Developer: H2 Group
 --
 
-select datediff('yy', timestamp '2003-12-01 10:20:30.0', timestamp '2004-01-01 10:00:00.0');
+create memory table test(id int primary key, name varchar(255));
+> ok
+
+insert into test values(1, 'Hello');
+> update count: 1
+
+select datediff('yy', timestamp '2003-12-01 10:20:30.0', timestamp '2004-01-01 10:00:00.0') from test;
 >> 1
 
-select datediff('year', timestamp '2003-12-01 10:20:30.0', timestamp '2004-01-01 10:00:00.0');
+select datediff('year', timestamp '2003-12-01 10:20:30.0', timestamp '2004-01-01 10:00:00.0') from test;
 >> 1
 
-select datediff('mm', timestamp '2003-11-01 10:20:30.0', timestamp '2004-01-01 10:00:00.0');
+select datediff('mm', timestamp '2003-11-01 10:20:30.0', timestamp '2004-01-01 10:00:00.0') from test;
 >> 2
 
-select datediff('month', timestamp '2003-11-01 10:20:30.0', timestamp '2004-01-01 10:00:00.0');
+select datediff('month', timestamp '2003-11-01 10:20:30.0', timestamp '2004-01-01 10:00:00.0') from test;
 >> 2
 
-select datediff('dd', timestamp '2004-01-01 10:20:30.0', timestamp '2004-01-05 10:00:00.0');
+select datediff('dd', timestamp '2004-01-01 10:20:30.0', timestamp '2004-01-05 10:00:00.0') from test;
 >> 4
 
-select datediff('day', timestamp '2004-01-01 10:20:30.0', timestamp '2004-01-05 10:00:00.0');
+select datediff('day', timestamp '2004-01-01 10:20:30.0', timestamp '2004-01-05 10:00:00.0') from test;
 >> 4
 
-select datediff('hh', timestamp '2004-01-01 10:20:30.0', timestamp '2004-01-02 10:00:00.0');
+select datediff('hh', timestamp '2004-01-01 10:20:30.0', timestamp '2004-01-02 10:00:00.0') from test;
 >> 24
 
-select datediff('hour', timestamp '2004-01-01 10:20:30.0', timestamp '2004-01-02 10:00:00.0');
+select datediff('hour', timestamp '2004-01-01 10:20:30.0', timestamp '2004-01-02 10:00:00.0') from test;
 >> 24
 
-select datediff('mi', timestamp '2004-01-01 10:20:30.0', timestamp '2004-01-01 10:00:00.0');
+select datediff('mi', timestamp '2004-01-01 10:20:30.0', timestamp '2004-01-01 10:00:00.0') from test;
 >> -20
 
-select datediff('minute', timestamp '2004-01-01 10:20:30.0', timestamp '2004-01-01 10:00:00.0');
+select datediff('minute', timestamp '2004-01-01 10:20:30.0', timestamp '2004-01-01 10:00:00.0') from test;
 >> -20
 
-select datediff('ss', timestamp '2004-01-01 10:00:00.5', timestamp '2004-01-01 10:00:01.0');
+select datediff('ss', timestamp '2004-01-01 10:00:00.5', timestamp '2004-01-01 10:00:01.0') from test;
 >> 1
 
-select datediff('second', timestamp '2004-01-01 10:00:00.5', timestamp '2004-01-01 10:00:01.0');
+select datediff('second', timestamp '2004-01-01 10:00:00.5', timestamp '2004-01-01 10:00:01.0') from test;
 >> 1
 
-select datediff('ms', timestamp '2004-01-01 10:00:00.5', timestamp '2004-01-01 10:00:01.0');
+select datediff('ms', timestamp '2004-01-01 10:00:00.5', timestamp '2004-01-01 10:00:01.0') from test;
 >> 500
 
-select datediff('millisecond', timestamp '2004-01-01 10:00:00.5', timestamp '2004-01-01 10:00:01.0');
+select datediff('millisecond', timestamp '2004-01-01 10:00:00.5', timestamp '2004-01-01 10:00:01.0') from test;
 >> 500
 
 SELECT DATEDIFF('SECOND', '1900-01-01 00:00:00.001', '1900-01-01 00:00:00.002'), DATEDIFF('SECOND', '2000-01-01 00:00:00.001', '2000-01-01 00:00:00.002');
@@ -181,18 +187,6 @@ SELECT DATEDIFF('TIMEZONE_HOUR', TIMESTAMP WITH TIME ZONE '2010-01-01 10:00:00+0
 
 SELECT DATEDIFF('TIMEZONE_MINUTE', TIMESTAMP WITH TIME ZONE '2010-01-01 10:00:00+01:15',
     TIMESTAMP WITH TIME ZONE '2012-02-02 12:00:00+02');
->> 45
-
-SELECT DATEDIFF('TIMEZONE_SECOND', TIMESTAMP WITH TIME ZONE '1880-01-01 10:00:00-07:52:58',
-    TIMESTAMP WITH TIME ZONE '1890-02-02 12:00:00-08');
->> -422
-
-SELECT DATEDIFF('TIMEZONE_HOUR', TIME WITH TIME ZONE '10:00:00+01',
-    TIME WITH TIME ZONE '12:00:00+02');
->> 1
-
-SELECT DATEDIFF('TIMEZONE_MINUTE', TIME WITH TIME ZONE '10:00:00+01:15',
-    TIME WITH TIME ZONE '12:00:00+02');
 >> 45
 
 select datediff('HOUR', timestamp '2007-01-06 10:00:00Z', '2007-01-06 10:00:00Z');

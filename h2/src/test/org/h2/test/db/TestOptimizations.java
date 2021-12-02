@@ -1,6 +1,6 @@
 /*
  * Copyright 2004-2019 H2 Group. Multiple-Licensed under the MPL 2.0,
- * and the EPL 1.0 (https://h2database.com/html/license.html).
+ * and the EPL 1.0 (http://h2database.com/html/license.html).
  * Initial Developer: H2 Group
  */
 package org.h2.test.db;
@@ -20,6 +20,7 @@ import org.h2.api.ErrorCode;
 import org.h2.test.TestBase;
 import org.h2.test.TestDb;
 import org.h2.tools.SimpleResultSet;
+import org.h2.util.StringUtils;
 import org.h2.util.Task;
 
 /**
@@ -114,7 +115,7 @@ public class TestOptimizations extends TestDb {
     private void testExplainRoundTrip() throws Exception {
         Connection conn = getConnection("optimizations");
         assertExplainRoundTrip(conn,
-                "SELECT \"X\" FROM SYSTEM_RANGE(1, 1) WHERE \"X\" > ANY(SELECT \"X\" FROM SYSTEM_RANGE(1, 1))");
+                "SELECT \"X\" FROM DUAL WHERE \"X\" > ANY(SELECT \"X\" FROM DUAL)");
         conn.close();
     }
 
@@ -127,6 +128,7 @@ public class TestOptimizations extends TestDb {
         plan = plan.replaceAll("\\s+", " ");
         plan = plan.replaceAll("/\\*[^\\*]*\\*/", "");
         plan = plan.replaceAll("\\s+", " ");
+        plan = StringUtils.replaceAll(plan, "SYSTEM_RANGE(1, 1)", "DUAL");
         plan = plan.replaceAll("\\( ", "\\(");
         plan = plan.replaceAll(" \\)", "\\)");
         assertEquals(sql, plan);
@@ -531,12 +533,12 @@ public class TestOptimizations extends TestDb {
         assertFalse(rs.next());
 
         PreparedStatement prep;
-        prep = conn.prepareStatement("SELECT * FROM SYSTEM_RANGE(1, 1) A " +
-                "WHERE A.X IN (SELECT B.X FROM SYSTEM_RANGE(1, 1) B WHERE B.X LIKE ?)");
+        prep = conn.prepareStatement("SELECT * FROM DUAL A " +
+                "WHERE A.X IN (SELECT B.X FROM DUAL B WHERE B.X LIKE ?)");
         prep.setString(1, "1");
         prep.execute();
-        prep = conn.prepareStatement("SELECT * FROM SYSTEM_RANGE(1, 1) A " +
-                "WHERE A.X IN (SELECT B.X FROM SYSTEM_RANGE(1, 1) B WHERE B.X IN (?, ?))");
+        prep = conn.prepareStatement("SELECT * FROM DUAL A " +
+                "WHERE A.X IN (SELECT B.X FROM DUAL B WHERE B.X IN (?, ?))");
         prep.setInt(1, 1);
         prep.setInt(2, 1);
         prep.executeQuery();
@@ -954,9 +956,9 @@ public class TestOptimizations extends TestDb {
         assertFalse(stat.executeQuery("select * from dual " +
                 "where null in(null, 1)").next());
 
-        assertFalse(stat.executeQuery("select * from system_range(1, 1) " +
+        assertFalse(stat.executeQuery("select * from dual " +
                 "where 1+x in(3, 4)").next());
-        assertFalse(stat.executeQuery("select * from system_range(1, 1) d1, dual d2 " +
+        assertFalse(stat.executeQuery("select * from dual d1, dual d2 " +
                 "where d1.x in(3, 4)").next());
 
         stat.execute("create table test(id int primary key, name varchar)");
@@ -1151,7 +1153,7 @@ public class TestOptimizations extends TestDb {
                 "name VARCHAR NOT NULL, active BOOLEAN DEFAULT TRUE, " +
                 "UNIQUE KEY TABLE_A_UK (name) )");
         stat.execute("CREATE TABLE TABLE_B(id IDENTITY PRIMARY KEY NOT NULL,  " +
-                "TABLE_a_id BIGINT NOT NULL,  createDate TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP, " +
+                "TABLE_a_id BIGINT NOT NULL,  createDate TIMESTAMP DEFAULT NOW(), " +
                 "UNIQUE KEY TABLE_B_UK (table_a_id, createDate), " +
                 "FOREIGN KEY (table_a_id) REFERENCES TABLE_A(id) )");
         stat.execute("INSERT INTO TABLE_A (name)  SELECT 'package_' || CAST(X as VARCHAR) " +
@@ -1160,7 +1162,7 @@ public class TestOptimizations extends TestDb {
         stat.execute("INSERT INTO TABLE_B (table_a_id, createDate)  SELECT " +
                 "CASE WHEN table_a_id = 0 THEN 1 ELSE table_a_id END, createDate " +
                 "FROM ( SELECT ROUND((RAND() * 100)) AS table_a_id, " +
-                "DATEADD('SECOND', X, CURRENT_TIMESTAMP) as createDate FROM SYSTEM_RANGE(1, " + count + ") " +
+                "DATEADD('SECOND', X, NOW()) as createDate FROM SYSTEM_RANGE(1, " + count + ") " +
                 "WHERE X < " + count + "  )");
         stat.execute("CREATE INDEX table_b_idx ON table_b(table_a_id, id)");
         stat.execute("ANALYZE");

@@ -1,6 +1,6 @@
 /*
  * Copyright 2004-2019 H2 Group. Multiple-Licensed under the MPL 2.0,
- * and the EPL 1.0 (https://h2database.com/html/license.html).
+ * and the EPL 1.0 (http://h2database.com/html/license.html).
  * Initial Developer: Daniel Gredler
  */
 package org.h2.expression.function;
@@ -14,15 +14,13 @@ import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Currency;
 import java.util.Locale;
+import java.util.TimeZone;
 
 import org.h2.api.ErrorCode;
 import org.h2.message.DbException;
 import org.h2.util.DateTimeUtils;
 import org.h2.util.StringUtils;
-import org.h2.util.TimeZoneProvider;
 import org.h2.value.Value;
-import org.h2.value.ValueTimeTimeZone;
-import org.h2.value.ValueTimestamp;
 import org.h2.value.ValueTimestampTimeZone;
 
 /**
@@ -523,20 +521,15 @@ public class ToChar {
      * @return time zone display name or ID
      */
     private static String getTimeZone(Value value, boolean tzd) {
-        if (value instanceof ValueTimestampTimeZone) {
-            return DateTimeUtils.timeZoneNameFromOffsetSeconds(((ValueTimestampTimeZone) value)
-                    .getTimeZoneOffsetSeconds());
-        } else if (value instanceof ValueTimeTimeZone) {
-            return DateTimeUtils.timeZoneNameFromOffsetSeconds(((ValueTimeTimeZone) value)
-                    .getTimeZoneOffsetSeconds());
-        } else {
-            TimeZoneProvider tz = DateTimeUtils.getTimeZone();
+        if (!(value instanceof ValueTimestampTimeZone)) {
+            TimeZone tz = TimeZone.getDefault();
             if (tzd) {
-                ValueTimestamp v = (ValueTimestamp) value.convertTo(Value.TIMESTAMP);
-                return tz.getShortId(tz.getEpochSecondsFromLocal(v.getDateValue(), v.getTimeNanos()));
+                boolean daylight = tz.inDaylightTime(value.getTimestamp());
+                return tz.getDisplayName(daylight, TimeZone.SHORT);
             }
-            return tz.getId();
+            return tz.getID();
         }
+        return DateTimeUtils.timeZoneNameFromOffsetMins(((ValueTimestampTimeZone) value).getTimeZoneOffsetMins());
     }
 
     /**
@@ -826,14 +819,12 @@ public class ToChar {
 
                 // Week
 
-            } else if (containsAt(format, i, "WW") != null) {
-                StringUtils.appendZeroPadded(output, 2, (DateTimeUtils.getDayOfYear(dateValue) - 1) / 7 + 1);
-                i += 2;
-            } else if (containsAt(format, i, "IW") != null) {
-                StringUtils.appendZeroPadded(output, 2, DateTimeUtils.getIsoWeekOfYear(dateValue));
+            } else if (containsAt(format, i, "IW", "WW") != null) {
+                output.append(DateTimeUtils.getWeekOfYear(dateValue, 0, 1));
                 i += 2;
             } else if (containsAt(format, i, "W") != null) {
-                output.append((dayOfMonth - 1) / 7 + 1);
+                int w = 1 + dayOfMonth / 7;
+                output.append(w);
                 i += 1;
 
                 // Year

@@ -1,6 +1,6 @@
 /*
  * Copyright 2004-2019 H2 Group. Multiple-Licensed under the MPL 2.0,
- * and the EPL 1.0 (https://h2database.com/html/license.html).
+ * and the EPL 1.0 (http://h2database.com/html/license.html).
  * Initial Developer: H2 Group
  */
 package org.h2.expression.aggregate;
@@ -144,15 +144,5 @@ public enum AggregateType {
      * The aggregate type for ENVELOPE(expression).
      */
     ENVELOPE,
-
-    /**
-     * The aggregate type for JSON_OBJECTAGG(expression: expression).
-     */
-    JSON_OBJECTAGG,
-
-    /**
-     * The aggregate type for JSON_ARRAYAGG(expression).
-     */
-    JSON_ARRAYAGG,
 
 }

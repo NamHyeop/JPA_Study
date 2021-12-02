@@ -1,6 +1,6 @@
 /*
  * Copyright 2004-2019 H2 Group. Multiple-Licensed under the MPL 2.0,
- * and the EPL 1.0 (https://h2database.com/html/license.html).
+ * and the EPL 1.0 (http://h2database.com/html/license.html).
  * Initial Developer: H2 Group
  */
 package org.h2.jdbc;
@@ -84,7 +84,7 @@ public class JdbcDatabaseMetaData extends TraceObject implements
     @Override
     public String getDatabaseProductVersion() {
         debugCodeCall("getDatabaseProductVersion");
-        return Constants.FULL_VERSION;
+        return Constants.getFullVersion();
     }
 
     /**
@@ -107,7 +107,7 @@ public class JdbcDatabaseMetaData extends TraceObject implements
     @Override
     public String getDriverVersion() {
         debugCodeCall("getDriverVersion");
-        return Constants.FULL_VERSION;
+        return Constants.getFullVersion();
     }
 
     private boolean hasSynonyms() {
@@ -1541,8 +1541,7 @@ public class JdbcDatabaseMetaData extends TraceObject implements
      * table/column/index name, in addition to the SQL:2003 keywords. The list
      * returned is:
      * <pre>
-     * CURRENT_CATALOG,CURRENT_SCHEMA,
-     * GROUPS,
+     * GROUPS
      * IF,ILIKE,INTERSECTS,
      * LIMIT,
      * MINUS,
@@ -1556,8 +1555,7 @@ public class JdbcDatabaseMetaData extends TraceObject implements
      * <pre>
      * ALL, AND, ARRAY, AS,
      * BETWEEN, BOTH
-     * CASE, CHECK, CONSTRAINT, CROSS, CURRENT_CATALOG, CURRENT_DATE, CURRENT_SCHEMA,
-     * CURRENT_TIME, CURRENT_TIMESTAMP, CURRENT_USER,
+     * CASE, CHECK, CONSTRAINT, CROSS, CURRENT_DATE, CURRENT_TIME, CURRENT_TIMESTAMP, CURRENT_USER,
      * DISTINCT,
      * EXCEPT, EXISTS,
      * FALSE, FETCH, FILTER, FOR, FOREIGN, FROM, FULL,
@@ -1574,7 +1572,7 @@ public class JdbcDatabaseMetaData extends TraceObject implements
      * RANGE, REGEXP, RIGHT, ROW, _ROWID_, ROWNUM, ROWS,
      * SELECT, SYSDATE, SYSTIME, SYSTIMESTAMP,
      * TABLE, TODAY, TOP, TRAILING, TRUE,
-     * UNION, UNIQUE, UNKNOWN, USING
+     * UNION, UNIQUE,
      * VALUES,
      * WHERE, WINDOW, WITH
      * </pre>
@@ -1584,9 +1582,7 @@ public class JdbcDatabaseMetaData extends TraceObject implements
     @Override
     public String getSQLKeywords() {
         debugCodeCall("getSQLKeywords");
-        return "CURRENT_CATALOG," //
-                + "CURRENT_SCHEMA," //
-                + "GROUPS," //
+        return "GROUPS," //
                 + "IF,ILIKE,INTERSECTS," //
                 + "LIMIT," //
                 + "MINUS," //
@@ -2356,10 +2352,25 @@ public class JdbcDatabaseMetaData extends TraceObject implements
     public boolean supportsTransactionIsolationLevel(int level) throws SQLException {
         debugCodeCall("supportsTransactionIsolationLevel");
         switch (level) {
-        case Connection.TRANSACTION_READ_UNCOMMITTED:
+        case Connection.TRANSACTION_READ_UNCOMMITTED: {
+            // Currently the combination of MV_STORE=FALSE, LOCK_MODE=0 and
+            // MULTI_THREADED=TRUE is not supported. Also see code in
+            // Database#setLockMode(int)
+            try (PreparedStatement prep = conn.prepareStatement(
+                    "SELECT VALUE FROM INFORMATION_SCHEMA.SETTINGS WHERE NAME=?")) {
+                // TODO skip MV_STORE check for H2 <= 1.4.197
+                prep.setString(1, "MV_STORE");
+                ResultSet rs = prep.executeQuery();
+                if (rs.next() && Boolean.parseBoolean(rs.getString(1))) {
+                    return true;
+                }
+                prep.setString(1, "MULTI_THREADED");
+                rs = prep.executeQuery();
+                return !rs.next() || !rs.getString(1).equals("1");
+            }
+        }
         case Connection.TRANSACTION_READ_COMMITTED:
         case Connection.TRANSACTION_REPEATABLE_READ:
-        case Constants.TRANSACTION_SNAPSHOT:
         case Connection.TRANSACTION_SERIALIZABLE:
             return true;
         default:
@@ -3075,12 +3086,12 @@ public class JdbcDatabaseMetaData extends TraceObject implements
     /**
      * Gets the SQL State type.
      *
-     * @return {@link DatabaseMetaData#sqlStateSQL}
+     * @return DatabaseMetaData.sqlStateSQL99
      */
     @Override
     public int getSQLStateType() {
         debugCodeCall("getSQLStateType");
-        return DatabaseMetaData.sqlStateSQL;
+        return DatabaseMetaData.sqlStateSQL99;
     }
 
     /**
@@ -3274,10 +3285,7 @@ public class JdbcDatabaseMetaData extends TraceObject implements
     }
 
     /**
-     * Returns whether database always returns generated keys if valid names or
-     * indexes of columns were specified and command was completed successfully.
-     *
-     * @return true
+     * [Not supported]
      */
     @Override
     public boolean generatedKeyAlwaysReturned() {

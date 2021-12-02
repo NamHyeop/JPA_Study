@@ -1,6 +1,6 @@
 /*
  * Copyright 2004-2019 H2 Group. Multiple-Licensed under the MPL 2.0,
- * and the EPL 1.0 (https://h2database.com/html/license.html).
+ * and the EPL 1.0 (http://h2database.com/html/license.html).
  * Initial Developer: H2 Group
  */
 package org.h2.api;
@@ -12,7 +12,7 @@ import org.h2.value.ValueTimestampTimeZone;
 /**
  * How we expose "TIMESTAMP WITH TIME ZONE" in our ResultSets.
  */
-public final class TimestampWithTimeZone implements Serializable, Cloneable {
+public class TimestampWithTimeZone implements Serializable, Cloneable {
 
     /**
      * The serial version UID.
@@ -29,20 +29,14 @@ public final class TimestampWithTimeZone implements Serializable, Cloneable {
      */
     private final long timeNanos;
     /**
-     * Time zone offset from UTC in seconds, range of -18 hours to +18 hours. This
-     * range is compatible with OffsetDateTime from JSR-310.
+     * Time zone offset from UTC in minutes, range of -12hours to +12hours
      */
-    private final int timeZoneOffsetSeconds;
+    private final short timeZoneOffsetMins;
 
-    @Deprecated
     public TimestampWithTimeZone(long dateValue, long timeNanos, short timeZoneOffsetMins) {
-        this(dateValue, timeNanos, timeZoneOffsetMins * 60);
-    }
-
-    public TimestampWithTimeZone(long dateValue, long timeNanos, int timeZoneOffsetSeconds) {
         this.dateValue = dateValue;
         this.timeNanos = timeNanos;
-        this.timeZoneOffsetSeconds = timeZoneOffsetSeconds;
+        this.timeZoneOffsetMins = timeZoneOffsetMins;
     }
 
     /**
@@ -110,24 +104,14 @@ public final class TimestampWithTimeZone implements Serializable, Cloneable {
      *
      * @return the offset
      */
-    @Deprecated
     public short getTimeZoneOffsetMins() {
-        return (short) (timeZoneOffsetSeconds / 60);
-    }
-
-    /**
-     * The time zone offset in seconds.
-     *
-     * @return the offset
-     */
-    public int getTimeZoneOffsetSeconds() {
-        return timeZoneOffsetSeconds;
+        return timeZoneOffsetMins;
     }
 
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder(ValueTimestampTimeZone.MAXIMUM_PRECISION);
-        DateTimeUtils.appendTimestampTimeZone(builder, dateValue, timeNanos, timeZoneOffsetSeconds);
+        DateTimeUtils.appendTimestampTimeZone(builder, dateValue, timeNanos, timeZoneOffsetMins);
         return builder.toString();
     }
 
@@ -137,7 +121,7 @@ public final class TimestampWithTimeZone implements Serializable, Cloneable {
         int result = 1;
         result = prime * result + (int) (dateValue ^ (dateValue >>> 32));
         result = prime * result + (int) (timeNanos ^ (timeNanos >>> 32));
-        result = prime * result + timeZoneOffsetSeconds;
+        result = prime * result + timeZoneOffsetMins;
         return result;
     }
 
@@ -159,7 +143,7 @@ public final class TimestampWithTimeZone implements Serializable, Cloneable {
         if (timeNanos != other.timeNanos) {
             return false;
         }
-        if (timeZoneOffsetSeconds != other.timeZoneOffsetSeconds) {
+        if (timeZoneOffsetMins != other.timeZoneOffsetMins) {
             return false;
         }
         return true;

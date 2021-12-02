@@ -1,6 +1,6 @@
 /*
  * Copyright 2004-2019 H2 Group. Multiple-Licensed under the MPL 2.0,
- * and the EPL 1.0 (https://h2database.com/html/license.html).
+ * and the EPL 1.0 (http://h2database.com/html/license.html).
  * Initial Developer: H2 Group
  */
 package org.h2.expression.condition;
@@ -12,7 +12,6 @@ import org.h2.expression.Expression;
 import org.h2.expression.ExpressionColumn;
 import org.h2.expression.ExpressionVisitor;
 import org.h2.expression.Parameter;
-import org.h2.expression.TypedValueExpression;
 import org.h2.expression.ValueExpression;
 import org.h2.expression.function.Function;
 import org.h2.expression.function.TableFunction;
@@ -89,8 +88,8 @@ public class ConditionIn extends Condition {
     public Expression optimize(Session session) {
         left = left.optimize(session);
         boolean constant = left.isConstant();
-        if (constant && left.isNullConstant()) {
-            return TypedValueExpression.getUnknown();
+        if (constant && left == ValueExpression.getNull()) {
+            return left;
         }
         int size = valueList.size();
         if (size == 1) {
@@ -145,7 +144,7 @@ public class ConditionIn extends Condition {
     private Expression optimize2(Session session, boolean constant, boolean allValuesConstant, boolean allValuesNull,
             ArrayList<Expression> values) {
         if (constant && allValuesConstant) {
-            return ValueExpression.getBoolean(getValue(session));
+            return ValueExpression.get(getValue(session));
         }
         if (values.size() == 1) {
             return new Comparison(session, Comparison.EQUAL, left, values.get(0)).optimize(session);

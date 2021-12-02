@@ -1,6 +1,6 @@
 /*
  * Copyright 2004-2019 H2 Group. Multiple-Licensed under the MPL 2.0,
- * and the EPL 1.0 (https://h2database.com/html/license.html).
+ * and the EPL 1.0 (http://h2database.com/html/license.html).
  * Initial Developer: H2 Group
  */
 package org.h2.server;
@@ -35,8 +35,6 @@ import org.h2.result.ResultInterface;
 import org.h2.result.ResultWithGeneratedKeys;
 import org.h2.store.LobStorageInterface;
 import org.h2.util.IOUtils;
-import org.h2.util.NetUtils;
-import org.h2.util.NetworkConnectionInfo;
 import org.h2.util.SmallLRUCache;
 import org.h2.util.SmallMap;
 import org.h2.value.DataType;
@@ -149,7 +147,7 @@ public class TcpServerThread implements Runnable {
                     ci.setBaseDir(baseDir);
                 }
                 if (server.getIfExists()) {
-                    ci.setProperty("FORBID_CREATION", "TRUE");
+                    ci.setProperty("IFEXISTS", "TRUE");
                 }
                 transfer.writeInt(SessionRemote.STATUS_OK);
                 transfer.writeInt(clientVersion);
@@ -159,12 +157,6 @@ public class TcpServerThread implements Runnable {
                         ci.setFileEncryptionKey(transfer.readBytes());
                     }
                 }
-                ci.setNetworkConnectionInfo(new NetworkConnectionInfo(
-                        NetUtils.ipToShortForm(new StringBuilder(server.getSSL() ? "ssl://" : "tcp://"),
-                                socket.getLocalAddress().getAddress(), true) //
-                                .append(':').append(socket.getLocalPort()).toString(), //
-                        socket.getInetAddress().getAddress(), socket.getPort(),
-                        new StringBuilder().append('P').append(clientVersion).toString()));
                 session = Engine.getInstance().createSession(ci);
                 transfer.setSession(session);
                 server.addConnection(threadId, originalURL, ci.getUserName());
@@ -311,7 +303,7 @@ public class TcpServerThread implements Runnable {
                 commit = session.prepareLocal("COMMIT");
             }
             int old = session.getModificationId();
-            commit.executeUpdate(null);
+            commit.executeUpdate(false);
             transfer.writeInt(getState(old)).flush();
             break;
         }

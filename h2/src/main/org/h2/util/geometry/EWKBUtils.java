@@ -1,6 +1,6 @@
 /*
  * Copyright 2004-2019 H2 Group. Multiple-Licensed under the MPL 2.0,
- * and the EPL 1.0 (https://h2database.com/html/license.html).
+ * and the EPL 1.0 (http://h2database.com/html/license.html).
  * Initial Developer: H2 Group
  */
 package org.h2.util.geometry;
@@ -436,14 +436,14 @@ public final class EWKBUtils {
             for (int i = 0; i < numItems; i++) {
                 Target innerTarget = target.startCollectionItem(i, numItems);
                 parseEWKB(source, innerTarget, type);
-                target.endCollectionItem(innerTarget, type, i, numItems);
+                target.endCollectionItem(innerTarget, i, numItems);
             }
+            target.endCollection(type);
             break;
         }
         default:
             throw new IllegalArgumentException();
         }
-        target.endObject(type);
     }
 
     private static void addRing(EWKBSource source, Target target, boolean useZ, boolean useM, int size) {

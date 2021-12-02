@@ -1,19 +1,17 @@
 /*
  * Copyright 2004-2019 H2 Group. Multiple-Licensed under the MPL 2.0,
- * and the EPL 1.0 (https://h2database.com/html/license.html).
+ * and the EPL 1.0 (http://h2database.com/html/license.html).
  * Initial Developer: H2 Group
  */
 package org.h2.command;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import org.h2.api.ErrorCode;
 import org.h2.engine.Constants;
 import org.h2.engine.Database;
-import org.h2.engine.DbObject;
 import org.h2.engine.Session;
 import org.h2.expression.ParameterInterface;
 import org.h2.message.DbException;
@@ -104,16 +102,12 @@ public abstract class Command implements CommandInterface {
      * Execute an updating statement (for example insert, delete, or update), if
      * this is possible.
      *
-     * @param generatedKeysRequest
-     *            {@code false} if generated keys are not needed, {@code true} if
-     *            generated keys should be configured automatically, {@code int[]}
-     *            to specify column indices to return generated keys from, or
-     *            {@code String[]} to specify column names to return generated keys
-     *            from
-     * @return the update count and generated keys, if any
+     * @return the update count
      * @throws DbException if the command is not an updating statement
      */
-    public abstract ResultWithGeneratedKeys update(Object generatedKeysRequest);
+    public int update() {
+        throw DbException.get(ErrorCode.METHOD_NOT_ALLOWED_FOR_QUERY);
+    }
 
     /**
      * Execute a query statement, if this is possible.
@@ -122,7 +116,9 @@ public abstract class Command implements CommandInterface {
      * @return the local result set
      * @throws DbException if the command is not a query
      */
-    public abstract ResultInterface query(int maxrows);
+    public ResultInterface query(@SuppressWarnings("unused") int maxrows) {
+        throw DbException.get(ErrorCode.METHOD_ONLY_ALLOWED_FOR_QUERY);
+    }
 
     @Override
     public final ResultInterface getMetaData() {
@@ -156,11 +152,15 @@ public abstract class Command implements CommandInterface {
 
     @Override
     public void stop() {
+        session.setCurrentCommand(null, false);
         if (!isTransactional()) {
             session.commit(true);
         } else if (session.getAutoCommit()) {
             session.commit(false);
+        } else {
+            session.unlockReadLocks();
         }
+        session.endStatement();
         if (trace.isInfoEnabled() && startTimeNanos > 0) {
             long timeMillis = (System.nanoTime() - startTimeNanos) / 1000 / 1000;
             if (timeMillis > Constants.SLOW_QUERY_LIMIT_MS) {
@@ -182,12 +182,19 @@ public abstract class Command implements CommandInterface {
         startTimeNanos = 0;
         long start = 0;
         Database database = session.getDatabase();
-        Object sync = database.isMVStore() ? session : database;
+        Object sync = database.isMultiThreaded() || database.getStore() != null ? session : database;
         session.waitIfExclusiveModeEnabled();
         boolean callStop = true;
+        boolean writing = !isReadOnly();
+        if (writing) {
+            while (!database.beforeWriting()) {
+                // wait
+            }
+        }
         //noinspection SynchronizationOnLocalVariableOrMethodParameter
         synchronized (sync) {
-            session.startStatementWithinTransaction(this);
+            session.startStatementWithinTransaction();
+            session.setCurrentCommand(this, false);
             try {
                 while (true) {
                     database.checkPowerOff();
@@ -224,9 +231,11 @@ public abstract class Command implements CommandInterface {
                 database.checkPowerOff();
                 throw e;
             } finally {
-                session.endStatement();
                 if (callStop) {
                     stop();
+                }
+                if (writing) {
+                    database.afterWriting();
                 }
             }
         }
@@ -236,19 +245,31 @@ public abstract class Command implements CommandInterface {
     public ResultWithGeneratedKeys executeUpdate(Object generatedKeysRequest) {
         long start = 0;
         Database database = session.getDatabase();
-        Object sync = database.isMVStore() ? session : database;
+        Object sync = database.isMultiThreaded() || database.getStore() != null ? session : database;
         session.waitIfExclusiveModeEnabled();
         boolean callStop = true;
+        boolean writing = !isReadOnly();
+        if (writing) {
+            while (!database.beforeWriting()) {
+                // wait
+            }
+        }
         //noinspection SynchronizationOnLocalVariableOrMethodParameter
         synchronized (sync) {
             Session.Savepoint rollback = session.setSavepoint();
-            session.startStatementWithinTransaction(this);
+            session.startStatementWithinTransaction();
+            session.setCurrentCommand(this, generatedKeysRequest);
             DbException ex = null;
             try {
                 while (true) {
                     database.checkPowerOff();
                     try {
-                        return update(generatedKeysRequest);
+                        int updateCount = update();
+                        if (!Boolean.FALSE.equals(generatedKeysRequest)) {
+                            return new ResultWithGeneratedKeys.WithKeys(updateCount,
+                                    session.getGeneratedKeys().getKeys(session));
+                        }
+                        return ResultWithGeneratedKeys.of(updateCount);
                     } catch (DbException e) {
                         start = filterConcurrentUpdate(e, start);
                     } catch (OutOfMemoryError e) {
@@ -282,7 +303,6 @@ public abstract class Command implements CommandInterface {
                 throw e;
             } finally {
                 try {
-                    session.endStatement();
                     if (callStop) {
                         stop();
                     }
@@ -291,6 +311,10 @@ public abstract class Command implements CommandInterface {
                         throw nested;
                     } else {
                         ex.addSuppressed(nested);
+                    }
+                } finally {
+                    if (writing) {
+                        database.afterWriting();
                     }
                 }
             }
@@ -310,13 +334,17 @@ public abstract class Command implements CommandInterface {
         }
         // Only in PageStore mode we need to sleep here to avoid busy wait loop
         Database database = session.getDatabase();
-        if (!database.isMVStore()) {
+        if (database.getStore() == null) {
             int sleep = 1 + MathUtils.randomInt(10);
             while (true) {
                 try {
-                    // although nobody going to notify us
-                    // it is vital to give up lock on a database
-                    database.wait(sleep);
+                    if (database.isMultiThreaded()) {
+                        Thread.sleep(sleep);
+                    } else {
+                        // although nobody going to notify us
+                        // it is vital to give up lock on a database
+                        database.wait(sleep);
+                    }
                 } catch (InterruptedException e1) {
                     // ignore
                 }
@@ -372,6 +400,4 @@ public abstract class Command implements CommandInterface {
     public void setCanReuse(boolean canReuse) {
         this.canReuse = canReuse;
     }
-
-    public abstract Set<DbObject> getDependencies();
 }

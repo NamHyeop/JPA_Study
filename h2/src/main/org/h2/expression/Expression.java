@@ -1,6 +1,6 @@
 /*
  * Copyright 2004-2019 H2 Group. Multiple-Licensed under the MPL 2.0,
- * and the EPL 1.0 (https://h2database.com/html/license.html).
+ * and the EPL 1.0 (http://h2database.com/html/license.html).
  * Initial Developer: H2 Group
  */
 package org.h2.expression;
@@ -220,15 +220,6 @@ public abstract class Expression {
     }
 
     /**
-     * Check if this expression will always return the NULL value.
-     *
-     * @return if the expression is constant NULL value
-     */
-    public boolean isNullConstant() {
-        return false;
-    }
-
-    /**
      * Is the value of a parameter set.
      *
      * @return true if set
@@ -243,6 +234,16 @@ public abstract class Expression {
      * @return true if it is an auto-increment column
      */
     public boolean isAutoIncrement() {
+        return false;
+    }
+
+    /**
+     * Check if this expression is an auto-generated key expression such as next
+     * value from a sequence.
+     *
+     * @return whether this expression is an auto-generated key expression
+     */
+    public boolean isGeneratedKey() {
         return false;
     }
 
@@ -338,9 +339,11 @@ public abstract class Expression {
      * Add conditions to a table filter if they can be evaluated.
      *
      * @param filter the table filter
+     * @param outerJoin if the expression is part of an outer join
      */
-    public void addFilterConditions(TableFilter filter) {
-        if (!addedToFilter && isEverything(ExpressionVisitor.EVALUATABLE_VISITOR)) {
+    public void addFilterConditions(TableFilter filter, boolean outerJoin) {
+        if (!addedToFilter && !outerJoin &&
+                isEverything(ExpressionVisitor.EVALUATABLE_VISITOR)) {
             filter.addFilterCondition(this, false);
             addedToFilter = true;
         }
@@ -419,7 +422,7 @@ public abstract class Expression {
      * Returns subexpression with specified index.
      *
      * @param index 0-based index
-     * @return subexpression with specified index, may be null
+     * @return subexpression with specified index
      * @throws IndexOutOfBoundsException if specified index is not valid
      */
     public Expression getSubexpression(int index) {

@@ -1,6 +1,6 @@
 /*
  * Copyright 2004-2019 H2 Group. Multiple-Licensed under the MPL 2.0,
- * and the EPL 1.0 (https://h2database.com/html/license.html).
+ * and the EPL 1.0 (http://h2database.com/html/license.html).
  * Initial Developer: H2 Group
  */
 package org.h2.table;
@@ -87,7 +87,10 @@ public class TableView extends Table {
         String oldQuerySQL = this.querySQL;
         Column[] oldColumnTemplates = this.columnTemplates;
         boolean oldRecursive = this.allowRecursive;
-        init(querySQL, null, newColumnTemplates, session, recursive, literalsChecked, isTableExpression);
+        init(querySQL, null,
+                newColumnTemplates == null ? this.columnTemplates
+                        : newColumnTemplates,
+                session, recursive, literalsChecked, isTableExpression);
         DbException e = recompile(session, force, true);
         if (e != null) {
             init(oldQuerySQL, null, oldColumnTemplates, session, oldRecursive,

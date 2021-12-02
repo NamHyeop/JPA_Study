@@ -1,6 +1,6 @@
 /*
  * Copyright 2004-2019 H2 Group. Multiple-Licensed under the MPL 2.0,
- * and the EPL 1.0 (https://h2database.com/html/license.html).
+ * and the EPL 1.0 (http://h2database.com/html/license.html).
  * Initial Developer: H2 Group
  */
 package org.h2.jdbc;
@@ -15,7 +15,6 @@ import org.h2.message.Trace;
 import org.h2.message.TraceObject;
 import org.h2.util.MathUtils;
 import org.h2.value.DataType;
-import org.h2.value.TypeInfo;
 import org.h2.value.Value;
 
 /**
@@ -81,7 +80,8 @@ public class JdbcParameterMetaData extends TraceObject implements
     public int getParameterType(int param) throws SQLException {
         try {
             debugCodeCall("getParameterType", param);
-            int type = getParameter(param).getType().getValueType();
+            ParameterInterface p = getParameter(param);
+            int type = p.getValueType();
             if (type == Value.UNKNOWN) {
                 type = Value.STRING;
             }
@@ -102,8 +102,8 @@ public class JdbcParameterMetaData extends TraceObject implements
     public int getPrecision(int param) throws SQLException {
         try {
             debugCodeCall("getPrecision", param);
-            TypeInfo type = getParameter(param).getType();
-            return type.getValueType() == Value.UNKNOWN ? 0 : MathUtils.convertLongToInt(type.getPrecision());
+            ParameterInterface p = getParameter(param);
+            return MathUtils.convertLongToInt(p.getPrecision());
         } catch (Exception e) {
             throw logAndConvert(e);
         }
@@ -120,8 +120,8 @@ public class JdbcParameterMetaData extends TraceObject implements
     public int getScale(int param) throws SQLException {
         try {
             debugCodeCall("getScale", param);
-            TypeInfo type = getParameter(param).getType();
-            return type.getValueType() == Value.UNKNOWN ? 0 : type.getScale();
+            ParameterInterface p = getParameter(param);
+            return p.getScale();
         } catch (Exception e) {
             throw logAndConvert(e);
         }
@@ -173,7 +173,8 @@ public class JdbcParameterMetaData extends TraceObject implements
     public String getParameterClassName(int param) throws SQLException {
         try {
             debugCodeCall("getParameterClassName", param);
-            int type = getParameter(param).getType().getValueType();
+            ParameterInterface p = getParameter(param);
+            int type = p.getValueType();
             if (type == Value.UNKNOWN) {
                 type = Value.STRING;
             }
@@ -194,7 +195,8 @@ public class JdbcParameterMetaData extends TraceObject implements
     public String getParameterTypeName(int param) throws SQLException {
         try {
             debugCodeCall("getParameterTypeName", param);
-            int type = getParameter(param).getType().getValueType();
+            ParameterInterface p = getParameter(param);
+            int type = p.getValueType();
             if (type == Value.UNKNOWN) {
                 type = Value.STRING;
             }

@@ -1,6 +1,6 @@
 /*
  * Copyright 2004-2019 H2 Group. Multiple-Licensed under the MPL 2.0,
- * and the EPL 1.0 (https://h2database.com/html/license.html).
+ * and the EPL 1.0 (http://h2database.com/html/license.html).
  * Initial Developer: H2 Group
  */
 package org.h2.test.db;
@@ -39,11 +39,11 @@ import org.h2.index.IndexType;
 import org.h2.index.SingleRowCursor;
 import org.h2.jdbc.JdbcConnection;
 import org.h2.message.DbException;
-import org.h2.pagestore.db.PageStoreTable;
 import org.h2.result.Row;
 import org.h2.result.SearchRow;
 import org.h2.result.SortOrder;
 import org.h2.table.IndexColumn;
+import org.h2.table.PageStoreTable;
 import org.h2.table.SubQueryInfo;
 import org.h2.table.Table;
 import org.h2.table.TableBase;
@@ -588,31 +588,31 @@ public class TestTableEngines extends TestDb {
         checkPlan(stat, "SELECT 1 FROM \"PUBLIC\".\"T\" /* PUBLIC.T_IDX_B */ "
                 + "INNER JOIN ( SELECT \"A\" FROM \"PUBLIC\".\"T\" ) \"Z\" "
                 + "/* batched:view SELECT A FROM PUBLIC.T "
-                + "/++ batched:test PUBLIC.T_IDX_A: A IS NOT DISTINCT FROM ?1 ++/ "
-                + "WHERE A IS NOT DISTINCT FROM ?1: A = T.B */ ON 1=1 WHERE \"Z\".\"A\" = \"T\".\"B\"");
+                + "/++ batched:test PUBLIC.T_IDX_A: A IS ?1 ++/ "
+                + "WHERE A IS ?1: A = T.B */ ON 1=1 WHERE \"Z\".\"A\" = \"T\".\"B\"");
         checkPlan(stat, "SELECT 1 FROM \"PUBLIC\".\"T\" /* PUBLIC.T_IDX_A */ "
                 + "INNER JOIN ( ((SELECT \"A\" FROM \"PUBLIC\".\"T\") UNION ALL (SELECT \"B\" FROM \"PUBLIC\".\"U\")) "
                 + "UNION ALL (SELECT \"B\" FROM \"PUBLIC\".\"T\") ) \"Z\" /* batched:view "
-                + "((SELECT A FROM PUBLIC.T /++ batched:test PUBLIC.T_IDX_A: A IS NOT DISTINCT FROM ?1 ++/ "
-                + "WHERE A IS NOT DISTINCT FROM ?1) "
+                + "((SELECT A FROM PUBLIC.T /++ batched:test PUBLIC.T_IDX_A: A IS ?1 ++/ "
+                + "WHERE A IS ?1) "
                 + "UNION ALL "
                 + "(SELECT B FROM PUBLIC.U /++ PUBLIC.U_IDX_B: "
-                + "B IS NOT DISTINCT FROM ?1 ++/ WHERE B IS NOT DISTINCT FROM ?1)) "
+                + "B IS ?1 ++/ WHERE B IS ?1)) "
                 + "UNION ALL "
-                + "(SELECT B FROM PUBLIC.T /++ batched:test PUBLIC.T_IDX_B: B IS NOT DISTINCT FROM ?1 ++/ "
-                + "WHERE B IS NOT DISTINCT FROM ?1): A = T.A */ ON 1=1 WHERE \"Z\".\"A\" = \"T\".\"A\"");
+                + "(SELECT B FROM PUBLIC.T /++ batched:test PUBLIC.T_IDX_B: B IS ?1 ++/ "
+                + "WHERE B IS ?1): A = T.A */ ON 1=1 WHERE \"Z\".\"A\" = \"T\".\"A\"");
         checkPlan(stat, "SELECT 1 FROM \"PUBLIC\".\"T\" /* PUBLIC.T_IDX_A */ "
                 + "INNER JOIN ( SELECT \"U\".\"A\" FROM \"PUBLIC\".\"U\" INNER JOIN \"PUBLIC\".\"T\" ON 1=1 "
                 + "WHERE \"U\".\"B\" = \"T\".\"B\" ) \"Z\" "
                 + "/* batched:view SELECT U.A FROM PUBLIC.U "
-                + "/++ batched:fake PUBLIC.U_IDX_A: A IS NOT DISTINCT FROM ?1 ++/ "
-                + "/++ WHERE U.A IS NOT DISTINCT FROM ?1 ++/ INNER JOIN PUBLIC.T "
+                + "/++ batched:fake PUBLIC.U_IDX_A: A IS ?1 ++/ "
+                + "/++ WHERE U.A IS ?1 ++/ INNER JOIN PUBLIC.T "
                 + "/++ batched:test PUBLIC.T_IDX_B: B = U.B ++/ "
-                + "ON 1=1 WHERE (U.B = T.B) _LOCAL_AND_GLOBAL_ (U.A IS NOT DISTINCT FROM ?1): A = T.A */ "
+                + "ON 1=1 WHERE (U.A IS ?1) AND (U.B = T.B): A = T.A */ "
                 + "ON 1=1 WHERE \"Z\".\"A\" = \"T\".\"A\"");
         checkPlan(stat, "SELECT 1 FROM \"PUBLIC\".\"T\" /* PUBLIC.T_IDX_A */ "
                 + "INNER JOIN ( SELECT \"A\" FROM \"PUBLIC\".\"U\" ) \"Z\" /* SELECT A FROM PUBLIC.U "
-                + "/++ PUBLIC.U_IDX_A: A IS NOT DISTINCT FROM ?1 ++/ WHERE A IS NOT DISTINCT FROM ?1: A = T.A */ "
+                + "/++ PUBLIC.U_IDX_A: A IS ?1 ++/ WHERE A IS ?1: A = T.A */ "
                 + "ON 1=1 WHERE \"T\".\"A\" = \"Z\".\"A\"");
         checkPlan(stat, "SELECT 1 FROM "
                 + "( SELECT \"U\".\"A\" FROM \"PUBLIC\".\"U\" INNER JOIN \"PUBLIC\".\"T\" "
@@ -641,16 +641,16 @@ public class TestTableEngines extends TestDb {
                 + "INNER JOIN ( (SELECT \"A\", \"B\" FROM \"PUBLIC\".\"T\") "
                 + "UNION (SELECT \"B\", \"A\" FROM \"PUBLIC\".\"U\") ) \"Z\" "
                 + "/* batched:view (SELECT A, B FROM PUBLIC.T "
-                + "/++ batched:test PUBLIC.T_IDX_B: B IS NOT DISTINCT FROM ?1 ++/ "
-                + "WHERE B IS NOT DISTINCT FROM ?1) UNION (SELECT B, A FROM PUBLIC.U "
-                + "/++ PUBLIC.U_IDX_A: A IS NOT DISTINCT FROM ?1 ++/ "
-                + "WHERE A IS NOT DISTINCT FROM ?1): B = U.B */ ON 1=1 /* WHERE U.B = Z.B */ "
+                + "/++ batched:test PUBLIC.T_IDX_B: B IS ?1 ++/ "
+                + "WHERE B IS ?1) UNION (SELECT B, A FROM PUBLIC.U "
+                + "/++ PUBLIC.U_IDX_A: A IS ?1 ++/ "
+                + "WHERE A IS ?1): B = U.B */ ON 1=1 /* WHERE U.B = Z.B */ "
                 + "INNER JOIN \"PUBLIC\".\"T\" /* batched:test PUBLIC.T_IDX_A: A = Z.A */ ON 1=1 "
                 + "WHERE (\"U\".\"B\" = \"Z\".\"B\") AND (\"Z\".\"A\" = \"T\".\"A\")");
         checkPlan(stat, "SELECT 1 FROM \"PUBLIC\".\"U\" /* PUBLIC.U_IDX_A */ "
                 + "INNER JOIN ( SELECT \"A\", \"B\" FROM \"PUBLIC\".\"U\" ) \"Z\" "
-                + "/* batched:fake SELECT A, B FROM PUBLIC.U /++ PUBLIC.U_IDX_A: A IS NOT DISTINCT FROM ?1 ++/ "
-                + "WHERE A IS NOT DISTINCT FROM ?1: A = U.A */ ON 1=1 /* WHERE U.A = Z.A */ "
+                + "/* batched:fake SELECT A, B FROM PUBLIC.U /++ PUBLIC.U_IDX_A: A IS ?1 ++/ "
+                + "WHERE A IS ?1: A = U.A */ ON 1=1 /* WHERE U.A = Z.A */ "
                 + "INNER JOIN \"PUBLIC\".\"T\" /* batched:test PUBLIC.T_IDX_B: B = Z.B */ "
                 + "ON 1=1 WHERE (\"U\".\"A\" = \"Z\".\"A\") AND (\"Z\".\"B\" = \"T\".\"B\")");
 

@@ -1,6 +1,6 @@
 /*
  * Copyright 2004-2019 H2 Group. Multiple-Licensed under the MPL 2.0,
- * and the EPL 1.0 (https://h2database.com/html/license.html).
+ * and the EPL 1.0 (http://h2database.com/html/license.html).
  * Initial Developer: H2 Group
  */
 package org.h2.util.geometry;
@@ -114,23 +114,21 @@ public final class GeometryUtils {
          *
          * @param target
          *            the result of {@link #startCollectionItem(int, int)}
-         * @param type
-         *            type of collection
          * @param index
          *            0-based index of this item in the collection
          * @param total
          *            total number of items in the collection
          */
-        protected void endCollectionItem(Target target, int type, int index, int total) {
+        protected void endCollectionItem(Target target, int index, int total) {
         }
 
         /**
-         * Invoked after writing of the object.
+         * Invoked after writing of a collection.
          *
          * @param type
-         *            type of the object
+         *            type of collection, see {@link #startCollection(int, int)}
          */
-        protected void endObject(int type) {
+        protected void endCollection(int type) {
         }
 
         /**

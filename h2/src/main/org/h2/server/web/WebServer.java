@@ -1,6 +1,6 @@
 /*
  * Copyright 2004-2019 H2 Group. Multiple-Licensed under the MPL 2.0,
- * and the EPL 1.0 (https://h2database.com/html/license.html).
+ * and the EPL 1.0 (http://h2database.com/html/license.html).
  * Initial Developer: H2 Group
  */
 package org.h2.server.web;
@@ -37,7 +37,6 @@ import org.h2.util.DateTimeUtils;
 import org.h2.util.JdbcUtils;
 import org.h2.util.MathUtils;
 import org.h2.util.NetUtils;
-import org.h2.util.NetworkConnectionInfo;
 import org.h2.util.SortedProperties;
 import org.h2.util.StringUtils;
 import org.h2.util.Tool;
@@ -55,7 +54,6 @@ public class WebServer implements Service {
         { "en", "English" },
         { "es", "Espa\u00f1ol" },
         { "fr", "Fran\u00e7ais" },
-        { "hi", "Hindi \u0939\u093f\u0902\u0926\u0940" },
         { "hu", "Magyar"},
         { "ko", "\ud55c\uad6d\uc5b4"},
         { "in", "Indonesia"},
@@ -763,11 +761,10 @@ public class WebServer implements Service {
      * @param user the user name
      * @param password the password
      * @param userKey the key of privileged user
-     * @param networkConnectionInfo the network connection information
      * @return the database connection
      */
     Connection getConnection(String driver, String databaseUrl, String user,
-            String password, String userKey, NetworkConnectionInfo networkConnectionInfo) throws SQLException {
+            String password, String userKey) throws SQLException {
         driver = driver.trim();
         databaseUrl = databaseUrl.trim();
         Properties p = new Properties();
@@ -778,11 +775,11 @@ public class WebServer implements Service {
         if (databaseUrl.startsWith("jdbc:h2:")) {
             if (!allowSecureCreation || key == null || !key.equals(userKey)) {
                 if (ifExists) {
-                    databaseUrl += ";FORBID_CREATION=TRUE";
+                    databaseUrl += ";IFEXISTS=TRUE";
                 }
             }
         }
-        return JdbcUtils.getConnection(driver, databaseUrl, p, networkConnectionInfo);
+        return JdbcUtils.getConnection(driver, databaseUrl, p);
     }
 
     /**
@@ -917,7 +914,7 @@ public class WebServer implements Service {
     /**
      * Check the admin password.
      *
-     * @param password the password to test
+     * @param the password to test
      * @return true if admin password not configure, or admin password correct
      */
     boolean checkAdminPassword(String password) {

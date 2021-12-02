@@ -1,6 +1,6 @@
 /*
  * Copyright 2004-2019 H2 Group. Multiple-Licensed under the MPL 2.0,
- * and the EPL 1.0 (https://h2database.com/html/license.html).
+ * and the EPL 1.0 (http://h2database.com/html/license.html).
  * Initial Developer: H2 Group
  */
 package org.h2.command.dml;
@@ -10,17 +10,13 @@ import java.util.HashSet;
 import org.h2.api.Trigger;
 import org.h2.command.CommandInterface;
 import org.h2.command.Prepared;
-import org.h2.engine.DbObject;
 import org.h2.engine.Right;
 import org.h2.engine.Session;
 import org.h2.engine.UndoLogRecord;
 import org.h2.expression.Expression;
-import org.h2.expression.ExpressionVisitor;
 import org.h2.result.ResultInterface;
-import org.h2.result.ResultTarget;
 import org.h2.result.Row;
 import org.h2.result.RowList;
-import org.h2.table.DataChangeDeltaTable.ResultOption;
 import org.h2.table.PlanItem;
 import org.h2.table.Table;
 import org.h2.table.TableFilter;
@@ -31,7 +27,7 @@ import org.h2.value.ValueNull;
  * This class represents the statement
  * DELETE
  */
-public class Delete extends Prepared implements DataChangeStatement {
+public class Delete extends Prepared {
 
     private Expression condition;
     private TableFilter targetTableFilter;
@@ -47,17 +43,8 @@ public class Delete extends Prepared implements DataChangeStatement {
 
     private HashSet<Long> keysFilter;
 
-    private ResultTarget deltaChangeCollector;
-
-    private ResultOption deltaChangeCollectionMode;
-
     public Delete(Session session) {
         super(session);
-    }
-
-    @Override
-    public Table getTable() {
-        return targetTableFilter.getTable();
     }
 
     public void setTableFilter(TableFilter tableFilter) {
@@ -82,12 +69,6 @@ public class Delete extends Prepared implements DataChangeStatement {
     }
 
     @Override
-    public void setDeltaChangeCollector(ResultTarget deltaChangeCollector, ResultOption deltaChangeCollectionMode) {
-        this.deltaChangeCollector = deltaChangeCollector;
-        this.deltaChangeCollectionMode = deltaChangeCollectionMode;
-    }
-
-    @Override
     public int update() {
         targetTableFilter.startQuery(session);
         targetTableFilter.reset();
@@ -107,9 +88,7 @@ public class Delete extends Prepared implements DataChangeStatement {
             int count = 0;
             while (limitRows != 0 && targetTableFilter.next()) {
                 setCurrentRowNumber(rows.size() + 1);
-                if (condition == null || condition.getBooleanValue(session)
-                        // the following is to support Oracle-style MERGE
-                        || (keysFilter != null && table.isMVStore())) {
+                if (condition == null || condition.getBooleanValue(session)) {
                     Row row = targetTableFilter.get();
                     if (keysFilter == null || keysFilter.contains(row.getKey())) {
                         if (table.isMVStore()) {
@@ -124,9 +103,6 @@ public class Delete extends Prepared implements DataChangeStatement {
                                     continue;
                                 }
                             }
-                        }
-                        if (deltaChangeCollectionMode == ResultOption.OLD) {
-                            deltaChangeCollector.addRow(row.getValueList());
                         }
                         if (!table.fireRow() || !table.fireBeforeRow(session, row, null)) {
                             rows.add(row);
@@ -211,11 +187,6 @@ public class Delete extends Prepared implements DataChangeStatement {
         return CommandInterface.DELETE;
     }
 
-    @Override
-    public String getStatementName() {
-        return "DELETE";
-    }
-
     public void setLimit(Expression limit) {
         this.limitExpr = limit;
     }
@@ -237,17 +208,4 @@ public class Delete extends Prepared implements DataChangeStatement {
         return sourceTableFilter;
     }
 
-    @Override
-    public void collectDependencies(HashSet<DbObject> dependencies) {
-        ExpressionVisitor visitor = ExpressionVisitor.getDependenciesVisitor(dependencies);
-        if (condition != null) {
-            condition.isEverything(visitor);
-        }
-        if (sourceTableFilter != null) {
-            Select select = sourceTableFilter.getSelect();
-            if (select != null) {
-                select.isEverything(visitor);
-            }
-        }
-    }
 }

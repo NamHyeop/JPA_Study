@@ -1,6 +1,6 @@
 /*
  * Copyright 2004-2019 H2 Group. Multiple-Licensed under the MPL 2.0,
- * and the EPL 1.0 (https://h2database.com/html/license.html).
+ * and the EPL 1.0 (http://h2database.com/html/license.html).
  * Initial Developer: H2 Group
  */
 package org.h2.message;
@@ -345,8 +345,6 @@ public class DbException extends RuntimeException {
                 throw (Error) e;
             }
             return get(GENERAL_ERROR_1, e, e.toString());
-        } catch (OutOfMemoryError ignore) {
-            return OOME;
         } catch (Throwable ex) {
             try {
                 DbException dbException = new DbException(
@@ -501,7 +499,6 @@ public class DbException extends RuntimeException {
         case METHOD_NOT_ALLOWED_FOR_PREPARED_STATEMENT:
         case ACCESS_DENIED_TO_CLASS_1:
         case RESULT_SET_READONLY:
-        case CURRENT_SEQUENCE_VALUE_IS_NOT_DEFINED_IN_SESSION_1:
             return new JdbcSQLNonTransientException(message, sql, state, errorCode, cause, stackTrace);
         case FEATURE_NOT_SUPPORTED_1:
             return new JdbcSQLFeatureNotSupportedException(message, sql, state, errorCode, cause, stackTrace);
@@ -590,8 +587,7 @@ public class DbException extends RuntimeException {
             return new JdbcSQLDataException(message, sql, state, errorCode, cause, stackTrace);
         case URL_RELATIVE_TO_CWD:
         case DATABASE_NOT_FOUND_1:
-        case DATABASE_NOT_FOUND_WITH_IF_EXISTS_1:
-        case REMOTE_DATABASE_NOT_FOUND_1:
+        case DATABASE_NOT_FOUND_2:
         case TRACE_CONNECTION_NOT_CLOSED:
         case DATABASE_ALREADY_OPEN_1:
         case FILE_CORRUPTED_1:
@@ -618,7 +614,6 @@ public class DbException extends RuntimeException {
         case DATABASE_IS_IN_EXCLUSIVE_MODE:
         case INVALID_DATABASE_NAME_1:
         case AUTHENTICATOR_NOT_AVAILABLE:
-        case METHOD_DISABLED_ON_AUTOCOMMIT_TRUE:
             return new JdbcSQLNonTransientConnectionException(message, sql, state, errorCode, cause, stackTrace);
         case ROW_NOT_FOUND_WHEN_DELETING_1:
         case CONCURRENT_UPDATE_1:

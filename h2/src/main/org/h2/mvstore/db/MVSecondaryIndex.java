@@ -1,6 +1,6 @@
 /*
  * Copyright 2004-2019 H2 Group. Multiple-Licensed under the MPL 2.0,
- * and the EPL 1.0 (https://h2database.com/html/license.html).
+ * and the EPL 1.0 (http://h2database.com/html/license.html).
  * Initial Developer: H2 Group
  */
 package org.h2.mvstore.db;
@@ -13,12 +13,12 @@ import java.util.Queue;
 import org.h2.api.ErrorCode;
 import org.h2.command.dml.AllColumnsForPlan;
 import org.h2.engine.Database;
+import org.h2.engine.Mode;
 import org.h2.engine.Session;
 import org.h2.index.BaseIndex;
 import org.h2.index.Cursor;
 import org.h2.index.IndexType;
 import org.h2.message.DbException;
-import org.h2.mvstore.DataUtils;
 import org.h2.mvstore.MVMap;
 import org.h2.mvstore.MVStore;
 import org.h2.mvstore.tx.Transaction;
@@ -34,7 +34,6 @@ import org.h2.value.Value;
 import org.h2.value.ValueArray;
 import org.h2.value.ValueLong;
 import org.h2.value.ValueNull;
-import org.h2.value.VersionedValue;
 
 /**
  * A table stored in a MVStore.
@@ -59,7 +58,7 @@ public final class MVSecondaryIndex extends BaseIndex implements MVIndex {
         // even for unique indexes, as some of the index columns could be null
         keyColumns = columns.length + 1;
         String mapName = "index." + getId();
-        assert db.isStarting() || !db.getStore().getMvStore().getMetaMap().containsKey(DataUtils.META_NAME + mapName);
+        assert db.isStarting() || !db.getStore().getMvStore().getMetaMap().containsKey("name." + mapName);
         int[] sortTypes = new int[keyColumns];
         for (int i = 0; i < columns.length; i++) {
             sortTypes[i] = columns[i].sortType;
@@ -109,26 +108,27 @@ public final class MVSecondaryIndex extends BaseIndex implements MVIndex {
         }
 
         public static final class Comparator implements java.util.Comparator<Source> {
-            private final Database database;
+            private final Mode databaseMode;
             private final CompareMode compareMode;
 
-            public Comparator(Database database, CompareMode compareMode) {
-                this.database = database;
+            public Comparator(Mode databaseMode, CompareMode compareMode) {
+                this.databaseMode = databaseMode;
                 this.compareMode = compareMode;
             }
 
             @Override
             public int compare(Source one, Source two) {
-                return one.currentRowData.compareTo(two.currentRowData, database, compareMode);
+                return one.currentRowData.compareTo(two.currentRowData, databaseMode, compareMode);
             }
         }
     }
 
     @Override
     public void addBufferedRows(List<String> bufferNames) {
+        CompareMode compareMode = database.getCompareMode();
         int buffersCount = bufferNames.size();
         Queue<Source> queue = new PriorityQueue<>(buffersCount,
-                new Source.Comparator(database, database.getCompareMode()));
+                new Source.Comparator(database.getMode(), compareMode));
         for (String bufferName : bufferNames) {
             Iterator<ValueArray> iter = openMap(bufferName).keyIterator(null);
             if (iter.hasNext()) {
@@ -208,15 +208,14 @@ public final class MVSecondaryIndex extends BaseIndex implements MVIndex {
     }
 
     private void checkUnique(TransactionMap<Value, Value> map, ValueArray row, long newKey) {
-        Iterator<Value> it = map.keyIteratorUncommitted(convertToKey(row, ValueLong.MIN),
-                                                        convertToKey(row, ValueLong.MAX));
+        Iterator<Value> it = map.keyIterator(convertToKey(row, ValueLong.MIN), convertToKey(row, ValueLong.MAX), true);
         while (it.hasNext()) {
             ValueArray rowData = (ValueArray)it.next();
             Value[] array = rowData.getList();
             Value rowKey = array[array.length - 1];
             long rowId = rowKey.getLong();
             if (newKey != rowId) {
-                if (map.getImmediate(rowData) != null) {
+                if (map.get(rowData) != null) {
                     // committed
                     throw getDuplicateKeyException(rowKey.toString());
                 }
@@ -271,7 +270,7 @@ public final class MVSecondaryIndex extends BaseIndex implements MVIndex {
         ValueArray min = convertToKey(first, bigger ? ValueLong.MAX : ValueLong.MIN);
         ValueArray max = convertToKey(last, ValueLong.MAX);
         TransactionMap<Value,Value> map = getMap(session);
-        return new MVStoreCursor(session, map.keyIterator(min, max));
+        return new MVStoreCursor(session, map.keyIterator(min, max, false));
     }
 
     private static ValueArray convertToKey(ValueArray r, ValueLong key) {
@@ -290,7 +289,7 @@ public final class MVSecondaryIndex extends BaseIndex implements MVIndex {
             int idx = c.getColumnId();
             Value v = r.getValue(idx);
             if (v != null) {
-                array[i] = v.convertTo(c.getType(), database, true, null);
+                array[i] = v.convertTo(c.getType(), database.getMode(), null);
             }
         }
         array[keyColumns - 1] = key != null ? key : ValueLong.get(r.getKey());
@@ -431,11 +430,6 @@ public final class MVSecondaryIndex extends BaseIndex implements MVIndex {
         }
         Transaction t = session.getTransaction();
         return dataMap.getInstance(t);
-    }
-
-    @Override
-    public MVMap<Value, VersionedValue> getMVMap() {
-        return dataMap.map;
     }
 
     /**

@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <!--
 Copyright 2004-2019 H2 Group. Multiple-Licensed under the MPL 2.0,
-and the EPL 1.0 (https://h2database.com/html/license.html).
+and the EPL 1.0 (http://h2database.com/html/license.html).
 Initial Developer: H2 Group
 -->
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
@@ -162,7 +162,7 @@ encrypted using the AES-128 encryption algorithm
 <h2 id="products_work_with">H2 in Use</h2>
 <p>
 For a list of applications that work with or use H2, see:
-<a href="https://h2database.com/html/links.html">Links</a>.
+<a href="http://www.h2database.com/html/links.html">Links</a>.
 </p>
 
 <h2 id="connection_modes">Connection Modes</h2>
@@ -183,15 +183,6 @@ The disadvantage is that a database may only be open in one virtual machine (and
 As in all modes, both persistent and in-memory databases are supported.
 There is no limit on the number of database open concurrently,
 or on the number of open connections.
-</p>
-<p>
-In embedded mode I/O operations can be performed by application's threads that execute a SQL command.
-The application may not interrupt these threads, it can lead to database corruption,
-because JVM closes I/O handle during thread interruption.
-Consider other ways to control execution of your application.
-When interrupts are possible the <a href="advanced.html#file_system"><code>async:</code></a>
-file system can be used as a workaround, but full safety is not guaranteed.
-It's recommended to use the client-server model instead, the client side may interrupt own threads.
 </p>
 <img src="images/connection-mode-embedded-2.png"
     width="208" height="259"
@@ -603,7 +594,7 @@ other database settings can be passed in the database URL.
 Adding <code>;setting=value</code> at the end of a database URL is the
 same as executing the statement <code>SET setting value</code> just after
 connecting. For a list of supported settings, see <a href="grammar.html">SQL Grammar</a>
-or the <a href="https://h2database.com/javadoc/org/h2/engine/DbSettings.html">DbSettings</a> javadoc.
+or the <a href="http://www.h2database.com/javadoc/org/h2/engine/DbSettings.html">DbSettings</a> javadoc.
 </p>
 
 <h2 id="custom_access_mode">Custom File Access Mode</h2>
@@ -653,6 +644,10 @@ An application can use multiple threads that access the same database at the sam
 With default MVStore engine threads that use different connections can use the database concurrently.
 With PageStore engine requests to the same database are synchronized,
 that means that if one thread executes a long running query, the other threads need to wait.
+Concurrent database usage may be enabled for PageStore or disabled for MVStore
+with <code>MULTI_THREADED</code> setting.
+Note that multi-threaded mode for PageStore engine is not tested well and has some issues;
+it should be used with caution.
 </p>
 
 <h3>Locking, Lock-Timeout, Deadlocks</h3>
@@ -731,41 +726,7 @@ but does not issue them with default MVStore engine.
 
 <h2 id="database_file_layout">Database File Layout</h2>
 <p>
-The following files are created for persistent databases when the default MVStore engine is used:
-</p>
-<table class="main">
-<tr><th>File Name</th><th>Description</th><th>Number of Files</th></tr>
-<tr><td class="notranslate">
-    test.mv.db
-</td><td>
-    Database file.<br />
-    Contains the transaction log, indexes, and data for all tables.<br />
-    Format: <code>&lt;database&gt;.mv.db</code>
-</td><td>
-    1 per database
-</td></tr>
-<tr><td class="notranslate">
-    test.newFile
-</td><td>
-    Temporary file for database compaction.<br />
-    Contains the new MVStore file.<br />
-    Format: <code>&lt;database&gt;.newFile</code>
-</td><td>
-    0 or 1 per database
-</td></tr>
-<tr><td class="notranslate">
-    test.tempFile
-</td><td>
-    Temporary file for database compaction.<br />
-    Contains the temporary MVStore file.<br />
-    Format: <code>&lt;database&gt;.tempFile</code>
-</td><td>
-    0 or 1 per database
-</td></tr>
-</table>
-
-<p>
-The following file is created for persistent databases when PageStore engine is used:
+The following files are created for persistent databases:
 </p>
 <table class="main">
 <tr><th>File Name</th><th>Description</th><th>Number of Files</th></tr>
@@ -778,13 +739,6 @@ The following file is created for persistent databases when PageStore engine is 
 </td><td>
     1 per database
 </td></tr>
-</table>
-
-<p>
-The following files are created for persistent databases by both MVStore and PageStore engines:
-</p>
-<table class="main">
-<tr><th>File Name</th><th>Description</th><th>Number of Files</th></tr>
 <tr><td class="notranslate">
     test.lock.db
 </td><td>
@@ -800,9 +754,18 @@ The following files are created for persistent databases by both MVStore and Pag
     Trace file (if the trace option is enabled).<br />
     Contains trace information.<br />
     Format: <code>&lt;database&gt;.trace.db</code><br />
-    Renamed to <code>&lt;database&gt;.trace.db.old</code> if too big.
+    Renamed to <code>&lt;database&gt;.trace.db.old</code> is too big.
 </td><td>
     0 or 1 per database
+</td></tr>
+<tr><td class="notranslate">
+    test.lobs.db/*
+</td><td>
+    Directory containing one file for each<br />
+    BLOB or CLOB value larger than a certain size.<br />
+    Format: <code>&lt;id&gt;.t&lt;tableId&gt;.lob.db</code>
+</td><td>
+    1 per large object
 </td></tr>
 <tr><td class="notranslate">
     test.123.temp.db
@@ -812,23 +775,6 @@ The following files are created for persistent databases by both MVStore and Pag
     Format: <code>&lt;database&gt;.&lt;id&gt;.temp.db</code>
 </td><td>
     1 per object
-</td></tr>
-</table>
-
-<p>
-Legacy PageStore databases from old versions of H2 can have the following additional files:
-</p>
-<table class="main">
-<tr><th>File Name</th><th>Description</th><th>Number of Files</th></tr>
-<tr><td class="notranslate">
-    test.lobs.db/*
-</td><td>
-    Directory containing one file for each<br />
-    BLOB or CLOB value larger than a certain size.
-    <br />
-    Format: <code>&lt;id&gt;.t&lt;tableId&gt;.lob.db</code>
-</td><td>
-    1 per large object
 </td></tr>
 </table>
 
@@ -893,7 +839,6 @@ or the SQL statement <code>SET MODE DB2</code>.
 </li><li>Support the pseudo-table SYSIBM.SYSDUMMY1.
 </li><li>Timestamps with dash between date and time are supported.
 </li><li>Datetime value functions return the same value within a command.
-</li><li>Second and third arguments of TRANSLATE() function are swapped.
 </li></ul>
 
 <h3>Derby Compatibility Mode</h3>
@@ -917,7 +862,14 @@ or the SQL statement <code>SET MODE Derby</code>.
 To use the HSQLDB mode, use the database URL <code>jdbc:h2:~/test;MODE=HSQLDB</code>
 or the SQL statement <code>SET MODE HSQLDB</code>.
 </p>
-<ul><li>Text can be concatenated using '+'.
+<ul><li>For aliased columns, <code>ResultSetMetaData.getColumnName()</code>
+    returns the alias name and <code>getTableName()</code> returns
+    <code>null</code>.
+</li><li>When converting the scale of decimal data, the number is only converted if the new scale is
+    smaller than the current scale. Usually, the scale is converted and 0s are added if required.
+</li><li>For unique indexes, <code>NULL</code> is distinct.
+    That means only one row with <code>NULL</code> in one of the columns is allowed.
+</li><li>Text can be concatenated using '+'.
 </li><li>Datetime value functions return the same value within a command.
 </li></ul>
 
@@ -935,14 +887,11 @@ or the SQL statement <code>SET MODE MSSQLServer</code>.
 </li><li>Concatenating <code>NULL</code> with another value
     results in the other value.
 </li><li>Text can be concatenated using '+'.
-</li><li>Arguments of LOG() function are swapped.
 </li><li>MONEY data type is treated like NUMERIC(19, 4) data type. SMALLMONEY data type is treated like NUMERIC(10, 4)
     data type.
 </li><li><code>IDENTITY</code> can be used for automatic id generation on column level.
 </li><li>Table hints are discarded. Example: <code>SELECT * FROM table WITH (NOLOCK)</code>.
 </li><li>Datetime value functions return the same value within a command.
-</li><li>0x literals are parsed as binary string literals.
-</li><li>TRUNCATE TABLE restarts next values of generated columns.
 </li></ul>
 
 <h3>MySQL Compatibility Mode</h3>
@@ -952,7 +901,11 @@ Use this mode for compatibility with MariaDB too.
 When case-insensitive identifiers are needed append <code>;CASE_INSENSITIVE_IDENTIFIERS=TRUE</code> to URL.
 Do not change value of DATABASE_TO_LOWER after creation of database.
 </p>
-<ul><li>Creating indexes in the <code>CREATE TABLE</code> statement is allowed using
+<ul><li>When inserting data, if a column is defined to be <code>NOT NULL</code>
+    and <code>NULL</code> is inserted,
+    then a 0 (or empty string, or the current timestamp for timestamp columns) value is used.
+    Usually, this operation is not allowed and an exception is thrown.
+</li><li>Creating indexes in the <code>CREATE TABLE</code> statement is allowed using
     <code>INDEX(..)</code> or <code>KEY(..)</code>.
     Example: <code>create table test(id int primary key, name varchar(255), key idx_name(name));</code>
 </li><li>When converting a floating point number to an integer, the fractional
@@ -963,13 +916,8 @@ Do not change value of DATABASE_TO_LOWER after creation of database.
     meaning is some contexts.
 </li><li>INSERT IGNORE is partially supported and may be used to skip rows with duplicate keys if ON DUPLICATE KEY
     UPDATE is not specified.
-</li><li>REPLACE INTO is partially supported.
 </li><li>REGEXP_REPLACE() uses \ for back-references for compatibility with MariaDB.
 </li><li>Datetime value functions return the same value within a command.
-</li><li>0x literals are parsed as binary string literals.
-</li><li>Unrelated expressions in ORDER BY clause of DISTINCT queries are allowed.
-</li><li>Some MySQL-specific ALTER TABLE commands are partially supported.
-</li><li>TRUNCATE TABLE restarts next values of generated columns.
 </li></ul>
 <p>
 Text comparison in MySQL is case insensitive by default, while in H2 it is case sensitive (as in most other databases).
@@ -993,12 +941,8 @@ or the SQL statement <code>SET MODE Oracle</code>.
     results in the other value.
 </li><li>Empty strings are treated like <code>NULL</code> values.
 </li><li>REGEXP_REPLACE() uses \ for back-references.
-</li><li>RAWTOHEX() converts character strings to hexadecimal representation of their UTF-8 encoding.
-</li><li>HEXTORAW() decodes a hexadecimal character string to a binary string.
 </li><li>DATE data type is treated like TIMESTAMP(0) data type.
 </li><li>Datetime value functions return the same value within a command.
-</li><li>ALTER TABLE MODIFY COLUMN command is partially supported.
-</li><li>SEQUENCE.NEXTVAL and SEQUENCE.CURRVAL return values with DECIMAL/NUMERIC data type.
 </li></ul>
 
 <h3>PostgreSQL Compatibility Mode</h3>
@@ -1020,7 +964,6 @@ Do not change value of DATABASE_TO_LOWER after creation of database.
     <li>does not throw an exception when the <code>flagsString</code> parameter contains a 'g';</li>
     <li>replaces only the first matched substring in the absence of the 'g' flag in the <code>flagsString</code> parameter.</li>
     </ul>
-</li><li>ON CONFLICT DO NOTHING is supported in INSERT statements.
 </li><li>Fixed-width strings are padded with spaces.
 </li><li>MONEY data type is treated like NUMERIC(19, 2) data type.
 </li><li>Datetime value functions return the same value within a transaction.
@@ -1285,11 +1228,7 @@ The formula is evaluated when the row is inserted, and re-evaluated every time t
 One use case is to automatically update the last-modification time:
 </p>
 <pre>
-CREATE TABLE TEST(
-    ID INT,
-    NAME VARCHAR,
-    LAST_MOD TIMESTAMP WITH TIME ZONE AS CURRENT_TIMESTAMP
-);
+CREATE TABLE TEST(ID INT, NAME VARCHAR, LAST_MOD TIMESTAMP AS NOW());
 </pre>
 <p>
 Function indexes are not directly supported by this database, but they can be emulated

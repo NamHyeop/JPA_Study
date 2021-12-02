@@ -1,5 +1,5 @@
 -- Copyright 2004-2019 H2 Group. Multiple-Licensed under the MPL 2.0,
--- and the EPL 1.0 (https://h2database.com/html/license.html).
+-- and the EPL 1.0 (http://h2database.com/html/license.html).
 -- Initial Developer: H2 Group
 --
 
@@ -150,7 +150,7 @@ SELECT ID, CATEGORY,
     NTH_VALUE(CATEGORY, 3) FROM LAST OVER (ORDER BY CATEGORY RANGE BETWEEN CURRENT ROW AND UNBOUNDED FOLLOWING) C3,
     NTH_VALUE(CATEGORY, 2) FROM LAST OVER (ORDER BY CATEGORY RANGE BETWEEN CURRENT ROW AND UNBOUNDED FOLLOWING EXCLUDE CURRENT ROW)
     FROM TEST OFFSET 10 ROWS;
-> ID CATEGORY C2 C3   NTH_VALUE(CATEGORY, 2) FROM LAST OVER (ORDER BY CATEGORY RANGE BETWEEN CURRENT ROW AND UNBOUNDED FOLLOWING EXCLUDE CURRENT ROW)
+> ID CATEGORY C2 C3   NTH_VALUE(CATEGORY, 2) FROM LAST OVER (ORDER BY CATEGORY RANGE BETWEEN CURRENT_ROW AND UNBOUNDED FOLLOWING EXCLUDE CURRENT ROW)
 > -- -------- -- ---- -------------------------------------------------------------------------------------------------------------------------------
 > 11 3        4  3    4
 > 12 4        4  null null

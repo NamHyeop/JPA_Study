@@ -1,6 +1,6 @@
 /*
  * Copyright 2004-2019 H2 Group. Multiple-Licensed under the MPL 2.0,
- * and the EPL 1.0 (https://h2database.com/html/license.html).
+ * and the EPL 1.0 (http://h2database.com/html/license.html).
  * Initial Developer: H2 Group
  */
 package org.h2.engine;
@@ -16,6 +16,8 @@ import org.h2.message.Trace;
 import org.h2.security.auth.AuthenticationException;
 import org.h2.security.auth.AuthenticationInfo;
 import org.h2.security.auth.Authenticator;
+import org.h2.store.FileLock;
+import org.h2.store.FileLockMethod;
 import org.h2.util.MathUtils;
 import org.h2.util.ParserUtil;
 import org.h2.util.ThreadDeadlockDetector;
@@ -46,7 +48,8 @@ public class Engine implements SessionFactory {
         return INSTANCE;
     }
 
-    private Session openSession(ConnectionInfo ci, boolean ifExists, boolean forbidCreation, String cipher) {
+    private Session openSession(ConnectionInfo ci, boolean ifExists,
+            String cipher) {
         String name = ci.getName();
         Database database;
         ci.removeProperty("NO_UPGRADE", false);
@@ -60,16 +63,8 @@ public class Engine implements SessionFactory {
                 database = DATABASES.get(name);
             }
             if (database == null) {
-                String p = ci.getProperty("MV_STORE");
-                boolean exists = p == null ? Database.exists(name)
-                        : Database.exists(name, Utils.parseBoolean(p, true, false));
-                if (!exists) {
-                    if (ifExists) {
-                        throw DbException.get(ErrorCode.DATABASE_NOT_FOUND_WITH_IF_EXISTS_1, name);
-                    }
-                    if (forbidCreation) {
-                        throw DbException.get(ErrorCode.REMOTE_DATABASE_NOT_FOUND_1, name);
-                    }
+                if (ifExists && !Database.exists(name)) {
+                    throw DbException.get(ErrorCode.DATABASE_NOT_FOUND_2, name);
                 }
                 database = new Database(ci, cipher);
                 opened = true;
@@ -137,7 +132,7 @@ public class Engine implements SessionFactory {
         //Prevent to set _PASSWORD
         ci.cleanAuthenticationInfo();
         checkClustering(ci, database);
-        Session session = database.createSession(user, ci.getNetworkConnectionInfo());
+        Session session = database.createSession(user);
         if (session == null) {
             // concurrently closing
             return null;
@@ -168,8 +163,23 @@ public class Engine implements SessionFactory {
 
     private Session createSessionAndValidate(ConnectionInfo ci) {
         try {
+            ConnectionInfo backup = null;
+            String lockMethodName = ci.getProperty("FILE_LOCK", null);
+            FileLockMethod fileLockMethod = FileLock.getFileLockMethod(lockMethodName);
+            if (fileLockMethod == FileLockMethod.SERIALIZED) {
+                // In serialized mode, database instance sharing is not possible
+                ci.setProperty("OPEN_NEW", "TRUE");
+                try {
+                    backup = ci.clone();
+                } catch (CloneNotSupportedException e) {
+                    throw DbException.convert(e);
+                }
+            }
             Session session = openSession(ci);
             validateUserAndPassword(true);
+            if (backup != null) {
+                session.setConnectionInfo(backup);
+            }
             return session;
         } catch (DbException e) {
             if (e.getErrorCode() == ErrorCode.WRONG_USER_OR_PASSWORD) {
@@ -181,7 +191,6 @@ public class Engine implements SessionFactory {
 
     private synchronized Session openSession(ConnectionInfo ci) {
         boolean ifExists = ci.removeProperty("IFEXISTS", false);
-        boolean forbidCreation = ci.removeProperty("FORBID_CREATION", false);
         boolean ignoreUnknownSetting = ci.removeProperty(
                 "IGNORE_UNKNOWN_SETTINGS", false);
         String cipher = ci.removeProperty("CIPHER", null);
@@ -189,7 +198,7 @@ public class Engine implements SessionFactory {
         Session session;
         long start = System.nanoTime();
         for (;;) {
-            session = openSession(ci, ifExists, forbidCreation, cipher);
+            session = openSession(ci, ifExists, cipher);
             if (session != null) {
                 break;
             }
@@ -222,7 +231,7 @@ public class Engine implements SessionFactory {
                     CommandInterface command = session.prepareCommand(
                             "SET " + setting + ' ' + value,
                             Integer.MAX_VALUE);
-                    command.executeUpdate(null);
+                    command.executeUpdate(false);
                 } catch (DbException e) {
                     if (e.getErrorCode() == ErrorCode.ADMIN_RIGHTS_REQUIRED) {
                         session.getTrace().error(e, "admin rights required; user: \"" +
@@ -240,7 +249,7 @@ public class Engine implements SessionFactory {
                 try {
                     CommandInterface command = session.prepareCommand(init,
                             Integer.MAX_VALUE);
-                    command.executeUpdate(null);
+                    command.executeUpdate(false);
                 } catch (DbException e) {
                     if (!ignoreUnknownSetting) {
                         session.close();

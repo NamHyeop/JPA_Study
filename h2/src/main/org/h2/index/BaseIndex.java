@@ -1,6 +1,6 @@
 /*
  * Copyright 2004-2019 H2 Group. Multiple-Licensed under the MPL 2.0,
- * and the EPL 1.0 (https://h2database.com/html/license.html).
+ * and the EPL 1.0 (http://h2database.com/html/license.html).
  * Initial Developer: H2 Group
  */
 package org.h2.index;
@@ -91,7 +91,7 @@ public abstract class BaseIndex extends SchemaObjectBase implements Index {
      * @param key the key values
      * @return the exception
      */
-    public DbException getDuplicateKeyException(String key) {
+    protected DbException getDuplicateKeyException(String key) {
         StringBuilder builder = new StringBuilder();
         getSQL(builder, false).append(" ON ");
         table.getSQL(builder, false).append('(');
@@ -103,22 +103,6 @@ public abstract class BaseIndex extends SchemaObjectBase implements Index {
         DbException e = DbException.get(ErrorCode.DUPLICATE_KEY_1, builder.toString());
         e.setSource(this);
         return e;
-    }
-
-    /**
-     * Get "PRIMARY KEY ON <table> [(column)]".
-     *
-     * @param mainIndexColumn the column index
-     * @return the message
-     */
-    protected StringBuilder getDuplicatePrimaryKeyMessage(int mainIndexColumn) {
-        StringBuilder builder = new StringBuilder("PRIMARY KEY ON ");
-        table.getSQL(builder, false);
-        if (mainIndexColumn >= 0 && mainIndexColumn < indexColumns.length) {
-            builder.append('(');
-            indexColumns[mainIndexColumn].getSQL(builder, false).append(')');
-        }
-        return builder;
     }
 
     @Override
@@ -352,7 +336,7 @@ public abstract class BaseIndex extends SchemaObjectBase implements Index {
      * @return {@code true} if specified row may have duplicates,
      *         {@code false otherwise}
      */
-    public boolean mayHaveNullDuplicates(SearchRow searchRow) {
+    protected boolean mayHaveNullDuplicates(SearchRow searchRow) {
         switch (database.getMode().uniqueIndexNullsHandling) {
         case ALLOW_DUPLICATES_WITH_ANY_NULL:
             for (int index : columnIds) {
@@ -381,7 +365,7 @@ public abstract class BaseIndex extends SchemaObjectBase implements Index {
      * @return 0 if both rows are equal, -1 if the first row is smaller,
      *         otherwise 1
      */
-    public int compareKeys(SearchRow rowData, SearchRow compare) {
+    int compareKeys(SearchRow rowData, SearchRow compare) {
         long k1 = rowData.getKey();
         long k2 = compare.getKey();
         if (k1 == k2) {

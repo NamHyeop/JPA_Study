@@ -1,11 +1,11 @@
 /*
  * Copyright 2004-2019 H2 Group. Multiple-Licensed under the MPL 2.0,
- * and the EPL 1.0 (https://h2database.com/html/license.html).
+ * and the EPL 1.0 (http://h2database.com/html/license.html).
  * Initial Developer: H2 Group
  */
 package org.h2.expression;
 
-import org.h2.engine.Database;
+import org.h2.engine.Mode;
 import org.h2.engine.Session;
 import org.h2.expression.IntervalOperation.IntervalOpType;
 import org.h2.expression.function.Function;
@@ -25,6 +25,12 @@ import org.h2.value.ValueString;
 public class BinaryOperation extends Expression {
 
     public enum OpType {
+        /**
+         * This operation represents a string concatenation as in
+         * 'Hello' || 'World'.
+         */
+        CONCAT,
+
         /**
          * This operation represents an addition as in 1 + 2.
          */
@@ -73,6 +79,8 @@ public class BinaryOperation extends Expression {
 
     private String getOperationToken() {
         switch (opType) {
+        case CONCAT:
+            return "||";
         case PLUS:
             return "+";
         case MINUS:
@@ -90,13 +98,30 @@ public class BinaryOperation extends Expression {
 
     @Override
     public Value getValue(Session session) {
-        Database database = session.getDatabase();
-        Value l = left.getValue(session).convertTo(type, database, true, null);
+        Mode mode = session.getDatabase().getMode();
+        Value l = left.getValue(session).convertTo(type, mode, null);
         Value r = right.getValue(session);
         if (convertRight) {
-            r = r.convertTo(type, database, true, null);
+            r = r.convertTo(type, mode, null);
         }
         switch (opType) {
+        case CONCAT: {
+            if (l == ValueNull.INSTANCE) {
+                if (mode.nullConcatIsNull) {
+                    return ValueNull.INSTANCE;
+                }
+                return r;
+            } else if (r == ValueNull.INSTANCE) {
+                if (mode.nullConcatIsNull) {
+                    return ValueNull.INSTANCE;
+                }
+                return l;
+            }
+            String s1 = l.getString(), s2 = r.getString();
+            StringBuilder buff = new StringBuilder(s1.length() + s2.length());
+            buff.append(s1).append(s2);
+            return ValueString.get(buff.toString());
+        }
         case PLUS:
             if (l == ValueNull.INSTANCE || r == ValueNull.INSTANCE) {
                 return ValueNull.INSTANCE;
@@ -138,6 +163,18 @@ public class BinaryOperation extends Expression {
         left = left.optimize(session);
         right = right.optimize(session);
         switch (opType) {
+        case CONCAT: {
+            TypeInfo l = left.getType(), r = right.getType();
+            if (DataType.isStringType(l.getValueType()) && DataType.isStringType(r.getValueType())) {
+                long precision = l.getPrecision() + r.getPrecision();
+                if (precision >= 0 && precision < Integer.MAX_VALUE) {
+                    type = TypeInfo.getTypeInfo(Value.STRING, precision, 0, null);
+                    break;
+                }
+            }
+            type = TypeInfo.TYPE_STRING;
+            break;
+        }
         case PLUS:
         case MINUS:
         case MULTIPLY:
@@ -149,8 +186,10 @@ public class BinaryOperation extends Expression {
                     (l == Value.UNKNOWN && r == Value.UNKNOWN)) {
                 // (? + ?) - use decimal by default (the most safe data type) or
                 // string when text concatenation with + is enabled
-                if (opType == OpType.PLUS && session.getDatabase().getMode().allowPlusForStringConcat) {
-                    return new ConcatenationOperation(left, right).optimize(session);
+                if (opType == OpType.PLUS && session.getDatabase().
+                        getMode().allowPlusForStringConcat) {
+                    type = TypeInfo.TYPE_STRING;
+                    opType = OpType.CONCAT;
                 } else {
                     type = TypeInfo.TYPE_DECIMAL_DEFAULT;
                 }
@@ -165,7 +204,7 @@ public class BinaryOperation extends Expression {
                 } else {
                     type = TypeInfo.getTypeInfo(dataType);
                     if (DataType.isStringType(dataType) && session.getDatabase().getMode().allowPlusForStringConcat) {
-                        return new ConcatenationOperation(left, right).optimize(session);
+                        opType = OpType.CONCAT;
                     }
                 }
             }
@@ -238,13 +277,8 @@ public class BinaryOperation extends Expression {
             }
             break;
         case DIVIDE:
-            if (lInterval) {
-                if (rNumeric) {
-                    return new IntervalOperation(IntervalOpType.INTERVAL_DIVIDE_NUMERIC, left, right);
-                } else if (rInterval && DataType.isYearMonthIntervalType(l) == DataType.isYearMonthIntervalType(r)) {
-                    // Non-standard
-                    return new IntervalOperation(IntervalOpType.INTERVAL_DIVIDE_INTERVAL, left, right);
-                }
+            if (lInterval && rNumeric) {
+                return new IntervalOperation(IntervalOpType.INTERVAL_DIVIDE_NUMERIC, left, right);
             }
             break;
         default:
@@ -265,21 +299,28 @@ public class BinaryOperation extends Expression {
             switch (l) {
             case Value.INT: {
                 // Oracle date add
-                return Function.getFunctionWithArgs(session.getDatabase(), Function.DATEADD,
-                        ValueExpression.get(ValueString.get("DAY")), left, right).optimize(session);
+                Function f = Function.getFunction(session.getDatabase(), "DATEADD");
+                f.setParameter(0, ValueExpression.get(ValueString.get("DAY")));
+                f.setParameter(1, left);
+                f.setParameter(2, right);
+                f.doneWithParameters();
+                return f.optimize(session);
             }
             case Value.DECIMAL:
             case Value.FLOAT:
             case Value.DOUBLE: {
                 // Oracle date add
-                return Function.getFunctionWithArgs(session.getDatabase(), Function.DATEADD,
-                        ValueExpression.get(ValueString.get("SECOND")),
-                        new BinaryOperation(OpType.MULTIPLY, ValueExpression.get(ValueInt.get(60 * 60 * 24)), left),
-                        right).optimize(session);
+                Function f = Function.getFunction(session.getDatabase(), "DATEADD");
+                f.setParameter(0, ValueExpression.get(ValueString.get("SECOND")));
+                left = new BinaryOperation(OpType.MULTIPLY, ValueExpression.get(ValueInt
+                        .get(60 * 60 * 24)), left);
+                f.setParameter(1, left);
+                f.setParameter(2, right);
+                f.doneWithParameters();
+                return f.optimize(session);
             }
             case Value.TIME:
-            case Value.TIME_TZ:
-                if (r == Value.TIME || r == Value.TIME_TZ || r == Value.TIMESTAMP_TZ) {
+                if (r == Value.TIME || r == Value.TIMESTAMP_TZ) {
                     type = TypeInfo.getTypeInfo(r);
                     return this;
                 } else { // DATE, TIMESTAMP
@@ -296,23 +337,31 @@ public class BinaryOperation extends Expression {
                 switch (r) {
                 case Value.INT: {
                     // Oracle date subtract
-                    return Function.getFunctionWithArgs(session.getDatabase(), Function.DATEADD,
-                            ValueExpression.get(ValueString.get("DAY")), //
-                            new UnaryOperation(right), //
-                            left).optimize(session);
+                    Function f = Function.getFunction(session.getDatabase(), "DATEADD");
+                    f.setParameter(0, ValueExpression.get(ValueString.get("DAY")));
+                    right = new UnaryOperation(right);
+                    right = right.optimize(session);
+                    f.setParameter(1, right);
+                    f.setParameter(2, left);
+                    f.doneWithParameters();
+                    return f.optimize(session);
                 }
                 case Value.DECIMAL:
                 case Value.FLOAT:
                 case Value.DOUBLE: {
                     // Oracle date subtract
-                    return Function.getFunctionWithArgs(session.getDatabase(), Function.DATEADD,
-                                ValueExpression.get(ValueString.get("SECOND")),
-                                new UnaryOperation(new BinaryOperation(OpType.MULTIPLY, //
-                                        ValueExpression.get(ValueInt.get(60 * 60 * 24)), right)), //
-                                left).optimize(session);
+                    Function f = Function.getFunction(session.getDatabase(), "DATEADD");
+                    f.setParameter(0, ValueExpression.get(ValueString.get("SECOND")));
+                    right = new BinaryOperation(OpType.MULTIPLY, ValueExpression.get(ValueInt
+                            .get(60 * 60 * 24)), right);
+                    right = new UnaryOperation(right);
+                    right = right.optimize(session);
+                    f.setParameter(1, right);
+                    f.setParameter(2, left);
+                    f.doneWithParameters();
+                    return f.optimize(session);
                 }
                 case Value.TIME:
-                case Value.TIME_TZ:
                     type = TypeInfo.TYPE_TIMESTAMP;
                     return this;
                 case Value.DATE:
@@ -322,8 +371,7 @@ public class BinaryOperation extends Expression {
                 }
                 break;
             case Value.TIME:
-            case Value.TIME_TZ:
-                if (r == Value.TIME || r == Value.TIME_TZ) {
+                if (r == Value.TIME) {
                     return new IntervalOperation(IntervalOpType.DATETIME_MINUS_DATETIME, left, right);
                 }
                 break;

@@ -1,12 +1,11 @@
 /*
  * Copyright 2004-2019 H2 Group. Multiple-Licensed under the MPL 2.0,
- * and the EPL 1.0 (https://h2database.com/html/license.html).
+ * and the EPL 1.0 (http://h2database.com/html/license.html).
  * Initial Developer: H2 Group
  */
 package org.h2.engine;
 
 import java.util.HashMap;
-
 import org.h2.api.ErrorCode;
 import org.h2.message.DbException;
 import org.h2.util.Utils;
@@ -14,7 +13,7 @@ import org.h2.util.Utils;
 /**
  * This class contains various database-level settings. To override the
  * documented default value for a database, append the setting in the database
- * URL: "jdbc:h2:./test;ALIAS_COLUMN_NAME=TRUE" when opening the first connection
+ * URL: "jdbc:h2:test;ALIAS_COLUMN_NAME=TRUE" when opening the first connection
  * to the database. The settings can not be changed once the database is open.
  * <p>
  * Some settings are a last resort and temporary solution to work around a
@@ -26,11 +25,6 @@ import org.h2.util.Utils;
 public class DbSettings extends SettingsBase {
 
     private static DbSettings defaultSettings;
-
-    /**
-     * The initial size of the hash table.
-     */
-    static final int TABLE_SIZE = 64;
 
     /**
      * Database setting <code>ALIAS_COLUMN_NAME</code> (default: false).<br />
@@ -288,6 +282,15 @@ public class DbSettings extends SettingsBase {
     public final boolean recompileAlways = get("RECOMPILE_ALWAYS", false);
 
     /**
+     * Database setting <code>RECONNECT_CHECK_DELAY</code> (default: 200).<br />
+     * Check the .lock.db file every this many milliseconds to detect that the
+     * database was changed. The process writing to the database must first
+     * notify a change in the .lock.db file, then wait twice this many
+     * milliseconds before updating the database.
+     */
+    public final int reconnectCheckDelay = get("RECONNECT_CHECK_DELAY", 200);
+
+    /**
      * Database setting <code>REUSE_SPACE</code> (default: true).<br />
      * If disabled, all changes are appended to the database file, and existing
      * content is never overwritten. This setting has no effect if the database
@@ -327,12 +330,15 @@ public class DbSettings extends SettingsBase {
     public final boolean compressData = get("COMPRESS", false);
 
     /**
-     * Database setting <code>IGNORE_CATALOGS</code>
-     * (default: false).<br />
-     * If set, all catalog names in identifiers are silently accepted
-     * without comparing them with the short name of the database.
+     * Database setting <code>STANDARD_DROP_TABLE_RESTRICT</code> (default:
+     * false).<br />
+     * <code>true</code> if DROP TABLE RESTRICT should fail if there's any
+     * foreign key referencing the table to be dropped. <code>false</code> if
+     * foreign keys referencing the table to be dropped should be silently
+     * dropped as well.
      */
-    public final boolean ignoreCatalogs = get("IGNORE_CATALOGS", false);
+    public final boolean standardDropTableRestrict = get(
+            "STANDARD_DROP_TABLE_RESTRICT", false);
 
     private DbSettings(HashMap<String, String> s) {
         super(s);
@@ -357,17 +363,6 @@ public class DbSettings extends SettingsBase {
     }
 
     /**
-     * Sets the database engine setting.
-     *
-     * @param mvStore
-     *            true for MVStore engine, false for PageStore engine
-     */
-    void setMvStore(boolean mvStore) {
-        this.mvStore = mvStore;
-        set("MV_STORE", mvStore);
-    }
-
-    /**
      * INTERNAL.
      * Get the settings for the given properties (may not be null).
      *
@@ -386,7 +381,7 @@ public class DbSettings extends SettingsBase {
      */
     public static DbSettings getDefaultSettings() {
         if (defaultSettings == null) {
-            defaultSettings = new DbSettings(new HashMap<String, String>(TABLE_SIZE));
+            defaultSettings = new DbSettings(new HashMap<String, String>());
         }
         return defaultSettings;
     }

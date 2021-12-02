@@ -1,6 +1,6 @@
 /*
  * Copyright 2004-2019 H2 Group. Multiple-Licensed under the MPL 2.0,
- * and the EPL 1.0 (https://h2database.com/html/license.html).
+ * and the EPL 1.0 (http://h2database.com/html/license.html).
  * Initial Developer: H2 Group
  */
 package org.h2.util.geometry;
@@ -171,7 +171,7 @@ public final class JTSUtils {
         }
 
         @Override
-        protected void endCollectionItem(Target target, int type, int index, int total) {
+        protected void endCollectionItem(Target target, int index, int total) {
             subgeometries[index] = ((GeometryTarget) target).getGeometry();
         }
 
@@ -341,7 +341,6 @@ public final class JTSUtils {
                 CoordinateSequence sequence = p.getCoordinateSequence();
                 addCoordinate(sequence, target, 0, 1, getMeasures(sequence));
             }
-            target.endObject(POINT);
         } else if (geometry instanceof LineString) {
             if (parentType != 0 && parentType != MULTI_LINE_STRING && parentType != GEOMETRY_COLLECTION) {
                 throw new IllegalArgumentException();
@@ -357,7 +356,6 @@ public final class JTSUtils {
             for (int i = 0; i < numPoints; i++) {
                 addCoordinate(cs, target, i, numPoints, measures);
             }
-            target.endObject(LINE_STRING);
         } else if (geometry instanceof Polygon) {
             if (parentType != 0 && parentType != MULTI_POLYGON && parentType != GEOMETRY_COLLECTION) {
                 throw new IllegalArgumentException();
@@ -392,7 +390,6 @@ public final class JTSUtils {
                 }
                 target.endNonEmptyPolygon();
             }
-            target.endObject(POLYGON);
         } else if (geometry instanceof GeometryCollection) {
             if (parentType != 0 && parentType != GEOMETRY_COLLECTION) {
                 throw new IllegalArgumentException();
@@ -416,12 +413,13 @@ public final class JTSUtils {
             for (int i = 0; i < numItems; i++) {
                 Target innerTarget = target.startCollectionItem(i, numItems);
                 parseGeometry(gc.getGeometryN(i), innerTarget, type);
-                target.endCollectionItem(innerTarget, type, i, numItems);
+                target.endCollectionItem(innerTarget, i, numItems);
             }
-            target.endObject(type);
+            target.endCollection(type);
         } else {
             throw new IllegalArgumentException();
         }
+
     }
 
     private static void addRing(CoordinateSequence sequence, Target target, int size, int measures) {

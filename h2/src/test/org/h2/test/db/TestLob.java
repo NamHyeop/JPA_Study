@@ -1,6 +1,6 @@
 /*
  * Copyright 2004-2019 H2 Group. Multiple-Licensed under the MPL 2.0,
- * and the EPL 1.0 (https://h2database.com/html/license.html).
+ * and the EPL 1.0 (http://h2database.com/html/license.html).
  * Initial Developer: H2 Group
  */
 package org.h2.test.db;
@@ -541,7 +541,7 @@ public class TestLob extends TestDb {
     }
 
     Connection getDeadlock2Connection() throws SQLException {
-        return getConnection("lob;LOCK_TIMEOUT=60000");
+        return getConnection("lob;MULTI_THREADED=TRUE;LOCK_TIMEOUT=60000");
     }
 
     private void testCopyManyLobs() throws Exception {

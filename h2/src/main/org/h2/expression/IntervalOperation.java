@@ -1,13 +1,13 @@
 /*
  * Copyright 2004-2019 H2 Group. Multiple-Licensed under the MPL 2.0,
- * and the EPL 1.0 (https://h2database.com/html/license.html).
+ * and the EPL 1.0 (http://h2database.com/html/license.html).
  * Initial Developer: H2 Group
  */
 package org.h2.expression;
 
 import static org.h2.util.DateTimeUtils.NANOS_PER_DAY;
 import static org.h2.util.DateTimeUtils.NANOS_PER_HOUR;
-import static org.h2.util.DateTimeUtils.NANOS_PER_SECOND;
+import static org.h2.util.DateTimeUtils.NANOS_PER_MINUTE;
 import static org.h2.util.DateTimeUtils.absoluteDayFromDateValue;
 import static org.h2.util.DateTimeUtils.dateAndTimeFromValue;
 import static org.h2.util.DateTimeUtils.dateTimeToValue;
@@ -24,17 +24,14 @@ import org.h2.expression.function.DateTimeFunctions;
 import org.h2.message.DbException;
 import org.h2.table.ColumnResolver;
 import org.h2.table.TableFilter;
-import org.h2.util.DateTimeUtils;
 import org.h2.util.IntervalUtils;
 import org.h2.value.DataType;
 import org.h2.value.TypeInfo;
 import org.h2.value.Value;
 import org.h2.value.ValueDate;
-import org.h2.value.ValueDecimal;
 import org.h2.value.ValueInterval;
 import org.h2.value.ValueNull;
 import org.h2.value.ValueTime;
-import org.h2.value.ValueTimeTimeZone;
 import org.h2.value.ValueTimestampTimeZone;
 
 /**
@@ -52,11 +49,6 @@ public class IntervalOperation extends Expression {
          * Interval minus interval.
          */
         INTERVAL_MINUS_INTERVAL,
-
-        /**
-         * Interval divided by interval (non-standard).
-         */
-        INTERVAL_DIVIDE_INTERVAL,
 
         /**
          * Date-time plus interval.
@@ -104,9 +96,6 @@ public class IntervalOperation extends Expression {
         case INTERVAL_MINUS_INTERVAL:
             type = TypeInfo.getTypeInfo(Value.getHigherOrder(l, r));
             break;
-        case INTERVAL_DIVIDE_INTERVAL:
-            type = TypeInfo.TYPE_DECIMAL_DEFAULT;
-            break;
         case DATETIME_PLUS_INTERVAL:
         case DATETIME_MINUS_INTERVAL:
         case INTERVAL_MULTIPLY_NUMERIC:
@@ -114,7 +103,7 @@ public class IntervalOperation extends Expression {
             type = left.getType();
             break;
         case DATETIME_MINUS_DATETIME:
-            if ((l == Value.TIME || l == Value.TIME_TZ) && (r == Value.TIME || r == Value.TIME_TZ)) {
+            if (l == Value.TIME && r == Value.TIME) {
                 type = TypeInfo.TYPE_INTERVAL_HOUR_TO_SECOND;
             } else if (l == Value.DATE && r == Value.DATE) {
                 type = TypeInfo.TYPE_INTERVAL_DAY;
@@ -142,7 +131,6 @@ public class IntervalOperation extends Expression {
             return '-';
         case INTERVAL_MULTIPLY_NUMERIC:
             return '*';
-        case INTERVAL_DIVIDE_INTERVAL:
         case INTERVAL_DIVIDE_NUMERIC:
             return '/';
         default:
@@ -167,9 +155,6 @@ public class IntervalOperation extends Expression {
                     IntervalQualifier.valueOf(Value.getHigherOrder(lType, rType) - Value.INTERVAL_YEAR),
                     opType == IntervalOpType.INTERVAL_PLUS_INTERVAL ? a1.add(a2) : a1.subtract(a2));
         }
-        case INTERVAL_DIVIDE_INTERVAL:
-            return ValueDecimal.get(IntervalUtils.intervalToAbsolute((ValueInterval) l))
-                    .divide(ValueDecimal.get(IntervalUtils.intervalToAbsolute((ValueInterval) r)));
         case DATETIME_PLUS_INTERVAL:
         case DATETIME_MINUS_INTERVAL:
             return getDateTimeWithInterval(l, r, lType, rType);
@@ -182,17 +167,8 @@ public class IntervalOperation extends Expression {
                             .toBigInteger());
         }
         case DATETIME_MINUS_DATETIME:
-            if ((lType == Value.TIME || lType == Value.TIME_TZ) && (rType == Value.TIME || rType == Value.TIME_TZ)) {
-                long diff;
-                if (lType == Value.TIME && rType == Value.TIME) {
-                    diff = ((ValueTime) l).getNanos() - ((ValueTime) r).getNanos();
-                } else {
-                    ValueTimeTimeZone left = (ValueTimeTimeZone) l.convertTo(Value.TIME_TZ, session, false),
-                            right = (ValueTimeTimeZone) r.convertTo(Value.TIME_TZ, session, false);
-                    diff = left.getNanos() - right.getNanos()
-                            + (right.getTimeZoneOffsetSeconds() - left.getTimeZoneOffsetSeconds())
-                            * DateTimeUtils.NANOS_PER_SECOND;
-                }
+            if (lType == Value.TIME && rType == Value.TIME) {
+                long diff = ((ValueTime) l).getNanos() - ((ValueTime) r).getNanos();
                 boolean negative = diff < 0;
                 if (negative) {
                     diff = -diff;
@@ -210,10 +186,10 @@ public class IntervalOperation extends Expression {
             } else {
                 BigInteger diff = nanosFromValue(l).subtract(nanosFromValue(r));
                 if (lType == Value.TIMESTAMP_TZ || rType == Value.TIMESTAMP_TZ) {
-                    l = l.convertTo(Value.TIMESTAMP_TZ, session, false);
-                    r = r.convertTo(Value.TIMESTAMP_TZ, session, false);
-                    diff = diff.add(BigInteger.valueOf((((ValueTimestampTimeZone) r).getTimeZoneOffsetSeconds()
-                            - ((ValueTimestampTimeZone) l).getTimeZoneOffsetSeconds()) * NANOS_PER_SECOND));
+                    l = l.convertTo(Value.TIMESTAMP_TZ);
+                    r = r.convertTo(Value.TIMESTAMP_TZ);
+                    diff = diff.add(BigInteger.valueOf((((ValueTimestampTimeZone) r).getTimeZoneOffsetMins()
+                            - ((ValueTimestampTimeZone) l).getTimeZoneOffsetMins()) * NANOS_PER_MINUTE));
                 }
                 return IntervalUtils.intervalFromAbsolute(IntervalQualifier.DAY_TO_SECOND, diff);
             }
@@ -223,17 +199,17 @@ public class IntervalOperation extends Expression {
 
     private Value getDateTimeWithInterval(Value l, Value r, int lType, int rType) {
         switch (lType) {
-        case Value.TIME:
+        case Value.TIME: {
             if (DataType.isYearMonthIntervalType(rType)) {
                 throw DbException.throwInternalError("type=" + rType);
             }
-            return ValueTime.fromNanos(getTimeWithInterval(r, ((ValueTime) l).getNanos()));
-        case Value.TIME_TZ: {
-            if (DataType.isYearMonthIntervalType(rType)) {
-                throw DbException.throwInternalError("type=" + rType);
+            BigInteger a1 = BigInteger.valueOf(((ValueTime) l).getNanos());
+            BigInteger a2 = IntervalUtils.intervalToAbsolute((ValueInterval) r);
+            BigInteger n = opType == IntervalOpType.DATETIME_PLUS_INTERVAL ? a1.add(a2) : a1.subtract(a2);
+            if (n.signum() < 0 || n.compareTo(NANOS_PER_DAY_BI) >= 0) {
+                throw DbException.get(ErrorCode.NUMERIC_VALUE_OUT_OF_RANGE_1, n.toString());
             }
-            ValueTimeTimeZone t = (ValueTimeTimeZone) l;
-            return ValueTimeTimeZone.fromNanos(getTimeWithInterval(r, t.getNanos()), t.getTimeZoneOffsetSeconds());
+            return ValueTime.fromNanos(n.longValue());
         }
         case Value.DATE:
         case Value.TIMESTAMP:
@@ -275,17 +251,6 @@ public class IntervalOperation extends Expression {
             }
         }
         throw DbException.throwInternalError("type=" + opType);
-    }
-
-    private long getTimeWithInterval(Value r, long nanos) {
-        BigInteger a1 = BigInteger.valueOf(nanos);
-        BigInteger a2 = IntervalUtils.intervalToAbsolute((ValueInterval) r);
-        BigInteger n = opType == IntervalOpType.DATETIME_PLUS_INTERVAL ? a1.add(a2) : a1.subtract(a2);
-        if (n.signum() < 0 || n.compareTo(NANOS_PER_DAY_BI) >= 0) {
-            throw DbException.get(ErrorCode.NUMERIC_VALUE_OUT_OF_RANGE_1, n.toString());
-        }
-        nanos = n.longValue();
-        return nanos;
     }
 
     @Override

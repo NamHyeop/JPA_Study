@@ -1,6 +1,6 @@
 /*
  * Copyright 2004-2019 H2 Group. Multiple-Licensed under the MPL 2.0,
- * and the EPL 1.0 (https://h2database.com/html/license.html).
+ * and the EPL 1.0 (http://h2database.com/html/license.html).
  * Initial Developer: H2 Group
  */
 
@@ -239,7 +239,7 @@ SELECT * FROM TEST WHERE ID IN(1, 1000);
 -- Display the query plan
 EXPLAIN SELECT * FROM TEST WHERE ID IN(1, 1000);
 --> SELECT
--->        "PUBLIC"."TEST"."ID"
+-->        "TEST"."ID"
 -->    FROM "PUBLIC"."TEST"
 -->        /* PUBLIC.PRIMARY_KEY_2: ID IN(1, 1000) */
 -->    WHERE "ID" IN(1, 1000)
@@ -261,8 +261,8 @@ INSERT INTO TEST SELECT X, MOD(X, 10) FROM SYSTEM_RANGE(1, 1000);
 -- Display the query plan
 EXPLAIN SELECT * FROM TEST WHERE ID IN (10, 20) AND DATA IN (1, 2);
 --> SELECT
--->        "PUBLIC"."TEST"."ID",
--->        "PUBLIC"."TEST"."DATA"
+-->        "TEST"."ID",
+-->        "TEST"."DATA"
 -->    FROM "PUBLIC"."TEST"
 -->        /* PUBLIC.PRIMARY_KEY_2: ID IN(10, 20) */
 -->    WHERE ("ID" IN(10, 20))

@@ -72,34 +72,19 @@ The compatibility modes. There is a fixed set of modes (for example
 <a href="#allowdb2timestampformat">allowDB2TimestampFormat</a>
 </td></tr>
 <tr><td class="return">static boolean</td><td class="method">
-<a href="#allowemptyinpredicate">allowEmptyInPredicate</a>
-</td></tr>
-<tr><td class="return">static boolean</td><td class="method">
-<a href="#allowemptyschemavaluesasdefaultschema">allowEmptySchemaValuesAsDefaultSchema</a>
-</td></tr>
-<tr><td class="return">static boolean</td><td class="method">
 <a href="#allowplusforstringconcat">allowPlusForStringConcat</a>
 </td></tr>
 <tr><td class="return">static boolean</td><td class="method">
-<a href="#allowunrelatedorderbyexpressionsindistinctqueries">allowUnrelatedOrderByExpressionsInDistinctQueries</a>
-</td></tr>
-<tr><td class="return">static boolean</td><td class="method">
-<a href="#altertableextensionsmysql">alterTableExtensionsMySQL</a>
-</td></tr>
-<tr><td class="return">static boolean</td><td class="method">
-<a href="#altertablemodifycolumn">alterTableModifyColumn</a>
-</td></tr>
-<tr><td class="return">static boolean</td><td class="method">
 <a href="#chartobinaryinutf8">charToBinaryInUtf8</a>
+</td></tr>
+<tr><td class="return">static boolean</td><td class="method">
+<a href="#convertinsertnulltozero">convertInsertNullToZero</a>
 </td></tr>
 <tr><td class="return">static boolean</td><td class="method">
 <a href="#convertonlytosmallerscale">convertOnlyToSmallerScale</a>
 </td></tr>
 <tr><td class="return">static boolean</td><td class="method">
 <a href="#datetimevaluewithintransaction">dateTimeValueWithinTransaction</a>
-</td></tr>
-<tr><td class="return">static boolean</td><td class="method">
-<a href="#decimalsequences">decimalSequences</a>
 </td></tr>
 <tr><td class="return">static Set</td><td class="method">
 <a href="#disallowedtypes">disallowedTypes</a>
@@ -111,13 +96,13 @@ The compatibility modes. There is a fixed set of modes (for example
 <a href="#INDEX(..)">indexDefinitionInCreateTable</a>
 </td></tr>
 <tr><td class="return">static boolean</td><td class="method">
-<a href="#insertonconflict">insertOnConflict</a>
-</td></tr>
-<tr><td class="return">static boolean</td><td class="method">
 <a href="#isolationlevelinselectorinsertstatement">isolationLevelInSelectOrInsertStatement</a>
 </td></tr>
 <tr><td class="return">static boolean</td><td class="method">
 <a href="#logislogbase10">logIsLogBase10</a>
+</td></tr>
+<tr><td class="return">static boolean</td><td class="method">
+<a href="#lowercaseidentifiers">lowerCaseIdentifiers</a>
 </td></tr>
 <tr><td class="return">static boolean</td><td class="method">
 <a href="#nullconcatisnull">nullConcatIsNull</a>
@@ -129,10 +114,10 @@ The compatibility modes. There is a fixed set of modes (for example
 <a href="#padfixedlengthstrings">padFixedLengthStrings</a>
 </td></tr>
 <tr><td class="return">static boolean</td><td class="method">
-<a href="#regexpreplacebackslashreferences">regexpReplaceBackslashReferences</a>
+<a href="#prohibitemptyinpredicate">prohibitEmptyInPredicate</a>
 </td></tr>
 <tr><td class="return">static boolean</td><td class="method">
-<a href="#replaceinto">replaceInto</a>
+<a href="#regexpreplacebackslashreferences">regexpReplaceBackslashReferences</a>
 </td></tr>
 <tr><td class="return">static boolean</td><td class="method">
 <a href="#serialcolumnisnotpk">serialColumnIsNotPK</a>
@@ -150,9 +135,6 @@ The compatibility modes. There is a fixed set of modes (for example
 <a href="#swapconvertfunctionparameters">swapConvertFunctionParameters</a>
 </td></tr>
 <tr><td class="return">static boolean</td><td class="method">
-<a href="#swaplogfunctionparameters">swapLogFunctionParameters</a>
-</td></tr>
-<tr><td class="return">static boolean</td><td class="method">
 <a href="#sysdummy1">sysDummy1</a>
 </td></tr>
 <tr><td class="return">static boolean</td><td class="method">
@@ -160,9 +142,6 @@ The compatibility modes. There is a fixed set of modes (for example
 </td></tr>
 <tr><td class="return">static boolean</td><td class="method">
 <a href="#treatemptystringsasnull">treatEmptyStringsAsNull</a>
-</td></tr>
-<tr><td class="return">static boolean</td><td class="method">
-<a href="#truncatetablerestartidentity">truncateTableRestartIdentity</a>
 </td></tr>
 <tr><td class="return">static HashMap</td><td class="method">
 <a href="#typebynamemap">typeByNameMap</a>
@@ -172,9 +151,6 @@ The compatibility modes. There is a fixed set of modes (for example
 </td></tr>
 <tr><td class="return">static boolean</td><td class="method">
 <a href="#useidentityasautoincrement">useIdentityAsAutoIncrement</a>
-</td></tr>
-<tr><td class="return">static boolean</td><td class="method">
-<a href="#zeroexliteralsarebinarystrings">zeroExLiteralsAreBinaryStrings</a>
 </td></tr>
 </table>
 <h4 id="aliascolumnname"><span class="methodName">aliasColumnName
@@ -195,42 +171,23 @@ The compatibility modes. There is a fixed set of modes (for example
 </span></h4>
 <div class="item">Whether DB2 TIMESTAMP formats are allowed.</div>
 <hr />
-<h4 id="allowemptyinpredicate"><span class="methodName">allowEmptyInPredicate
-
-</span></h4>
-<div class="item">Whether IN predicate may have an empty value list.</div>
-<hr />
-<h4 id="allowemptyschemavaluesasdefaultschema"><span class="methodName">allowEmptySchemaValuesAsDefaultSchema
-
-</span></h4>
-<div class="item">If {@code true} constructs like 'CREATE TABLE CATALOG..TABLE_NAME' are allowed,
- the default schema is used.</div>
-<hr />
 <h4 id="allowplusforstringconcat"><span class="methodName">allowPlusForStringConcat
 
 </span></h4>
 <div class="item">Text can be concatenated using '+'.</div>
 <hr />
-<h4 id="allowunrelatedorderbyexpressionsindistinctqueries"><span class="methodName">allowUnrelatedOrderByExpressionsInDistinctQueries
-
-</span></h4>
-<div class="item">If {@code true} unrelated ORDER BY expression are allowed in DISTINCT
- queries, if {@code false} they are disallowed.</div>
-<hr />
-<h4 id="altertableextensionsmysql"><span class="methodName">alterTableExtensionsMySQL
-
-</span></h4>
-<div class="item">If {@code true} some additional non-standard ALTER TABLE commands are allowed.</div>
-<hr />
-<h4 id="altertablemodifycolumn"><span class="methodName">alterTableModifyColumn
-
-</span></h4>
-<div class="item">If {@code true} non-standard ALTER TABLE MODIFY COLUMN is allowed.</div>
-<hr />
 <h4 id="chartobinaryinutf8"><span class="methodName">charToBinaryInUtf8
 
 </span></h4>
 <div class="item">Convert (VAR)CHAR to VAR(BINARY) and vice versa with UTF-8 encoding instead of HEX.</div>
+<hr />
+<h4 id="convertinsertnulltozero"><span class="methodName">convertInsertNullToZero
+
+</span></h4>
+<div class="item">When inserting data, if a column is defined to be NOT NULL and NULL is
+ inserted, then a 0 (or empty string, or the current timestamp for
+ timestamp columns) value is used. Usually, this operation is not allowed
+ and an exception is thrown.</div>
 <hr />
 <h4 id="convertonlytosmallerscale"><span class="methodName">convertOnlyToSmallerScale
 
@@ -245,13 +202,6 @@ The compatibility modes. There is a fixed set of modes (for example
 <div class="item">If {@code true}, datetime value function return the same value within a
  transaction, if {@code false} datetime value functions return the same
  value within a command.</div>
-<hr />
-<h4 id="decimalsequences"><span class="methodName">decimalSequences
-
-</span></h4>
-<div class="item">If {@code true} NEXT VALUE FOR SEQUENCE, CURRENT VALUE FOR SEQUENCE,
- SEQUENCE.NEXTVAL, and SEQUENCE.CURRVAL return values with DECIMAL/NUMERIC
- data type instead of BIGINT.</div>
 <hr />
 <h4 id="disallowedtypes"><span class="methodName">disallowedTypes
 
@@ -273,11 +223,6 @@ The compatibility modes. There is a fixed set of modes (for example
  Example: <code>create table test(id int primary key, name varchar(255),
  key idx_name(name));</code></div>
 <hr />
-<h4 id="insertonconflict"><span class="methodName">insertOnConflict
-
-</span></h4>
-<div class="item">PostgreSQL style INSERT ... ON CONFLICT DO NOTHING.</div>
-<hr />
 <h4 id="isolationlevelinselectorinsertstatement"><span class="methodName">isolationLevelInSelectOrInsertStatement
 
 </span></h4>
@@ -286,7 +231,12 @@ The compatibility modes. There is a fixed set of modes (for example
 <h4 id="logislogbase10"><span class="methodName">logIsLogBase10
 
 </span></h4>
-<div class="item">The single-argument function LOG() uses base 10 instead of E.</div>
+<div class="item">The function LOG() uses base 10 instead of E.</div>
+<hr />
+<h4 id="lowercaseidentifiers"><span class="methodName">lowerCaseIdentifiers
+
+</span></h4>
+<div class="item">Meta data calls return identifiers in lower case.</div>
 <hr />
 <h4 id="nullconcatisnull"><span class="methodName">nullConcatIsNull
 
@@ -298,22 +248,22 @@ The compatibility modes. There is a fixed set of modes (for example
 <h4 id="onduplicatekeyupdate"><span class="methodName">onDuplicateKeyUpdate
 
 </span></h4>
-<div class="item">MySQL style INSERT ... ON DUPLICATE KEY UPDATE ... and INSERT IGNORE.</div>
+<div class="item">MySQL style INSERT ... ON DUPLICATE KEY UPDATE ... and INSERT IGNORE</div>
 <hr />
 <h4 id="padfixedlengthstrings"><span class="methodName">padFixedLengthStrings
 
 </span></h4>
 <div class="item">Whether to right-pad fixed strings with spaces.</div>
 <hr />
+<h4 id="prohibitemptyinpredicate"><span class="methodName">prohibitEmptyInPredicate
+
+</span></h4>
+<div class="item">Whether an empty list as in "NAME IN()" results in a syntax error.</div>
+<hr />
 <h4 id="regexpreplacebackslashreferences"><span class="methodName">regexpReplaceBackslashReferences
 
 </span></h4>
 <div class="item">The function REGEXP_REPLACE() uses \ for back-references.</div>
-<hr />
-<h4 id="replaceinto"><span class="methodName">replaceInto
-
-</span></h4>
-<div class="item">MySQL style REPLACE INTO.</div>
 <hr />
 <h4 id="serialcolumnisnotpk"><span class="methodName">serialColumnIsNotPK
 
@@ -341,11 +291,6 @@ The compatibility modes. There is a fixed set of modes (for example
 </span></h4>
 <div class="item">Swap the parameters of the CONVERT function.</div>
 <hr />
-<h4 id="swaplogfunctionparameters"><span class="methodName">swapLogFunctionParameters
-
-</span></h4>
-<div class="item">Swap the parameters of LOG() function.</div>
-<hr />
 <h4 id="sysdummy1"><span class="methodName">sysDummy1
 
 </span></h4>
@@ -360,11 +305,6 @@ The compatibility modes. There is a fixed set of modes (for example
 
 </span></h4>
 <div class="item">Empty strings are treated like NULL values. Useful for Oracle emulation.</div>
-<hr />
-<h4 id="truncatetablerestartidentity"><span class="methodName">truncateTableRestartIdentity
-
-</span></h4>
-<div class="item">If {@code true} TRUNCATE TABLE uses RESTART IDENTITY by default.</div>
 <hr />
 <h4 id="typebynamemap"><span class="methodName">typeByNameMap
 
@@ -381,11 +321,5 @@ The compatibility modes. There is a fixed set of modes (for example
 
 </span></h4>
 <div class="item">Use "IDENTITY" as an alias for "auto_increment" (SQLServer style)</div>
-<hr />
-<h4 id="zeroexliteralsarebinarystrings"><span class="methodName">zeroExLiteralsAreBinaryStrings
-
-</span></h4>
-<div class="item">If {@code true} {@code 0x}-prefixed numbers are parsed as binary string
- literals, if {@code false} they are parsed as hexadecimal numeric values.</div>
 <hr />
 </div></td></tr></table></body></html>

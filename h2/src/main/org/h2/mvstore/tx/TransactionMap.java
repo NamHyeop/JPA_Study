@@ -1,11 +1,10 @@
 /*
  * Copyright 2004-2019 H2 Group. Multiple-Licensed under the MPL 2.0,
- * and the EPL 1.0 (https://h2database.com/html/license.html).
+ * and the EPL 1.0 (http://h2database.com/html/license.html).
  * Initial Developer: H2 Group
  */
 package org.h2.mvstore.tx;
 
-import org.h2.engine.IsolationLevel;
 import org.h2.mvstore.Cursor;
 import org.h2.mvstore.DataUtils;
 import org.h2.mvstore.MVMap;
@@ -94,27 +93,42 @@ public class TransactionMap<K, V> extends AbstractMap<K, V> {
      * @return the size
      */
     public long sizeAsLong() {
-        if (transaction.isolationLevel != IsolationLevel.READ_COMMITTED) {
-            return sizeAsLongSlow();
-        }
-        // getting coherent picture of the map, committing transactions, and undo logs
-        // either from values stored in transaction (never loops in that case),
-        // or current values from the transaction store (loops until moment of silence)
-        Snapshot snapshot;
-        RootReference[] undoLogRootReferences;
-        do {
-            snapshot = getSnapshot();
-            undoLogRootReferences = getTransaction().getUndoLogRootReferences();
-        } while (!snapshot.equals(getSnapshot()));
+        TransactionStore store = transaction.store;
 
-        RootReference mapRootReference = snapshot.root;
-        BitSet committingTransactions = snapshot.committingTransactions;
+        // The purpose of the following loop is to get a coherent picture
+        // of a state of three independent volatile / atomic variables,
+        // which they had at some recent moment in time.
+        // In order to get such a "snapshot", we wait for a moment of silence,
+        // when none of the variables concurrently changes it's value.
+        BitSet committingTransactions;
+        RootReference mapRootReference;
+        RootReference[] undoLogRootReferences;
+        long undoLogSize;
+        do {
+            committingTransactions = store.committingTransactions.get();
+            mapRootReference = map.flushAndGetRoot();
+            BitSet opentransactions = store.openTransactions.get();
+            undoLogRootReferences = new RootReference[opentransactions.length()];
+            undoLogSize = 0;
+            for (int i = opentransactions.nextSetBit(0); i >= 0; i = opentransactions.nextSetBit(i+1)) {
+                MVMap<Long, Object[]> undoLog = store.undoLogs[i];
+                if (undoLog != null) {
+                    RootReference rootReference = undoLog.flushAndGetRoot();
+                    undoLogRootReferences[i] = rootReference;
+                    undoLogSize += rootReference.getTotalCount();
+                }
+            }
+        } while(committingTransactions != store.committingTransactions.get() ||
+                mapRootReference != map.getRoot());
+        // Now we have a snapshot, where mapRootReference points to state of the map,
+        // undoLogRootReference captures the state of undo log
+        // and committingTransactions mask tells us which of seemingly uncommitted changes
+        // should be considered as committed.
+        // Subsequent processing uses this snapshot info only.
         Page mapRootPage = mapRootReference.root;
         long size = mapRootReference.getTotalCount();
-        long undoLogsTotalSize = undoLogRootReferences == null ? size
-                : TransactionStore.calculateUndoLogsTotalSize(undoLogRootReferences);
         // if we are looking at the map without any uncommitted values
-        if (undoLogsTotalSize == 0) {
+        if (undoLogSize == 0) {
             return size;
         }
 
@@ -122,7 +136,7 @@ public class TransactionMap<K, V> extends AbstractMap<K, V> {
         // which are committed but not closed yet,
         // and entries about additions to the map by other uncommitted transactions were counted,
         // but they should not contribute into total count.
-        if (2 * undoLogsTotalSize > size) {
+        if (2 * undoLogSize > size) {
             // the undo log is larger than half of the map - scan the entries of the map directly
             Cursor<K, VersionedValue> cursor = new Cursor<>(mapRootPage, null);
             while(cursor.hasNext()) {
@@ -130,13 +144,17 @@ public class TransactionMap<K, V> extends AbstractMap<K, V> {
                 VersionedValue currentValue = cursor.getValue();
                 assert currentValue != null;
                 long operationId = currentValue.getOperationId();
-                if (operationId != 0 &&         // skip committed entries
-                        isIrrelevant(operationId, currentValue, committingTransactions)) {
-                    --size;
+                if (operationId != 0) {  // skip committed entries
+                    int txId = TransactionStore.getTransactionId(operationId);
+                    boolean isVisible = txId == transaction.transactionId ||
+                                            committingTransactions.get(txId);
+                    Object v = isVisible ? currentValue.getCurrentValue() : currentValue.getCommittedValue();
+                    if (v == null) {
+                        --size;
+                    }
                 }
             }
         } else {
-            assert undoLogRootReferences != null;
             // The undo logs are much smaller than the map - scan all undo logs,
             // and then lookup relevant map entry.
             for (RootReference undoLogRootReference : undoLogRootReferences) {
@@ -144,7 +162,7 @@ public class TransactionMap<K, V> extends AbstractMap<K, V> {
                     Cursor<Long, Object[]> cursor = new Cursor<>(undoLogRootReference.root, null);
                     while (cursor.hasNext()) {
                         cursor.next();
-                        Object[] op = cursor.getValue();
+                        Object op[] = cursor.getValue();
                         if ((int) op[0] == map.getId()) {
                             VersionedValue currentValue = map.get(mapRootPage, op[1]);
                             // If map entry is not there, then we never counted
@@ -157,10 +175,15 @@ public class TransactionMap<K, V> extends AbstractMap<K, V> {
                                 // only the last undo entry for any given map
                                 // key should be considered
                                 long operationId = cursor.getKey();
-                                assert operationId != 0;
-                                if (currentValue.getOperationId() == operationId &&
-                                        isIrrelevant(operationId, currentValue, committingTransactions)) {
-                                    --size;
+                                if (currentValue.getOperationId() == operationId) {
+                                    int txId = TransactionStore.getTransactionId(operationId);
+                                    boolean isVisible = txId == transaction.transactionId ||
+                                            committingTransactions.get(txId);
+                                    Object v = isVisible ? currentValue.getCurrentValue()
+                                            : currentValue.getCommittedValue();
+                                    if (v == null) {
+                                        --size;
+                                    }
                                 }
                             }
                         }
@@ -170,24 +193,6 @@ public class TransactionMap<K, V> extends AbstractMap<K, V> {
         }
         return size;
     }
-
-    private long sizeAsLongSlow() {
-        long count = 0L;
-        Iterator<K> iterator = keyIterator(null, null);
-        while (iterator.hasNext()) {
-            iterator.next();
-            count++;
-        }
-        return count;
-    }
-
-    private boolean isIrrelevant(long operationId, VersionedValue currentValue, BitSet committingTransactions) {
-        int txId = TransactionStore.getTransactionId(operationId);
-        boolean isVisible = txId == transaction.transactionId || committingTransactions.get(txId);
-        Object v = isVisible ? currentValue.getCurrentValue() : currentValue.getCommittedValue();
-        return v == null;
-    }
-
 
     /**
      * Remove an entry.
@@ -280,7 +285,7 @@ public class TransactionMap<K, V> extends AbstractMap<K, V> {
     }
 
     private V set(Object key, V value) {
-        TxDecisionMaker decisionMaker = new TxDecisionMaker(map.getId(), key, value, transaction);
+        TxDecisionMaker decisionMaker = new TxDecisionMaker.PutDecisionMaker(map.getId(), key, value, transaction);
         return set(key, decisionMaker);
     }
 
@@ -378,69 +383,8 @@ public class TransactionMap<K, V> extends AbstractMap<K, V> {
      * @throws ClassCastException if type of the specified key is not compatible with this map
      */
     @Override
+    @SuppressWarnings("unchecked")
     public V get(Object key) {
-        return getImmediate(key);
-    }
-
-    /**
-     * Get the value for the given key from a snapshot, or null if not found.
-     *
-     * @param key the key
-     * @return the value, or null if not found
-     */
-    @SuppressWarnings("unchecked")
-    public V getFromSnapshot(Object key) {
-        switch (transaction.isolationLevel) {
-        case READ_UNCOMMITTED: {
-            Snapshot snapshot = getStatementSnapshot();
-            VersionedValue data = map.get(snapshot.root.root, key);
-            if (data != null) {
-                return (V) data.getCurrentValue();
-            }
-            return null;
-        }
-        case REPEATABLE_READ:
-        case SNAPSHOT:
-        case SERIALIZABLE:
-            if (transaction.hasChanges()) {
-                Snapshot snapshot = getStatementSnapshot();
-                VersionedValue data = map.get(snapshot.root.root, key);
-                if (data != null) {
-                    long id = data.getOperationId();
-                    if (id != 0L && transaction.transactionId == TransactionStore.getTransactionId(id)) {
-                        return (V) data.getCurrentValue();
-                    }
-                }
-            }
-            //$FALL-THROUGH$
-        case READ_COMMITTED:
-        default:
-            Snapshot snapshot = getSnapshot();
-            VersionedValue data = map.get(snapshot.root.root, key);
-            if (data == null) {
-                // doesn't exist or deleted by a committed transaction
-                return null;
-            }
-            long id = data.getOperationId();
-            if (id != 0) {
-                int tx = TransactionStore.getTransactionId(id);
-                if (tx != transaction.transactionId && !snapshot.committingTransactions.get(tx)) {
-                    return (V) data.getCommittedValue();
-                }
-            }
-            // added by this transaction or another transaction which is committed by now
-            return (V) data.getCurrentValue();
-        }
-    }
-
-    /**
-     * Get the value for the given key, or null if not found.
-     *
-     * @param key the key
-     * @return the value, or null if not found
-     */
-    @SuppressWarnings("unchecked")
-    public V getImmediate(Object key) {
         VersionedValue data = map.get(key);
         if (data == null) {
             // doesn't exist or deleted by a committed transaction
@@ -460,23 +404,6 @@ public class TransactionMap<K, V> extends AbstractMap<K, V> {
         }
     }
 
-    Snapshot getSnapshot() {
-        return transaction.getSnapshot(map.getId());
-    }
-
-    Snapshot getStatementSnapshot() {
-        return transaction.getStatementSnapshot(map.getId());
-    }
-
-    /**
-     * Create a new snapshot for this map.
-     *
-     * @return the snapshot
-     */
-    Snapshot createSnapshot() {
-        return transaction.createSnapshot(map.getId());
-    }
-
     /**
      * Whether the map contains the key.
      *
@@ -486,7 +413,7 @@ public class TransactionMap<K, V> extends AbstractMap<K, V> {
      */
     @Override
     public boolean containsKey(Object key) {
-        return getImmediate(key) != null;
+        return get(key) != null;
     }
 
     /**
@@ -562,10 +489,9 @@ public class TransactionMap<K, V> extends AbstractMap<K, V> {
      * @return the last key, or null if empty
      */
     public K lastKey() {
-        RootReference rootReference = getSnapshot().root;
-        K k = map.lastKey(rootReference.root);
-        while (k != null && getFromSnapshot(k) == null) {
-            k = map.lowerKey(rootReference.root, k);
+        K k = map.lastKey();
+        while (k != null && get(k) == null) {
+            k = map.lowerKey(k);
         }
         return k;
     }
@@ -578,10 +504,9 @@ public class TransactionMap<K, V> extends AbstractMap<K, V> {
      * @return the result
      */
     public K higherKey(K key) {
-        RootReference rootReference = getSnapshot().root;
         do {
-            key = map.higherKey(rootReference.root, key);
-        } while (key != null && getFromSnapshot(key) == null);
+            key = map.higherKey(key);
+        } while (key != null && get(key) == null);
         return key;
     }
 
@@ -605,11 +530,10 @@ public class TransactionMap<K, V> extends AbstractMap<K, V> {
      * @return the result
      */
     public K floorKey(K key) {
-        RootReference rootReference = getSnapshot().root;
-        key = map.floorKey(rootReference.root, key);
-        while (key != null && getFromSnapshot(key) == null) {
+        key = map.floorKey(key);
+        while (key != null && get(key) == null) {
             // Use lowerKey() for the next attempts, otherwise we'll get an infinite loop
-            key = map.lowerKey(rootReference.root, key);
+            key = map.lowerKey(key);
         }
         return key;
     }
@@ -622,10 +546,9 @@ public class TransactionMap<K, V> extends AbstractMap<K, V> {
      * @return the result
      */
     public K lowerKey(K key) {
-        RootReference rootReference = getSnapshot().root;
         do {
-            key = map.lowerKey(rootReference.root, key);
-        } while (key != null && getFromSnapshot(key) == null);
+            key = map.lowerKey(key);
+        } while (key != null && get(key) == null);
         return key;
     }
 
@@ -636,7 +559,7 @@ public class TransactionMap<K, V> extends AbstractMap<K, V> {
      * @return the iterator
      */
     public Iterator<K> keyIterator(K from) {
-        return keyIterator(from, null);
+        return keyIterator(from, null, false);
     }
 
     /**
@@ -644,21 +567,12 @@ public class TransactionMap<K, V> extends AbstractMap<K, V> {
      *
      * @param from the first key to return
      * @param to the last key to return or null if there is no limit
+     * @param includeUncommitted whether uncommitted entries should be
+     *            included
      * @return the iterator
      */
-    public Iterator<K> keyIterator(K from, K to) {
-        return chooseIterator(from, to, false);
-    }
-
-    /**
-     * Iterate over keys, including keys from uncommitted entries.
-     *
-     * @param from the first key to return
-     * @param to the last key to return or null if there is no limit
-     * @return the iterator
-     */
-    public Iterator<K> keyIteratorUncommitted(K from, K to) {
-        return new ValidationIterator<>(this, from, to);
+    public Iterator<K> keyIterator(K from, K to, boolean includeUncommitted) {
+        return new KeyIterator<>(this, from, to, includeUncommitted);
     }
 
     /**
@@ -669,24 +583,58 @@ public class TransactionMap<K, V> extends AbstractMap<K, V> {
      * @return the iterator
      */
     public Iterator<Map.Entry<K, V>> entryIterator(final K from, final K to) {
-        return chooseIterator(from, to, true);
+        return new EntryIterator<>(this, from, to);
     }
 
-    private <X> Iterator<X> chooseIterator(K from, K to, boolean forEntries) {
-        switch (transaction.isolationLevel) {
-            case READ_UNCOMMITTED:
-                return new UncommittedIterator<>(this, from, to, forEntries);
-            case REPEATABLE_READ:
-            case SNAPSHOT:
-            case SERIALIZABLE:
-                if (transaction.hasChanges()) {
-                    return new RepeatableIterator<>(this, from, to, forEntries);
+    /**
+     * Iterate over keys.
+     *
+     * @param iterator the iterator to wrap
+     * @param includeUncommitted whether uncommitted entries should be
+     *            included
+     * @return the iterator
+     */
+    public Iterator<K> wrapIterator(final Iterator<K> iterator,
+            final boolean includeUncommitted) {
+        // TODO duplicate code for wrapIterator and entryIterator
+        return new Iterator<K>() {
+            private K current;
+
+            {
+                fetchNext();
+            }
+
+            private void fetchNext() {
+                while (iterator.hasNext()) {
+                    current = iterator.next();
+                    if (includeUncommitted) {
+                        return;
+                    }
+                    if (containsKey(current)) {
+                        return;
+                    }
                 }
-                //$FALL-THROUGH$
-            case READ_COMMITTED:
-            default:
-                return new CommittedIterator<>(this, from, to, forEntries);
-        }
+                current = null;
+            }
+
+            @Override
+            public boolean hasNext() {
+                return current != null;
+            }
+
+            @Override
+            public K next() {
+                K result = current;
+                fetchNext();
+                return result;
+            }
+
+            @Override
+            public void remove() {
+                throw DataUtils.newUnsupportedOperationException(
+                        "Removal is not supported");
+            }
+        };
     }
 
     public Transaction getTransaction() {
@@ -697,246 +645,98 @@ public class TransactionMap<K, V> extends AbstractMap<K, V> {
         return map.getKeyType();
     }
 
-    /**
-     * The iterator for read uncommitted isolation level. This iterator is also
-     * used for unique indexes.
-     *
-     * @param <K>
-     *            the type of keys
-     * @param <X>
-     *            the type of elements
-     */
-    private static class UncommittedIterator<K, X> extends TMIterator<K, X> {
 
-        UncommittedIterator(TransactionMap<K, ?> transactionMap, K from, K to, boolean forEntries) {
-            super(transactionMap, from, to, transactionMap.getStatementSnapshot(), forEntries);
-            fetchNext();
-        }
+    private static final class KeyIterator<K> extends TMIterator<K,K> {
 
-        UncommittedIterator(TransactionMap<K, ?> transactionMap, K from, K to, Snapshot snapshot,
-                            boolean forEntries) {
-            super(transactionMap, from, to, snapshot, forEntries);
-            fetchNext();
+        public KeyIterator(TransactionMap<K, ?> transactionMap, K from, K to, boolean includeUncommitted) {
+            super(transactionMap, from, to, includeUncommitted);
         }
 
         @Override
-        final void fetchNext() {
-            while (cursor.hasNext()) {
-                K key = cursor.next();
-                VersionedValue data = cursor.getValue();
-                if (data != null) {
-                    Object currentValue = data.getCurrentValue();
-                    if (currentValue != null || isApplicable(data)) {
-                        registerCurrent(key, currentValue);
-                        return;
-                    }
-                }
-            }
-            current = null;
-        }
-
-        boolean isApplicable(VersionedValue data) {
-            return false;
+        protected K registerCurrent(K key, VersionedValue data) {
+            return key;
         }
     }
 
-    private static final class ValidationIterator<K, X> extends UncommittedIterator<K, X>
-    {
-        ValidationIterator(TransactionMap<K, ?> transactionMap, K from, K to) {
-            super(transactionMap, from, to, transactionMap.createSnapshot(), false);
+    private static final class EntryIterator<K,V> extends TMIterator<K,Map.Entry<K,V>> {
+
+        public EntryIterator(TransactionMap<K, ?> transactionMap, K from, K to) {
+            super(transactionMap, from, to, false);
         }
 
         @Override
-        boolean isApplicable(VersionedValue data) {
-            // Include all uncommitted entries for unique index validation
-            long id = data.getOperationId();
-            if (id != 0) {
-                int tx = TransactionStore.getTransactionId(id);
-                return transactionId != tx && !committingTransactions.get(tx);
-            }
-            return false;
+        @SuppressWarnings("unchecked")
+        protected Map.Entry<K, V> registerCurrent(K key, VersionedValue data) {
+            return new AbstractMap.SimpleImmutableEntry<>(key, (V) data.getCurrentValue());
         }
     }
 
-    /**
-     * The iterator for read committed isolation level. Can also be used on
-     * higher levels when the transaction doesn't have own changes.
-     *
-     * @param <K>
-     *            the type of keys
-     * @param <X>
-     *            the type of elements
-     */
-    private static final class CommittedIterator<K, X> extends TMIterator<K, X>
-    {
-        CommittedIterator(TransactionMap<K, ?> transactionMap, K from, K to, boolean forEntries) {
-            super(transactionMap, from, to, transactionMap.getSnapshot(), forEntries);
-            fetchNext();
-        }
+    private abstract static class TMIterator<K,X> implements Iterator<X> {
+        private final int transactionId;
+        private final BitSet committingTransactions;
+        private final Cursor<K,VersionedValue> cursor;
+        private final boolean includeAllUncommitted;
+        private X current;
 
-        @Override
-        void fetchNext() {
-            while (cursor.hasNext()) {
-                K key = cursor.next();
-                VersionedValue data = cursor.getValue();
-                // If value doesn't exist or it was deleted by a committed transaction,
-                // or if value is a committed one, just return it.
-                if (data != null) {
-                    long id = data.getOperationId();
-                    if (id != 0) {
-                        int tx = TransactionStore.getTransactionId(id);
-                        if (tx != transactionId && !committingTransactions.get(tx)) {
-                            // current value comes from another uncommitted transaction
-                            // take committed value instead
-                            Object committedValue = data.getCommittedValue();
-                            if (committedValue == null) {
-                                continue;
-                            }
-                            registerCurrent(key, committedValue);
-                            return;
-                        }
-                    }
-                    Object currentValue = data.getCurrentValue();
-                    if (currentValue != null) {
-                        registerCurrent(key, currentValue);
-                        return;
-                    }
-                }
-            }
-            current = null;
-        }
-    }
-
-    /**
-     * The iterator for repeatable read and serializable isolation levels.
-     *
-     * @param <K>
-     *            the type of keys
-     * @param <X>
-     *            the type of elements
-     */
-    private static final class RepeatableIterator<K, X> extends TMIterator<K, X>
-    {
-        private final DataType keyType;
-
-        private K snapshotKey;
-
-        private Object snapshotValue;
-
-        private final Cursor<K, VersionedValue> uncommittedCursor;
-
-        private K uncommittedKey;
-
-        private Object uncommittedValue;
-
-        RepeatableIterator(TransactionMap<K, ?> transactionMap, K from, K to, boolean forEntries) {
-            super(transactionMap, from, to, transactionMap.getSnapshot(), forEntries);
-            keyType = transactionMap.map.getKeyType();
-            Snapshot snapshot = transactionMap.getStatementSnapshot();
-            uncommittedCursor = new Cursor<>(snapshot.root.root, from, to);
-            fetchNext();
-        }
-
-        @Override
-        void fetchNext() {
-            current = null;
-            do {
-                if (snapshotKey == null) {
-                    fetchSnapshot();
-                }
-                if (uncommittedKey == null) {
-                    fetchUncommitted();
-                }
-                if (snapshotKey == null && uncommittedKey == null) {
-                    break;
-                }
-                int cmp = snapshotKey == null ? 1 :
-                            uncommittedKey == null ? -1 :
-                            keyType.compare(snapshotKey, uncommittedKey);
-                if (cmp < 0) {
-                    registerCurrent(snapshotKey, snapshotValue);
-                    snapshotKey = null;
-                    break;
-                }
-                if (uncommittedValue != null) {
-                    // This entry was added / updated by this transaction, use the new value
-                    registerCurrent(uncommittedKey, uncommittedValue);
-                }
-                if (cmp == 0) { // This entry was updated / deleted
-                    snapshotKey = null;
-                }
-                uncommittedKey = null;
-            } while (current == null);
-        }
-
-        private void fetchSnapshot() {
-            while (cursor.hasNext()) {
-                K key = cursor.next();
-                VersionedValue data = cursor.getValue();
-                // If value doesn't exist or it was deleted by a committed transaction,
-                // or if value is a committed one, just return it.
-                if (data != null) {
-                    Object value = data.getCommittedValue();
-                    long id = data.getOperationId();
-                    if (id != 0) {
-                        int tx = TransactionStore.getTransactionId(id);
-                        if (tx == transactionId || committingTransactions.get(tx)) {
-                            // value comes from this transaction or another committed transaction
-                            // take current value instead instead of committed one
-                            value = data.getCurrentValue();
-                        }
-                    }
-                    if (value != null) {
-                        snapshotKey = key;
-                        snapshotValue = value;
-                        return;
-                    }
-                }
-            }
-        }
-
-        private void fetchUncommitted() {
-            while (uncommittedCursor.hasNext()) {
-                K key = uncommittedCursor.next();
-                VersionedValue data = uncommittedCursor.getValue();
-                if (data != null) {
-                    long id = data.getOperationId();
-                    if (id != 0L && transactionId == TransactionStore.getTransactionId(id)) {
-                        uncommittedKey = key;
-                        uncommittedValue = data.getCurrentValue();
-                        return;
-                    }
-                }
-            }
-        }
-    }
-
-    private abstract static class TMIterator<K,X> implements Iterator<X>
-    {
-        final int transactionId;
-
-        final BitSet committingTransactions;
-
-        protected final Cursor<K, VersionedValue> cursor;
-
-        private final boolean forEntries;
-
-        X current;
-
-        TMIterator(TransactionMap<K, ?> transactionMap, K from, K to, Snapshot snapshot, boolean forEntries) {
+        TMIterator(TransactionMap<K,?> transactionMap, K from, K to, boolean includeAllUncommitted) {
             Transaction transaction = transactionMap.getTransaction();
             this.transactionId = transaction.transactionId;
-            this.forEntries = forEntries;
-            this.cursor = new Cursor<>(snapshot.root.root, from, to);
-            this.committingTransactions = snapshot.committingTransactions;
+            TransactionStore store = transaction.store;
+            MVMap<K, VersionedValue> map = transactionMap.map;
+            // The purpose of the following loop is to get a coherent picture
+            // of a state of two independent volatile / atomic variables,
+            // which they had at some recent moment in time.
+            // In order to get such a "snapshot", we wait for a moment of silence,
+            // when neither of the variables concurrently changes it's value.
+            BitSet committingTransactions;
+            RootReference mapRootReference;
+            do {
+                committingTransactions = store.committingTransactions.get();
+                mapRootReference = map.flushAndGetRoot();
+            } while (committingTransactions != store.committingTransactions.get());
+            // Now we have a snapshot, where mapRootReference points to state of the map
+            // and committingTransactions mask tells us which of seemingly uncommitted changes
+            // should be considered as committed.
+            // Subsequent map traversal uses this snapshot info only.
+            this.cursor = new Cursor<>(mapRootReference.root, from, to);
+            this.committingTransactions = committingTransactions;
+
+            this.includeAllUncommitted = includeAllUncommitted;
+            fetchNext();
         }
 
-        @SuppressWarnings("unchecked")
-        final void registerCurrent(K key, Object value) {
-            current = (X) (forEntries ? new AbstractMap.SimpleImmutableEntry<>(key, value) : key);
-        }
+        protected abstract X registerCurrent(K key, VersionedValue data);
 
-        abstract void fetchNext();
+        private void fetchNext() {
+            while (cursor.hasNext()) {
+                K key = cursor.next();
+                VersionedValue data = cursor.getValue();
+                if (!includeAllUncommitted) {
+                    // If value doesn't exist or it was deleted by a committed transaction,
+                    // or if value is a committed one, just return it.
+                    if (data != null) {
+                        long id = data.getOperationId();
+                        if (id != 0) {
+                            int tx = TransactionStore.getTransactionId(id);
+                            if (tx != transactionId && !committingTransactions.get(tx)) {
+                                // current value comes from another uncommitted transaction
+                                // take committed value instead
+                                Object committedValue = data.getCommittedValue();
+                                data = committedValue == null ? null
+                                        : VersionedValueCommitted.getInstance(committedValue);
+                            }
+                        }
+                    }
+                }
+                if (data != null && (data.getCurrentValue() != null ||
+                        includeAllUncommitted && transactionId !=
+                                                    TransactionStore.getTransactionId(data.getOperationId()))) {
+                    current = registerCurrent(key, data);
+                    return;
+                }
+            }
+            current = null;
+        }
 
         @Override
         public final boolean hasNext() {
@@ -945,7 +745,7 @@ public class TransactionMap<K, V> extends AbstractMap<K, V> {
 
         @Override
         public final X next() {
-            if (current == null) {
+            if(current == null) {
                 throw new NoSuchElementException();
             }
             X result = current;

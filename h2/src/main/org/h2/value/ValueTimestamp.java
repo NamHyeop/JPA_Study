@@ -1,6 +1,6 @@
 /*
  * Copyright 2004-2019 H2 Group. Multiple-Licensed under the MPL 2.0,
- * and the EPL 1.0 (https://h2database.com/html/license.html).
+ * and the EPL 1.0 (http://h2database.com/html/license.html).
  * Initial Developer: H2 Group
  */
 package org.h2.value;
@@ -8,14 +8,10 @@ package org.h2.value;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.sql.Types;
-import java.util.TimeZone;
 import org.h2.api.ErrorCode;
-import org.h2.engine.CastDataProvider;
+import org.h2.engine.Mode;
 import org.h2.message.DbException;
 import org.h2.util.DateTimeUtils;
-import org.h2.util.JSR310;
-import org.h2.util.JSR310Utils;
 
 /**
  * Implementation of the TIMESTAMP data type.
@@ -55,13 +51,10 @@ public class ValueTimestamp extends Value {
     private final long timeNanos;
 
     private ValueTimestamp(long dateValue, long timeNanos) {
-        if (dateValue < DateTimeUtils.MIN_DATE_VALUE || dateValue > DateTimeUtils.MAX_DATE_VALUE) {
-            throw new IllegalArgumentException("dateValue out of range " + dateValue);
-        }
+        this.dateValue = dateValue;
         if (timeNanos < 0 || timeNanos >= DateTimeUtils.NANOS_PER_DAY) {
             throw new IllegalArgumentException("timeNanos out of range " + timeNanos);
         }
-        this.dateValue = dateValue;
         this.timeNanos = timeNanos;
     }
 
@@ -80,15 +73,16 @@ public class ValueTimestamp extends Value {
     /**
      * Get or create a timestamp value for the given timestamp.
      *
-     * @param timeZone time zone, or {@code null} for default
      * @param timestamp the timestamp
      * @return the value
      */
-    public static ValueTimestamp get(TimeZone timeZone, Timestamp timestamp) {
+    public static ValueTimestamp get(Timestamp timestamp) {
         long ms = timestamp.getTime();
-        return fromLocalMillis(
-                ms + (timeZone == null ? DateTimeUtils.getTimeZoneOffsetMillis(ms) : timeZone.getOffset(ms)),
-                timestamp.getNanos() % 1_000_000);
+        long nanos = timestamp.getNanos() % 1_000_000;
+        ms += DateTimeUtils.getTimeZoneOffset(ms);
+        long dateValue = DateTimeUtils.dateValueFromLocalMillis(ms);
+        nanos += DateTimeUtils.nanosFromLocalMillis(ms);
+        return fromDateValueAndNanos(dateValue, nanos);
     }
 
     /**
@@ -98,14 +92,24 @@ public class ValueTimestamp extends Value {
      * @param nanos the nanoseconds
      * @return the value
      */
-    public static ValueTimestamp fromMillis(long ms, int nanos) {
-        return fromLocalMillis(ms + DateTimeUtils.getTimeZoneOffsetMillis(ms), nanos);
-    }
-
-    private static ValueTimestamp fromLocalMillis(long ms, int nanos) {
+    public static ValueTimestamp fromMillisNanos(long ms, int nanos) {
+        ms += DateTimeUtils.getTimeZoneOffset(ms);
         long dateValue = DateTimeUtils.dateValueFromLocalMillis(ms);
         long timeNanos = nanos + DateTimeUtils.nanosFromLocalMillis(ms);
         return fromDateValueAndNanos(dateValue, timeNanos);
+    }
+
+    /**
+     * Get or create a timestamp value for the given date/time in millis.
+     *
+     * @param ms the milliseconds
+     * @return the value
+     */
+    public static ValueTimestamp fromMillis(long ms) {
+        ms += DateTimeUtils.getTimeZoneOffset(ms);
+        long dateValue = DateTimeUtils.dateValueFromLocalMillis(ms);
+        long nanos = DateTimeUtils.nanosFromLocalMillis(ms);
+        return fromDateValueAndNanos(dateValue, nanos);
     }
 
     /**
@@ -121,17 +125,17 @@ public class ValueTimestamp extends Value {
     }
 
     /**
-     * Parse a string to a ValueTimestamp, using the given {@link CastDataProvider}.
+     * Parse a string to a ValueTimestamp, using the given {@link Mode}.
      * This method supports the format +/-year-month-day[ -]hour[:.]minute[:.]seconds.fractional
      * and an optional timezone part.
      *
      * @param s the string to parse
-     * @param provider the cast information provider, or {@code null}
+     * @param mode the database {@link Mode}
      * @return the date
      */
-    public static ValueTimestamp parse(String s, CastDataProvider provider) {
+    public static ValueTimestamp parse(String s, Mode mode) {
         try {
-            return (ValueTimestamp) DateTimeUtils.parseTimestamp(s, provider, false);
+            return (ValueTimestamp) DateTimeUtils.parseTimestamp(s, mode, false);
         } catch (Exception e) {
             throw DbException.get(ErrorCode.INVALID_DATETIME_CONSTANT_2,
                     e, "TIMESTAMP", s);
@@ -158,10 +162,8 @@ public class ValueTimestamp extends Value {
     }
 
     @Override
-    public Timestamp getTimestamp(TimeZone timeZone) {
-        Timestamp ts = new Timestamp(DateTimeUtils.getMillis(timeZone, dateValue, timeNanos));
-        ts.setNanos((int) (timeNanos % DateTimeUtils.NANOS_PER_SECOND));
-        return ts;
+    public Timestamp getTimestamp() {
+        return DateTimeUtils.convertDateValueToTimestamp(dateValue, timeNanos);
     }
 
     @Override
@@ -211,13 +213,12 @@ public class ValueTimestamp extends Value {
         if (targetScale < 0) {
             throw DbException.getInvalidValueException("scale", targetScale);
         }
-        long dv = dateValue;
         long n = timeNanos;
-        long n2 = DateTimeUtils.convertScale(n, targetScale,
-                dv == DateTimeUtils.MAX_DATE_VALUE ? DateTimeUtils.NANOS_PER_DAY : Long.MAX_VALUE);
+        long n2 = DateTimeUtils.convertScale(n, targetScale);
         if (n2 == n) {
             return this;
         }
+        long dv = dateValue;
         if (n2 >= DateTimeUtils.NANOS_PER_DAY) {
             n2 -= DateTimeUtils.NANOS_PER_DAY;
             dv = DateTimeUtils.incrementDateValue(dv);
@@ -226,7 +227,7 @@ public class ValueTimestamp extends Value {
     }
 
     @Override
-    public int compareTypeSafe(Value o, CompareMode mode, CastDataProvider provider) {
+    public int compareTypeSafe(Value o, CompareMode mode) {
         ValueTimestamp t = (ValueTimestamp) o;
         int c = Long.compare(dateValue, t.dateValue);
         if (c != 0) {
@@ -253,46 +254,29 @@ public class ValueTimestamp extends Value {
 
     @Override
     public Object getObject() {
-        return getTimestamp(null);
+        return getTimestamp();
     }
 
     @Override
-    public void set(PreparedStatement prep, int parameterIndex) throws SQLException {
-        if (JSR310.PRESENT) {
-            try {
-                prep.setObject(parameterIndex, JSR310Utils.valueToLocalDateTime(this, null), Types.TIMESTAMP);
-                return;
-            } catch (SQLException ignore) {
-                // Nothing to do
-            }
-        }
-        prep.setTimestamp(parameterIndex, getTimestamp(null));
+    public void set(PreparedStatement prep, int parameterIndex)
+            throws SQLException {
+        prep.setTimestamp(parameterIndex, getTimestamp());
     }
 
     @Override
     public Value add(Value v) {
         ValueTimestamp t = (ValueTimestamp) v.convertTo(Value.TIMESTAMP);
-        long absoluteDay = DateTimeUtils.absoluteDayFromDateValue(dateValue)
-                + DateTimeUtils.absoluteDayFromDateValue(t.dateValue);
-        long nanos = timeNanos + t.timeNanos;
-        if (nanos >= DateTimeUtils.NANOS_PER_DAY) {
-            nanos -= DateTimeUtils.NANOS_PER_DAY;
-            absoluteDay++;
-        }
-        return ValueTimestamp.fromDateValueAndNanos(DateTimeUtils.dateValueFromAbsoluteDay(absoluteDay), nanos);
+        long d1 = DateTimeUtils.absoluteDayFromDateValue(dateValue);
+        long d2 = DateTimeUtils.absoluteDayFromDateValue(t.dateValue);
+        return DateTimeUtils.normalizeTimestamp(d1 + d2, timeNanos + t.timeNanos);
     }
 
     @Override
     public Value subtract(Value v) {
         ValueTimestamp t = (ValueTimestamp) v.convertTo(Value.TIMESTAMP);
-        long absoluteDay = DateTimeUtils.absoluteDayFromDateValue(dateValue)
-                - DateTimeUtils.absoluteDayFromDateValue(t.dateValue);
-        long nanos = timeNanos - t.timeNanos;
-        if (nanos < 0) {
-            nanos += DateTimeUtils.NANOS_PER_DAY;
-            absoluteDay--;
-        }
-        return ValueTimestamp.fromDateValueAndNanos(DateTimeUtils.dateValueFromAbsoluteDay(absoluteDay), nanos);
+        long d1 = DateTimeUtils.absoluteDayFromDateValue(dateValue);
+        long d2 = DateTimeUtils.absoluteDayFromDateValue(t.dateValue);
+        return DateTimeUtils.normalizeTimestamp(d1 - d2, timeNanos - t.timeNanos);
     }
 
 }

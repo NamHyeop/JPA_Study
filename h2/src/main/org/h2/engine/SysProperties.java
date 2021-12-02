@@ -1,6 +1,6 @@
 /*
  * Copyright 2004-2019 H2 Group. Multiple-Licensed under the MPL 2.0,
- * and the EPL 1.0 (https://h2database.com/html/license.html).
+ * and the EPL 1.0 (http://h2database.com/html/license.html).
  * Initial Developer: H2 Group
  */
 package org.h2.engine;
@@ -381,13 +381,6 @@ public class SysProperties {
      */
     public static final String PREFIX_TEMP_FILE =
             Utils.getProperty("h2.prefixTempFile", "h2.temp");
-
-    /**
-     * System property <code>h2.forceAutoCommitOffOnCommit</code> (default: false).<br />
-     * Throw error if transaction's auto-commit property is true when a commit is executed.
-     */
-    public static boolean FORCE_AUTOCOMMIT_OFF_ON_COMMIT =
-            Utils.getProperty("h2.forceAutoCommitOffOnCommit", false);
 
     /**
      * System property <code>h2.serverCachedObjects</code> (default: 64).<br />

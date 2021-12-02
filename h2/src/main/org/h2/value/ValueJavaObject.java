@@ -1,6 +1,6 @@
 /*
  * Copyright 2004-2019 H2 Group. Multiple-Licensed under the MPL 2.0,
- * and the EPL 1.0 (https://h2database.com/html/license.html).
+ * and the EPL 1.0 (http://h2database.com/html/license.html).
  * Initial Developer: H2 Group
  */
 package org.h2.value;
@@ -9,7 +9,6 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Types;
 
-import org.h2.engine.CastDataProvider;
 import org.h2.engine.SysProperties;
 import org.h2.store.DataHandler;
 import org.h2.util.Bits;
@@ -106,7 +105,7 @@ public class ValueJavaObject extends ValueBytes {
         }
 
         @Override
-        public int compareTypeSafe(Value v, CompareMode mode, CastDataProvider provider) {
+        public int compareTypeSafe(Value v, CompareMode mode) {
             Object o1 = getObject();
             Object o2 = v.getObject();
 
@@ -201,6 +200,10 @@ public class ValueJavaObject extends ValueBytes {
             return getObject().equals(((NotSerialized) other).getObject());
         }
 
+        @Override
+        public Value convertPrecision(long precision, boolean force) {
+            return this;
+        }
     }
 
     @Override

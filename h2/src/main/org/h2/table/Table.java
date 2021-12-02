@@ -1,6 +1,6 @@
 /*
  * Copyright 2004-2019 H2 Group. Multiple-Licensed under the MPL 2.0,
- * and the EPL 1.0 (https://h2database.com/html/license.html).
+ * and the EPL 1.0 (http://h2database.com/html/license.html).
  * Initial Developer: H2 Group
  */
 package org.h2.table;
@@ -91,7 +91,8 @@ public abstract class Table extends SchemaObjectBase {
     private volatile Row nullRow;
     private boolean tableExpression;
 
-    protected Table(Schema schema, int id, String name, boolean persistIndexes, boolean persistData) {
+    public Table(Schema schema, int id, String name, boolean persistIndexes,
+            boolean persistData) {
         super(schema, id, name, Trace.TABLE);
         columnMap = schema.getDatabase().newStringMap();
         this.persistIndexes = persistIndexes;
@@ -507,6 +508,8 @@ public abstract class Table extends SchemaObjectBase {
                 if (e.getErrorCode() == ErrorCode.CONCURRENT_UPDATE_1
                         || e.getErrorCode() == ErrorCode.ROW_NOT_FOUND_WHEN_DELETING_1) {
                     session.rollbackTo(rollback);
+                    session.startStatementWithinTransaction();
+                    rollback = session.setSavepoint();
                 }
                 throw e;
             }
@@ -524,6 +527,8 @@ public abstract class Table extends SchemaObjectBase {
             } catch (DbException e) {
                 if (e.getErrorCode() == ErrorCode.CONCURRENT_UPDATE_1) {
                     session.rollbackTo(rollback);
+                    session.startStatementWithinTransaction();
+                    rollback = session.setSavepoint();
                 }
                 throw e;
             }
@@ -703,32 +708,6 @@ public abstract class Table extends SchemaObjectBase {
             throw DbException.get(ErrorCode.COLUMN_NOT_FOUND_1, columnName);
         }
         return column;
-    }
-
-    /**
-     * Get the column with the given name.
-     *
-     * @param columnName the column name
-     * @param ifExists if (@code true) return {@code null} if column does not exist
-     * @return the column
-     * @throws DbException if the column was not found
-     */
-    public Column getColumn(String columnName, boolean ifExists) {
-        Column column = columnMap.get(columnName);
-        if (column == null && !ifExists) {
-            throw DbException.get(ErrorCode.COLUMN_NOT_FOUND_1, columnName);
-        }
-        return column;
-    }
-
-    /**
-     * Get the column with the given name if it exists.
-     *
-     * @param columnName the column name, or {@code null}
-     * @return the column
-     */
-    public Column findColumn(String columnName) {
-        return columnMap.get(columnName);
     }
 
     /**
@@ -1009,22 +988,6 @@ public abstract class Table extends SchemaObjectBase {
     }
 
     /**
-     * Check whether this table has a select trigger.
-     *
-     * @return true if it has
-     */
-    public boolean hasInsteadOfTrigger() {
-        if (triggers != null) {
-            for (TriggerObject trigger : triggers) {
-                if (trigger.isInsteadOf()) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
-    /**
      * Check if row based triggers or constraints are defined.
      * In this case the fire after and before row methods need to be called.
      *
@@ -1205,20 +1168,6 @@ public abstract class Table extends SchemaObjectBase {
     }
 
     /**
-     * Removes dependencies of column expressions, used for tables with circular
-     * dependencies.
-     *
-     * @param session the session
-     */
-    public void removeColumnExpressionsDependencies(Session session) {
-        for (Column column : columns) {
-            column.setDefaultExpression(session, null);
-            column.setOnUpdateExpression(session, null);
-            column.removeCheckConstraint();
-        }
-    }
-
-    /**
      * Check if a deadlock occurred. This method is called recursively. There is
      * a circle if the session to be tested has already being visited. If this
      * session is part of the circle (if it is the clash session), the method
@@ -1258,7 +1207,7 @@ public abstract class Table extends SchemaObjectBase {
      *         1 otherwise
      */
     public int compareValues(Value a, Value b) {
-        return a.compareTo(b, database, compareMode);
+        return a.compareTo(b, database.getMode(), compareMode);
     }
 
     public CompareMode getCompareMode() {
@@ -1281,7 +1230,7 @@ public abstract class Table extends SchemaObjectBase {
         } else {
             v = expression.getValue(session);
         }
-        return column.convert(v, false);
+        return column.convert(v);
     }
 
     /**

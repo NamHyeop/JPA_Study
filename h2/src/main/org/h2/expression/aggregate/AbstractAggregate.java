@@ -1,6 +1,6 @@
 /*
  * Copyright 2004-2019 H2 Group. Multiple-Licensed under the MPL 2.0,
- * and the EPL 1.0 (https://h2database.com/html/license.html).
+ * and the EPL 1.0 (http://h2database.com/html/license.html).
  * Initial Developer: H2 Group
  */
 package org.h2.expression.aggregate;
@@ -11,6 +11,7 @@ import java.util.Iterator;
 
 import org.h2.command.dml.Select;
 import org.h2.command.dml.SelectGroups;
+import org.h2.command.dml.SelectOrderBy;
 import org.h2.engine.Session;
 import org.h2.expression.Expression;
 import org.h2.expression.analysis.DataAnalysisOperation;
@@ -269,18 +270,19 @@ public abstract class AbstractAggregate extends DataAnalysisOperation {
 
     @Override
     protected void updateAggregate(Session session, SelectGroups groupData, int groupRowId) {
+        ArrayList<SelectOrderBy> orderBy;
         if (filterCondition == null || filterCondition.getBooleanValue(session)) {
             if (over != null) {
-                if (over.isOrdered()) {
-                    updateOrderedAggregate(session, groupData, groupRowId, over.getOrderBy());
+                if ((orderBy = over.getOrderBy()) != null) {
+                    updateOrderedAggregate(session, groupData, groupRowId, orderBy);
                 } else {
                     updateAggregate(session, getWindowData(session, groupData, false));
                 }
             } else {
                 updateAggregate(session, getGroupData(groupData, false));
             }
-        } else if (over != null && over.isOrdered()) {
-            updateOrderedAggregate(session, groupData, groupRowId, over.getOrderBy());
+        } else if (over != null && (orderBy = over.getOrderBy()) != null) {
+            updateOrderedAggregate(session, groupData, groupRowId, orderBy);
         }
     }
 

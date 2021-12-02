@@ -126,9 +126,6 @@ This class defines the error codes used for SQL exceptions.
 <a href="#c90057">CONSTRAINT_NOT_FOUND_1</a> = 90057
 </td></tr>
 <tr><td class="return">static int</td><td class="method">
-<a href="#c90148">CURRENT_SEQUENCE_VALUE_IS_NOT_DEFINED_IN_SESSION_1</a> = 90148
-</td></tr>
-<tr><td class="return">static int</td><td class="method">
 <a href="#c90020">DATABASE_ALREADY_OPEN_1</a> = 90020
 </td></tr>
 <tr><td class="return">static int</td><td class="method">
@@ -150,7 +147,7 @@ This class defines the error codes used for SQL exceptions.
 <a href="#c90013">DATABASE_NOT_FOUND_1</a> = 90013
 </td></tr>
 <tr><td class="return">static int</td><td class="method">
-<a href="#c90146">DATABASE_NOT_FOUND_WITH_IF_EXISTS_1</a> = 90146
+<a href="#c90146">DATABASE_NOT_FOUND_2</a> = 90146
 </td></tr>
 <tr><td class="return">static int</td><td class="method">
 <a href="#c22018">DATA_CONVERSION_ERROR_1</a> = 22018
@@ -282,9 +279,6 @@ This class defines the error codes used for SQL exceptions.
 <a href="#c22007">INVALID_DATETIME_CONSTANT_2</a> = 22007
 </td></tr>
 <tr><td class="return">static int</td><td class="method">
-<a href="#c42602">INVALID_NAME_1</a> = 42602
-</td></tr>
-<tr><td class="return">static int</td><td class="method">
 <a href="#c7001">INVALID_PARAMETER_COUNT_2</a> = 7001
 </td></tr>
 <tr><td class="return">static int</td><td class="method">
@@ -328,9 +322,6 @@ This class defines the error codes used for SQL exceptions.
 </td></tr>
 <tr><td class="return">static int</td><td class="method">
 <a href="#c90073">METHODS_MUST_HAVE_DIFFERENT_PARAMETER_COUNTS_2</a> = 90073
-</td></tr>
-<tr><td class="return">static int</td><td class="method">
-<a href="#c90147">METHOD_DISABLED_ON_AUTOCOMMIT_TRUE</a> = 90147
 </td></tr>
 <tr><td class="return">static int</td><td class="method">
 <a href="#c90130">METHOD_NOT_ALLOWED_FOR_PREPARED_STATEMENT</a> = 90130
@@ -394,9 +385,6 @@ This class defines the error codes used for SQL exceptions.
 </td></tr>
 <tr><td class="return">static int</td><td class="method">
 <a href="#c90117">REMOTE_CONNECTION_NOT_ALLOWED</a> = 90117
-</td></tr>
-<tr><td class="return">static int</td><td class="method">
-<a href="#c90149">REMOTE_DATABASE_NOT_FOUND_1</a> = 90149
 </td></tr>
 <tr><td class="return">static int</td><td class="method">
 <a href="#c90128">RESULT_SET_NOT_SCROLLABLE</a> = 90128
@@ -807,7 +795,7 @@ This class defines the error codes used for SQL exceptions.
  = 23514
 </span></h4>
 <div class="item">The error with code <code>23514</code> is thrown when
- evaluation of a check constraint resulted in an error.</div>
+ evaluation of a check constraint resulted in a error.</div>
 <hr />
 <h4 id="c28000"><span class="methodName">WRONG_USER_OR_PASSWORD
  = 28000
@@ -922,15 +910,6 @@ This class defines the error codes used for SQL exceptions.
  Example:
  <pre>
  SELECT MODE(A ORDER BY B) FROM TEST;</pre></div>
-<hr />
-<h4 id="c42602"><span class="methodName">INVALID_NAME_1
- = 42602
-</span></h4>
-<div class="item">The error with code <code>42602</code> is thrown when
- invalid name of identifier is used.
- Example:
- <pre>
- statement.enquoteIdentifier("\"", true);</pre></div>
 <hr />
 <h4 id="c50000"><span class="methodName">GENERAL_ERROR_1
  = 50000
@@ -2423,7 +2402,8 @@ This class defines the error codes used for SQL exceptions.
  = 90143
 </span></h4>
 <div class="item">The error with code <code>90143</code> is thrown when
- trying to fetch a row from the primary index and the row is not there.</div>
+ trying to fetch a row from the primary index and the row is not there.
+ Can happen in MULTI_THREADED=1 case.</div>
 <hr />
 <h4 id="c90144"><span class="methodName">AUTHENTICATOR_NOT_AVAILABLE
  = 90144
@@ -2447,37 +2427,12 @@ This class defines the error codes used for SQL exceptions.
  SELECT DISTINCT NAME FOR UPDATE;
  SELECT MAX(VALUE) FOR UPDATE;</pre></div>
 <hr />
-<h4 id="c90146"><span class="methodName">DATABASE_NOT_FOUND_WITH_IF_EXISTS_1
+<h4 id="c90146"><span class="methodName">DATABASE_NOT_FOUND_2
  = 90146
 </span></h4>
 <div class="item">The error with code <code>90146</code> is thrown when trying to open a
- database that does not exist using the flag IFEXISTS=TRUE
- <pre>
- jdbc:h2:./database_that_does_not_exist</pre></div>
-<hr />
-<h4 id="c90147"><span class="methodName">METHOD_DISABLED_ON_AUTOCOMMIT_TRUE
- = 90147
-</span></h4>
-<div class="item">The error with code <code>90147</code> is thrown when trying to execute a
- statement which closes the transaction (such as commit and rollback) and
- autocommit mode is on.</div>
-<hr />
-<h4 id="c90148"><span class="methodName">CURRENT_SEQUENCE_VALUE_IS_NOT_DEFINED_IN_SESSION_1
- = 90148
-</span></h4>
-<div class="item">The error with code <code>90148</code> is thrown when trying to access
- the current value of a sequence before execution of NEXT VALUE FOR
- sequenceName in the current session. Example:
-
- <pre>
- SELECT CURRENT VALUE FOR SEQUENCE XYZ;</pre></div>
-<hr />
-<h4 id="c90149"><span class="methodName">REMOTE_DATABASE_NOT_FOUND_1
- = 90149
-</span></h4>
-<div class="item">The error with code <code>90149</code> is thrown when trying to open a
  database that does not exist remotely without enabling remote database
- creation first.
+ creation first, or using the flag IFEXISTS=TRUE
  <pre>
  jdbc:h2:./database_that_does_not_exist</pre></div>
 <hr />

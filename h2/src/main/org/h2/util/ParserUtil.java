@@ -1,6 +1,6 @@
 /*
  * Copyright 2004-2019 H2 Group. Multiple-Licensed under the MPL 2.0,
- * and the EPL 1.0 (https://h2database.com/html/license.html).
+ * and the EPL 1.0 (http://h2database.com/html/license.html).
  * Initial Developer: H2 Group
  */
 package org.h2.util;
@@ -48,24 +48,14 @@ public class ParserUtil {
     public static final int CROSS = CONSTRAINT + 1;
 
     /**
-     * The token "CURRENT_CATALOG".
-     */
-    public static final int CURRENT_CATALOG = CROSS + 1;
-
-    /**
      * The token "CURRENT_DATE".
      */
-    public static final int CURRENT_DATE = CURRENT_CATALOG + 1;
-
-    /**
-     * The token "CURRENT_SCHEMA".
-     */
-    public static final int CURRENT_SCHEMA = CURRENT_DATE + 1;
+    public static final int CURRENT_DATE = CROSS + 1;
 
     /**
      * The token "CURRENT_TIME".
      */
-    public static final int CURRENT_TIME = CURRENT_SCHEMA + 1;
+    public static final int CURRENT_TIME = CURRENT_DATE + 1;
 
     /**
      * The token "CURRENT_TIMESTAMP".
@@ -168,14 +158,9 @@ public class ParserUtil {
     public static final int JOIN = IS + 1;
 
     /**
-     * The token "LEFT".
-     */
-    public static final int LEFT = JOIN + 1;
-
-    /**
      * The token "LIKE".
      */
-    public static final int LIKE = LEFT + 1;
+    public static final int LIKE = JOIN + 1;
 
     /**
      * The token "LIMIT".
@@ -238,14 +223,9 @@ public class ParserUtil {
     public static final int QUALIFY = PRIMARY + 1;
 
     /**
-     * The token "RIGHT".
-     */
-    public static final int RIGHT = QUALIFY + 1;
-
-    /**
      * The token "ROW".
      */
-    public static final int ROW = RIGHT + 1;
+    public static final int ROW = QUALIFY + 1;
 
     /**
      * The token "_ROWID_".
@@ -283,19 +263,9 @@ public class ParserUtil {
     public static final int UNIQUE = UNION + 1;
 
     /**
-     * The token "UNKNOWN".
-     */
-    public static final int UNKNOWN = UNIQUE + 1;
-
-    /**
-     * The token "USING".
-     */
-    public static final int USING = UNKNOWN + 1;
-
-    /**
      * The token "VALUES".
      */
-    public static final int VALUES = USING + 1;
+    public static final int VALUES = UNIQUE + 1;
 
     /**
      * The token "WHERE".
@@ -456,12 +426,8 @@ public class ParserUtil {
                 return CONSTRAINT;
             } else if (eq("CROSS", s, ignoreCase, start, end)) {
                 return CROSS;
-            } else if (eq("CURRENT_CATALOG", s, ignoreCase, start, end)) {
-                return CURRENT_CATALOG;
             } else if (eq("CURRENT_DATE", s, ignoreCase, start, end)) {
                 return CURRENT_DATE;
-            } else if (eq("CURRENT_SCHEMA", s, ignoreCase, start, end)) {
-                return CURRENT_SCHEMA;
             } else if (eq("CURRENT_TIME", s, ignoreCase, start, end)) {
                 return CURRENT_TIME;
             } else if (eq("CURRENT_TIMESTAMP", s, ignoreCase, start, end)) {
@@ -543,9 +509,7 @@ public class ParserUtil {
             }
             return IDENTIFIER;
         case 'L':
-            if (eq("LEFT", s, ignoreCase, start, end)) {
-                return LEFT;
-            } else if (eq("LIMIT", s, ignoreCase, start, end)) {
+            if (eq("LIMIT", s, ignoreCase, start, end)) {
                 return LIMIT;
             } else if (eq("LIKE", s, ignoreCase, start, end)) {
                 return LIKE;
@@ -555,7 +519,7 @@ public class ParserUtil {
                 return LOCALTIMESTAMP;
             }
             if (additionalKeywords) {
-                if (eq("LEADING", s, ignoreCase, start, end)) {
+                if (eq("LEADING", s, ignoreCase, start, end) || eq("LEFT", s, ignoreCase, start, end)) {
                     return KEYWORD;
                 }
             }
@@ -604,16 +568,14 @@ public class ParserUtil {
             }
             return IDENTIFIER;
         case 'R':
-            if (eq("RIGHT", s, ignoreCase, start, end)) {
-                return RIGHT;
-            } else if (eq("ROW", s, ignoreCase, start, end)) {
+            if (eq("ROW", s, ignoreCase, start, end)) {
                 return ROW;
             } else if (eq("ROWNUM", s, ignoreCase, start, end)) {
                 return ROWNUM;
             }
             if (additionalKeywords) {
                 if (eq("RANGE", s, ignoreCase, start, end) || eq("REGEXP", s, ignoreCase, start, end)
-                        || eq("ROWS", s, ignoreCase, start, end)) {
+                        || eq("ROWS", s, ignoreCase, start, end) || eq("RIGHT", s, ignoreCase, start, end)) {
                     return KEYWORD;
                 }
             }
@@ -643,14 +605,10 @@ public class ParserUtil {
             }
             return IDENTIFIER;
         case 'U':
-            if (eq("UNION", s, ignoreCase, start, end)) {
-                return UNION;
-            } else if (eq("UNIQUE", s, ignoreCase, start, end)) {
+            if (eq("UNIQUE", s, ignoreCase, start, end)) {
                 return UNIQUE;
-            } else if (eq("UNKNOWN", s, ignoreCase, start, end)) {
-                return UNKNOWN;
-            } else if (eq("USING", s, ignoreCase, start, end)) {
-                return USING;
+            } else if (eq("UNION", s, ignoreCase, start, end)) {
+                return UNION;
             }
             return IDENTIFIER;
         case 'V':

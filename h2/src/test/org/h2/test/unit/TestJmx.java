@@ -1,6 +1,6 @@
 /*
  * Copyright 2004-2019 H2 Group. Multiple-Licensed under the MPL 2.0,
- * and the EPL 1.0 (https://h2database.com/html/license.html).
+ * and the EPL 1.0 (http://h2database.com/html/license.html).
  * Initial Developer: H2 Group
  */
 package org.h2.test.unit;
@@ -81,12 +81,19 @@ public class TestJmx extends TestDb {
         }
         assertEquals("REGULAR", mbeanServer.
                 getAttribute(name, "Mode").toString());
-        if (config.mvStore) {
-            assertEquals("true", mbeanServer.getAttribute(name, "MultiThreaded").toString());
-            assertEquals("true", mbeanServer.getAttribute(name, "Mvcc").toString());
+        if (config.multiThreaded) {
+            assertEquals("true", mbeanServer.
+                    getAttribute(name, "MultiThreaded").toString());
         } else {
-            assertEquals("false", mbeanServer.getAttribute(name, "MultiThreaded").toString());
-            assertEquals("false", mbeanServer.getAttribute(name, "Mvcc").toString());
+            assertEquals("false", mbeanServer.
+                    getAttribute(name, "MultiThreaded").toString());
+        }
+        if (config.mvStore) {
+            assertEquals("true", mbeanServer.
+                    getAttribute(name, "Mvcc").toString());
+        } else {
+            assertEquals("false", mbeanServer.
+                    getAttribute(name, "Mvcc").toString());
         }
         assertEquals("false", mbeanServer.
                 getAttribute(name, "ReadOnly").toString());

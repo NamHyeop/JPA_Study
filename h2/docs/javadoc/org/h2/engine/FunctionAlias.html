@@ -11,12 +11,12 @@ Represents a user-defined function, or alias.<br /><br />
 <table class="block"><tr onclick="return allDetails()"><th colspan="2">Methods</th></tr>
 <tr id="__0" onclick="return on(0)">
 <td class="return">static FunctionAlias</td><td class="method">
-<a id="newInstance_Schema_int_String_String_boolean" href="#newInstance_Schema_int_String_String_boolean">newInstance</a>(Schema schema, int id, String name, String javaClassMethod, boolean force)
+<a id="newInstance_Schema_int_String_String_boolean_boolean" href="#newInstance_Schema_int_String_String_boolean_boolean">newInstance</a>(Schema schema, int id, String name, String javaClassMethod, boolean force, boolean bufferResultSetToLocalTemp)
 <div class="methodText">Create a new alias based on a method name.</div>
 </td></tr>
 <tr onclick="return off(0)" class="detail" id="_0">
 <td class="return">static FunctionAlias</td><td>
-<a id="newInstance_Schema_int_String_String_boolean" href="#newInstance_Schema_int_String_String_boolean">newInstance</a>(Schema schema, int id, String name, String javaClassMethod, boolean force)
+<a id="newInstance_Schema_int_String_String_boolean_boolean" href="#newInstance_Schema_int_String_String_boolean_boolean">newInstance</a>(Schema schema, int id, String name, String javaClassMethod, boolean force, boolean bufferResultSetToLocalTemp)
 <div class="methodText">Create a new alias based on a method name.</div>
 <div class="itemTitle">Parameters:</div>
 <div class="item">schema - the schema</div>
@@ -24,17 +24,18 @@ Represents a user-defined function, or alias.<br /><br />
 <div class="item">name - the name</div>
 <div class="item">javaClassMethod - the class and method name</div>
 <div class="item">force - create the object even if the class or method does not exist</div>
+<div class="item">bufferResultSetToLocalTemp - whether the result should be buffered</div>
 <div class="itemTitle">Returns:</div>
 <div class="item">the database object</div>
 </td></tr>
 <tr id="__1" onclick="return on(1)">
 <td class="return">static FunctionAlias</td><td class="method">
-<a id="newInstanceFromSource_Schema_int_String_String_boolean" href="#newInstanceFromSource_Schema_int_String_String_boolean">newInstanceFromSource</a>(Schema schema, int id, String name, String source, boolean force)
+<a id="newInstanceFromSource_Schema_int_String_String_boolean_boolean" href="#newInstanceFromSource_Schema_int_String_String_boolean_boolean">newInstanceFromSource</a>(Schema schema, int id, String name, String source, boolean force, boolean bufferResultSetToLocalTemp)
 <div class="methodText">Create a new alias based on source code.</div>
 </td></tr>
 <tr onclick="return off(1)" class="detail" id="_1">
 <td class="return">static FunctionAlias</td><td>
-<a id="newInstanceFromSource_Schema_int_String_String_boolean" href="#newInstanceFromSource_Schema_int_String_String_boolean">newInstanceFromSource</a>(Schema schema, int id, String name, String source, boolean force)
+<a id="newInstanceFromSource_Schema_int_String_String_boolean_boolean" href="#newInstanceFromSource_Schema_int_String_String_boolean_boolean">newInstanceFromSource</a>(Schema schema, int id, String name, String source, boolean force, boolean bufferResultSetToLocalTemp)
 <div class="methodText">Create a new alias based on source code.</div>
 <div class="itemTitle">Parameters:</div>
 <div class="item">schema - the schema</div>
@@ -42,6 +43,7 @@ Represents a user-defined function, or alias.<br /><br />
 <div class="item">name - the name</div>
 <div class="item">source - the source code</div>
 <div class="item">force - create the object even if the class or method does not exist</div>
+<div class="item">bufferResultSetToLocalTemp - whether the result should be buffered</div>
 <div class="itemTitle">Returns:</div>
 <div class="item">the database object</div>
 </td></tr>
@@ -156,27 +158,39 @@ Represents a user-defined function, or alias.<br /><br />
 </td></tr>
 <tr id="__13" onclick="return on(13)">
 <td class="return">boolean</td><td class="method">
-<a id="isDeterministic" href="#isDeterministic">isDeterministic</a>()
+<a id="isBufferResultSetToLocalTemp" href="#isBufferResultSetToLocalTemp">isBufferResultSetToLocalTemp</a>()
+<div class="methodText">Should the return value ResultSet be buffered in a local temporary file?</div>
 </td></tr>
 <tr onclick="return off(13)" class="detail" id="_13">
+<td class="return">boolean</td><td>
+<a id="isBufferResultSetToLocalTemp" href="#isBufferResultSetToLocalTemp">isBufferResultSetToLocalTemp</a>()
+<div class="methodText">Should the return value ResultSet be buffered in a local temporary file?</div>
+<div class="itemTitle">Returns:</div>
+<div class="item">true if yes</div>
+</td></tr>
+<tr id="__14" onclick="return on(14)">
+<td class="return">boolean</td><td class="method">
+<a id="isDeterministic" href="#isDeterministic">isDeterministic</a>()
+</td></tr>
+<tr onclick="return off(14)" class="detail" id="_14">
 <td class="return">boolean</td><td>
 <a id="isDeterministic" href="#isDeterministic">isDeterministic</a>()
 <div class="methodText"></div>
 </td></tr>
-<tr id="__14" onclick="return on(14)">
+<tr id="__15" onclick="return on(15)">
 <td class="return">void</td><td class="method">
 <a id="removeChildrenAndResources_Session" href="#removeChildrenAndResources_Session">removeChildrenAndResources</a>(Session session)
 </td></tr>
-<tr onclick="return off(14)" class="detail" id="_14">
+<tr onclick="return off(15)" class="detail" id="_15">
 <td class="return">void</td><td>
 <a id="removeChildrenAndResources_Session" href="#removeChildrenAndResources_Session">removeChildrenAndResources</a>(Session session)
 <div class="methodText"></div>
 </td></tr>
-<tr id="__15" onclick="return on(15)">
+<tr id="__16" onclick="return on(16)">
 <td class="return">void</td><td class="method">
 <a id="setDeterministic_boolean" href="#setDeterministic_boolean">setDeterministic</a>(boolean deterministic)
 </td></tr>
-<tr onclick="return off(15)" class="detail" id="_15">
+<tr onclick="return off(16)" class="detail" id="_16">
 <td class="return">void</td><td>
 <a id="setDeterministic_boolean" href="#setDeterministic_boolean">setDeterministic</a>(boolean deterministic)
 <div class="methodText"></div>

@@ -1,6 +1,6 @@
 /*
  * Copyright 2004-2019 H2 Group. Multiple-Licensed under the MPL 2.0,
- * and the EPL 1.0 (https://h2database.com/html/license.html).
+ * and the EPL 1.0 (http://h2database.com/html/license.html).
  * Initial Developer: H2 Group
  */
 package org.h2.engine;
@@ -29,7 +29,6 @@ import org.h2.store.fs.FileUtils;
 import org.h2.util.JdbcUtils;
 import org.h2.util.MathUtils;
 import org.h2.util.NetUtils;
-import org.h2.util.NetworkConnectionInfo;
 import org.h2.util.SmallLRUCache;
 import org.h2.util.StringUtils;
 import org.h2.util.TempFileDeleter;
@@ -37,7 +36,6 @@ import org.h2.util.Utils;
 import org.h2.value.CompareMode;
 import org.h2.value.Transfer;
 import org.h2.value.Value;
-import org.h2.value.ValueInt;
 
 /**
  * The client side part of a session when using the server mode. This object
@@ -96,8 +94,6 @@ public class SessionRemote extends SessionWithState implements DataHandler {
     private volatile boolean javaObjectSerializerInitialized;
 
     private final CompareMode compareMode = CompareMode.getInstance(null, 0);
-
-    private String currentSchemaName;
 
     public SessionRemote(ConnectionInfo ci) {
         this.connectionInfo = ci;
@@ -214,7 +210,7 @@ public class SessionRemote extends SessionWithState implements DataHandler {
             CommandInterface c = prepareCommand(
                     "SET CLUSTER " + serverList, Integer.MAX_VALUE);
             // this will set autoCommit to false
-            c.executeUpdate(null);
+            c.executeUpdate(false);
             // so we need to switch it on
             autoCommit = true;
             cluster = true;
@@ -454,7 +450,7 @@ public class SessionRemote extends SessionWithState implements DataHandler {
 
     private void switchOffCluster() {
         CommandInterface ci = prepareCommand("SET CLUSTER ''", Integer.MAX_VALUE);
-        ci.executeUpdate(null);
+        ci.executeUpdate(false);
     }
 
     /**
@@ -618,7 +614,6 @@ public class SessionRemote extends SessionWithState implements DataHandler {
             transferList = null;
         } else if (status == STATUS_OK_STATE_CHANGED) {
             sessionStateChanged = true;
-            currentSchemaName = null;
         } else if (status == STATUS_OK) {
             // ok
         } else {
@@ -727,6 +722,21 @@ public class SessionRemote extends SessionWithState implements DataHandler {
     }
 
     @Override
+    public boolean isReconnectNeeded(boolean write) {
+        return false;
+    }
+
+    @Override
+    public SessionInterface reconnect(boolean write) {
+        return this;
+    }
+
+    @Override
+    public void afterWriting() {
+        // nothing to do
+    }
+
+    @Override
     public LobStorageInterface getLobStorage() {
         if (lobStorage == null) {
             lobStorage = new LobStorageFrontend(this);
@@ -832,70 +842,17 @@ public class SessionRemote extends SessionWithState implements DataHandler {
 
     @Override
     public String getCurrentSchemaName() {
-        String schema = currentSchemaName;
-        if (schema == null) {
-            synchronized (this) {
-                try (CommandInterface command = prepareCommand("CALL SCHEMA()", 1);
-                        ResultInterface result = command.executeQuery(1, false)) {
-                    result.next();
-                    currentSchemaName = schema = result.currentRow()[0].getString();
-                }
-            }
-        }
-        return schema;
+        throw DbException.getUnsupportedException("getSchema && remote session");
     }
 
     @Override
-    public synchronized void setCurrentSchemaName(String schema) {
-        currentSchemaName = null;
-        try (CommandInterface command = prepareCommand(
-                StringUtils.quoteIdentifier(new StringBuilder("SET SCHEMA "), schema).toString(), 0)) {
-            command.executeUpdate(null);
-            currentSchemaName = schema;
-        }
+    public void setCurrentSchemaName(String schema) {
+        throw DbException.getUnsupportedException("setSchema && remote session");
     }
 
     @Override
     public boolean isSupportsGeneratedKeys() {
         return getClientVersion() >= Constants.TCP_PROTOCOL_VERSION_17;
-    }
-
-    @Override
-    public void setNetworkConnectionInfo(NetworkConnectionInfo networkConnectionInfo) {
-        // Not supported
-    }
-
-    @Override
-    public IsolationLevel getIsolationLevel() {
-        if (getClientVersion() >= Constants.TCP_PROTOCOL_VERSION_19) {
-            try (CommandInterface command = prepareCommand(
-                    "SELECT ISOLATION_LEVEL FROM INFORMATION_SCHEMA.SESSIONS WHERE ID = SESSION_ID()", 1);
-                    ResultInterface result = command.executeQuery(1, false)) {
-                result.next();
-                return IsolationLevel.fromSql(result.currentRow()[0].getString());
-            }
-        } else {
-            try (CommandInterface command = prepareCommand("CALL LOCK_MODE()", 1);
-                    ResultInterface result = command.executeQuery(1, false)) {
-                result.next();
-                return IsolationLevel.fromLockMode(result.currentRow()[0].getInt());
-            }
-        }
-    }
-
-    @Override
-    public void setIsolationLevel(IsolationLevel isolationLevel) {
-        if (getClientVersion() >= Constants.TCP_PROTOCOL_VERSION_19) {
-            try (CommandInterface command = prepareCommand(
-                    "SET SESSION CHARACTERISTICS AS TRANSACTION ISOLATION LEVEL " + isolationLevel.getSQL(), 0)) {
-                command.executeUpdate(null);
-            }
-        } else {
-            try (CommandInterface command = prepareCommand("SET LOCK_MODE ?", 0)) {
-                command.getParameters().get(0).setValue(ValueInt.get(isolationLevel.getLockMode()), false);
-                command.executeUpdate(null);
-            }
-        }
     }
 
 }

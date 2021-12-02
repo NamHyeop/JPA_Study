@@ -1,6 +1,6 @@
 /*
  * Copyright 2004-2019 H2 Group. Multiple-Licensed under the MPL 2.0,
- * and the EPL 1.0 (https://h2database.com/html/license.html).
+ * and the EPL 1.0 (http://h2database.com/html/license.html).
  * Initial Developer: H2 Group
  */
 package org.h2.test.jdbc;
@@ -16,7 +16,7 @@ import java.text.DecimalFormat;
 import java.util.Locale;
 import org.h2.api.CustomDataTypesHandler;
 import org.h2.api.ErrorCode;
-import org.h2.engine.CastDataProvider;
+import org.h2.engine.Mode;
 import org.h2.message.DbException;
 import org.h2.store.DataHandler;
 import org.h2.test.TestBase;
@@ -80,11 +80,6 @@ public class TestCustomDataTypesHandler extends TestDb {
             rs.next();
             assertTrue(rs.getObject(1).equals(new ComplexNumber(2, 0)));
 
-            //Test IS OF
-            rs = stat.executeQuery("select CAST('1-1i' AS complex) IS OF (complex)");
-            rs.next();
-            assertTrue(rs.getBoolean(1));
-
             //Test create table
             stat.execute("create table t(id int, val complex)");
             rs = conn.getMetaData().getColumns(null, null, "T", "VAL");
@@ -121,13 +116,11 @@ public class TestCustomDataTypesHandler extends TestDb {
 
             for (int id = 0; id < expected.length; ++id) {
                 PreparedStatement prepStat = conn.prepareStatement(
-                        "select id, val is of (complex), val is of (double) from t where val = ?");
+                        "select id from t where val = ?");
                 prepStat.setObject(1, expected[id]);
                 rs = prepStat.executeQuery();
                 assertTrue(rs.next());
                 assertEquals(rs.getInt(1), id);
-                assertTrue(rs.getBoolean(2));
-                assertFalse(rs.getBoolean(3));
             }
 
             // Repeat selects with index
@@ -380,7 +373,7 @@ public class TestCustomDataTypesHandler extends TestDb {
         }
 
         @Override
-        public int compareTypeSafe(Value v, CompareMode mode, CastDataProvider provider) {
+        public int compareTypeSafe(Value v, CompareMode mode) {
             return val.compare((ComplexNumber) v.getObject());
         }
 
@@ -402,8 +395,7 @@ public class TestCustomDataTypesHandler extends TestDb {
         }
 
         @Override
-        protected Value convertTo(int targetType, ExtTypeInfo extTypeInfo, CastDataProvider provider,
-                boolean forComparison, Object column) {
+        protected Value convertTo(int targetType, Mode mode, Object column, ExtTypeInfo extTypeInfo) {
             if (getValueType() == targetType) {
                 return this;
             }

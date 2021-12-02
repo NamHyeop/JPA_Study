@@ -1,36 +1,33 @@
 /*
  * Copyright 2004-2019 H2 Group. Multiple-Licensed under the MPL 2.0,
- * and the EPL 1.0 (https://h2database.com/html/license.html).
+ * and the EPL 1.0 (http://h2database.com/html/license.html).
  * Initial Developer: H2 Group
  */
 package org.h2.command.dml;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.Map.Entry;
 import java.util.Objects;
 
 import org.h2.api.ErrorCode;
 import org.h2.api.Trigger;
 import org.h2.command.CommandInterface;
 import org.h2.command.Prepared;
-import org.h2.engine.DbObject;
 import org.h2.engine.Right;
 import org.h2.engine.Session;
 import org.h2.expression.Expression;
-import org.h2.expression.ExpressionVisitor;
 import org.h2.expression.Parameter;
 import org.h2.expression.ValueExpression;
 import org.h2.message.DbException;
 import org.h2.result.ResultInterface;
-import org.h2.result.ResultTarget;
 import org.h2.result.Row;
 import org.h2.result.RowList;
 import org.h2.table.Column;
-import org.h2.table.DataChangeDeltaTable.ResultOption;
 import org.h2.table.PlanItem;
 import org.h2.table.Table;
 import org.h2.table.TableFilter;
+import org.h2.util.Utils;
 import org.h2.value.Value;
 import org.h2.value.ValueNull;
 
@@ -38,7 +35,7 @@ import org.h2.value.ValueNull;
  * This class represents the statement
  * UPDATE
  */
-public class Update extends Prepared implements DataChangeStatement {
+public class Update extends Prepared {
 
     private Expression condition;
     private TableFilter targetTableFilter;// target of update
@@ -52,21 +49,13 @@ public class Update extends Prepared implements DataChangeStatement {
 
     private boolean updateToCurrentValuesReturnsZero;
 
-    private final LinkedHashMap<Column, Expression> setClauseMap  = new LinkedHashMap<>();
+    private final ArrayList<Column> columns = Utils.newSmallArrayList();
+    private final HashMap<Column, Expression> expressionMap  = new HashMap<>();
 
     private HashSet<Long> updatedKeysCollector;
 
-    private ResultTarget deltaChangeCollector;
-
-    private ResultOption deltaChangeCollectionMode;
-
     public Update(Session session) {
         super(session);
-    }
-
-    @Override
-    public Table getTable() {
-        return targetTableFilter.getTable();
     }
 
     public void setTableFilter(TableFilter tableFilter) {
@@ -88,9 +77,12 @@ public class Update extends Prepared implements DataChangeStatement {
      * @param expression the expression
      */
     public void setAssignment(Column column, Expression expression) {
-        if (setClauseMap.put(column, expression) != null) {
-            throw DbException.get(ErrorCode.DUPLICATE_COLUMN_NAME_1, column.getName());
+        if (expressionMap.containsKey(column)) {
+            throw DbException.get(ErrorCode.DUPLICATE_COLUMN_NAME_1, column
+                    .getName());
         }
+        columns.add(column);
+        expressionMap.put(column, expression);
         if (expression instanceof Parameter) {
             Parameter p = (Parameter) expression;
             p.setColumn(column);
@@ -107,12 +99,6 @@ public class Update extends Prepared implements DataChangeStatement {
     }
 
     @Override
-    public void setDeltaChangeCollector(ResultTarget deltaChangeCollector, ResultOption deltaChangeCollectionMode) {
-        this.deltaChangeCollector = deltaChangeCollector;
-        this.deltaChangeCollectionMode = deltaChangeCollectionMode;
-    }
-
-    @Override
     public int update() {
         targetTableFilter.startQuery(session);
         targetTableFilter.reset();
@@ -121,11 +107,11 @@ public class Update extends Prepared implements DataChangeStatement {
             session.getUser().checkRight(table, Right.UPDATE);
             table.fire(session, Trigger.UPDATE, true);
             table.lock(session, true, false);
+            int columnCount = table.getColumns().length;
             // get the old rows, compute the new rows
             setCurrentRowNumber(0);
             int count = 0;
             Column[] columns = table.getColumns();
-            int columnCount = columns.length;
             int limitRows = -1;
             if (limitExpr != null) {
                 Value v = limitExpr.getValue(session);
@@ -156,8 +142,8 @@ public class Update extends Prepared implements DataChangeStatement {
                     Row newRow = table.getTemplateRow();
                     boolean setOnUpdate = false;
                     for (int i = 0; i < columnCount; i++) {
-                        Column column = columns[i];
-                        Expression newExpr = setClauseMap.get(column);
+                        Expression newExpr = expressionMap.get(columns[i]);
+                        Column column = table.getColumn(i);
                         Value newValue;
                         if (newExpr == null) {
                             if (column.getOnUpdateExpression() != null) {
@@ -167,13 +153,12 @@ public class Update extends Prepared implements DataChangeStatement {
                         } else if (newExpr == ValueExpression.getDefault()) {
                             newValue = table.getDefaultValue(session, column);
                         } else {
-                            newValue = newExpr.getValue(session);
+                            newValue = column.convert(newExpr.getValue(session), session.getDatabase().getMode());
                         }
                         newRow.setValue(i, newValue);
                     }
                     long key = oldRow.getKey();
                     newRow.setKey(key);
-                    table.validateConvertUpdateSequence(session, newRow);
                     if (setOnUpdate || updateToCurrentValuesReturnsZero) {
                         setOnUpdate = false;
                         for (int i = 0; i < columnCount; i++) {
@@ -185,8 +170,8 @@ public class Update extends Prepared implements DataChangeStatement {
                         }
                         if (setOnUpdate) {
                             for (int i = 0; i < columnCount; i++) {
-                                Column column = columns[i];
-                                if (setClauseMap.get(column) == null) {
+                                if (expressionMap.get(columns[i]) == null) {
+                                    Column column = table.getColumn(i);
                                     if (column.getOnUpdateExpression() != null) {
                                         newRow.setValue(i, table.getOnUpdateValue(session, column));
                                     }
@@ -196,19 +181,12 @@ public class Update extends Prepared implements DataChangeStatement {
                             count--;
                         }
                     }
-                    if (deltaChangeCollectionMode == ResultOption.OLD) {
-                        deltaChangeCollector.addRow(oldRow.getValueList());
-                    } else if (deltaChangeCollectionMode == ResultOption.NEW) {
-                        deltaChangeCollector.addRow(newRow.getValueList().clone());
-                    }
+                    table.validateConvertUpdateSequence(session, newRow);
                     if (!table.fireRow() || !table.fireBeforeRow(session, oldRow, newRow)) {
                         rows.add(oldRow);
                         rows.add(newRow);
                         if (updatedKeysCollector != null) {
                             updatedKeysCollector.add(key);
-                        }
-                        if (deltaChangeCollectionMode == ResultOption.FINAL) {
-                            deltaChangeCollector.addRow(newRow.getValueList());
                         }
                     }
                     count++;
@@ -239,14 +217,13 @@ public class Update extends Prepared implements DataChangeStatement {
     public String getPlanSQL(boolean alwaysQuote) {
         StringBuilder builder = new StringBuilder("UPDATE ");
         targetTableFilter.getPlanSQL(builder, false, alwaysQuote).append("\nSET\n    ");
-        boolean f = false;
-        for (Entry<Column, Expression> entry : setClauseMap.entrySet()) {
-            if (f) {
+        for (int i = 0, size = columns.size(); i < size; i++) {
+            if (i > 0) {
                 builder.append(",\n    ");
             }
-            f = true;
-            entry.getKey().getSQL(builder, alwaysQuote).append(" = ");
-            entry.getValue().getSQL(builder, alwaysQuote);
+            Column c = columns.get(i);
+            c.getSQL(builder, alwaysQuote).append(" = ");
+            expressionMap.get(c).getSQL(builder, alwaysQuote);
         }
         if (condition != null) {
             builder.append("\nWHERE ");
@@ -266,13 +243,13 @@ public class Update extends Prepared implements DataChangeStatement {
             condition = condition.optimize(session);
             condition.createIndexConditions(session, targetTableFilter);
         }
-        for (Entry<Column, Expression> entry : setClauseMap.entrySet()) {
-            Expression e = entry.getValue();
+        for (Column c : columns) {
+            Expression e = expressionMap.get(c);
             e.mapColumns(targetTableFilter, 0, Expression.MAP_INITIAL);
             if (sourceTableFilter!=null){
                 e.mapColumns(sourceTableFilter, 0, Expression.MAP_INITIAL);
             }
-            entry.setValue(e.optimize(session));
+            expressionMap.put(c, e.optimize(session));
         }
         TableFilter[] filters;
         if(sourceTableFilter==null){
@@ -302,11 +279,6 @@ public class Update extends Prepared implements DataChangeStatement {
         return CommandInterface.UPDATE;
     }
 
-    @Override
-    public String getStatementName() {
-        return "UPDATE";
-    }
-
     public void setLimit(Expression limit) {
         this.limitExpr = limit;
     }
@@ -332,19 +304,5 @@ public class Update extends Prepared implements DataChangeStatement {
      */
     public void setUpdateToCurrentValuesReturnsZero(boolean updateToCurrentValuesReturnsZero) {
         this.updateToCurrentValuesReturnsZero = updateToCurrentValuesReturnsZero;
-    }
-
-    @Override
-    public void collectDependencies(HashSet<DbObject> dependencies) {
-        ExpressionVisitor visitor = ExpressionVisitor.getDependenciesVisitor(dependencies);
-        if (condition != null) {
-            condition.isEverything(visitor);
-        }
-        if (sourceTableFilter != null) {
-            Select select = sourceTableFilter.getSelect();
-            if (select != null) {
-                select.isEverything(visitor);
-            }
-        }
     }
 }

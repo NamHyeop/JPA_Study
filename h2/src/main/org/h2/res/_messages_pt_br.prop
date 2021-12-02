@@ -26,7 +26,6 @@
 40001=#Deadlock detected. The current transaction was rolled back. Details: {0}
 42000=Erro de sintax na declaração SQL {0}
 42001=Erro de sintax na declaração SQL {0}; esperado {1}
-42602=#Invalid name {0}
 42S01=Tabela {0} já existe
 42S02=Tabela {0} não foi encontrada
 42S11=índice {0} já existe
@@ -179,9 +178,6 @@
 90144=#Authenticator not enabled on database {0}
 90145=#FOR UPDATE is not allowed in DISTINCT or grouped select
 90146=#Database {0} not found, and IFEXISTS=true, so we can't auto-create it
-90147=#Method {0} is not allowed when connection is in auto-commit mode
-90148=#Current value of sequence {0} is not yet defined in this session
-90149=#Database {0} not found, either pre-create it or allow remote database creation (not recommended in secure environments)
 HY000=Erro geral: {0}
 HY004=Tipo de dados desconhecido: {0}
 HYC00=Recurso não suportado: {0}

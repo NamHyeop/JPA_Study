@@ -1,6 +1,6 @@
 /*
  * Copyright 2004-2019 H2 Group. Multiple-Licensed under the MPL 2.0,
- * and the EPL 1.0 (https://h2database.com/html/license.html).
+ * and the EPL 1.0 (http://h2database.com/html/license.html).
  * Initial Developer: H2 Group
  */
 package org.h2.build.doc;
@@ -124,11 +124,11 @@ public class WebSite {
                 return;
             }
             if (web) {
-                if (name.endsWith("main.html")) {
+                if (name.endsWith("main.html") || name.endsWith("main_ja.html")) {
                     return;
                 }
             } else {
-                if (name.endsWith("mainWeb.html")) {
+                if (name.endsWith("mainWeb.html") || name.endsWith("mainWeb_ja.html")) {
                     return;
                 }
             }
@@ -158,6 +158,8 @@ public class WebSite {
             if (web) {
                 if (name.endsWith("mainWeb.html")) {
                     target.renameTo(new File(target.getParentFile(), "main.html"));
+                } else if (name.endsWith("mainWeb_ja.html")) {
+                    target.renameTo(new File(target.getParentFile(), "main_ja.html"));
                 }
             }
         }

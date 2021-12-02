@@ -1,6 +1,6 @@
 /*
  * Copyright 2004-2019 H2 Group. Multiple-Licensed under the MPL 2.0,
- * and the EPL 1.0 (https://h2database.com/html/license.html).
+ * and the EPL 1.0 (http://h2database.com/html/license.html).
  * Initial Developer: H2 Group
  */
 package org.h2.mvstore;
@@ -10,9 +10,15 @@ import static org.h2.engine.Constants.MEMORY_OBJECT;
 import static org.h2.engine.Constants.MEMORY_POINTER;
 import static org.h2.mvstore.DataUtils.PAGE_TYPE_LEAF;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.concurrent.atomic.AtomicLongFieldUpdater;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.atomic.AtomicInteger;
 import org.h2.compress.Compressor;
+import org.h2.message.DbException;
 import org.h2.mvstore.type.DataType;
 import org.h2.util.Utils;
 
@@ -41,18 +47,9 @@ public abstract class Page implements Cloneable
     public final MVMap<?, ?> map;
 
     /**
-     * Position of this page's saved image within a Chunk
-     * or 0 if this page has not been saved yet
-     * or 1 if this page has not been saved yet, but already removed
-     * This "removed" flag is to keep track of pages that concurrently
-     * changed while they are being stored, in which case the live bookkeeping
-     * needs to be aware of such cases.
-     * Field need to be volatile to avoid races between saving thread setting it
-     * and other thread reading it to access the page.
-     * On top of this update atomicity is required so removal mark and saved position
-     * can be set concurrently
+     * Position of this page's saved image within a Chunk or 0 if this page has not been saved yet.
      */
-    private volatile long pos;
+    private long pos;
 
     /**
      * The last result of a find operation is cached.
@@ -75,11 +72,13 @@ public abstract class Page implements Cloneable
     private Object[] keys;
 
     /**
-     * Updater for pos field, which can be updated when page is saved,
-     * but can be concurrently marked as removed
+     * Whether the page is an in-memory (not stored, or not yet stored) page,
+     * and it is removed. This is to keep track of pages that concurrently
+     * changed while they are being stored, in which case the live bookkeeping
+     * needs to be aware of such cases.
      */
-    private static final AtomicLongFieldUpdater<Page> posUpdater =
-                                                AtomicLongFieldUpdater.newUpdater(Page.class, "pos");
+    private volatile boolean removedInMemory;
+
     /**
      * The estimated number of bytes used per child entry.
      */
@@ -185,7 +184,7 @@ public abstract class Page implements Cloneable
      * @param memory the memory used in bytes
      * @return the page
      */
-    static Page createLeaf(MVMap<?, ?> map, Object[] keys, Object[] values, int memory) {
+    public static Page createLeaf(MVMap<?, ?> map, Object[] keys, Object[] values, int memory) {
         assert keys != null;
         Page page = new Leaf(map, keys, values);
         page.initMemoryAccount(memory);
@@ -193,7 +192,7 @@ public abstract class Page implements Cloneable
     }
 
     private void initMemoryAccount(int memoryCount) {
-        if(!map.isPersistent()) {
+        if(map.store.getFileStore() == null) {
             memory = IN_MEMORY;
         } else if (memoryCount == 0) {
             recalculateMemory();
@@ -241,6 +240,69 @@ public abstract class Page implements Cloneable
     }
 
     /**
+     * Read an inner node page from the buffer, but ignore the keys and
+     * values.
+     *
+     * @param buff ByteBuffer containing serialized page info
+     * @param pos the position
+     * @param collector to report child pages positions to
+     * @param executorService to use far parallel processing
+     * @param executingThreadCounter for parallel processing
+     */
+    static void readChildrenPositions(ByteBuffer buff, long pos,
+                                        final MVStore.ChunkIdsCollector collector,
+                                        final ThreadPoolExecutor executorService,
+                                        final AtomicInteger executingThreadCounter) {
+        int len = DataUtils.readVarInt(buff);
+        int type = buff.get();
+        if ((type & 1) != DataUtils.PAGE_TYPE_NODE) {
+            throw DataUtils.newIllegalStateException(DataUtils.ERROR_FILE_CORRUPT,
+                    "Position {0} expected to be a non-leaf", pos);
+        }
+        /*
+         * The logic here is a little awkward. We want to (a) execute reads in parallel, but (b)
+         * limit the number of threads we create. This is complicated by (a) the algorithm is
+         * recursive and needs to wait for children before returning up the call-stack, (b) checking
+         * the size of the thread-pool is not reliable.
+         */
+        final List<Future<?>> futures = new ArrayList<>(len + 1);
+        for (int i = 0; i <= len; i++) {
+            final long childPagePos = buff.getLong();
+            for (;;) {
+                int counter = executingThreadCounter.get();
+                if (counter >= executorService.getMaximumPoolSize()) {
+                    collector.visit(childPagePos, executorService, executingThreadCounter);
+                    break;
+                } else {
+                    if (executingThreadCounter.compareAndSet(counter, counter + 1)) {
+                        Future<?> f = executorService.submit(new Runnable() {
+                            @Override
+                            public void run() {
+                                try {
+                                    collector.visit(childPagePos, executorService, executingThreadCounter);
+                                } finally {
+                                    executingThreadCounter.decrementAndGet();
+                                }
+                            }
+                        });
+                        futures.add(f);
+                        break;
+                    }
+                }
+            }
+        }
+        for (Future<?> f : futures) {
+            try {
+                f.get();
+            } catch (InterruptedException ex) {
+                throw new RuntimeException(ex);
+            } catch (ExecutionException ex) {
+                throw DbException.convert(ex);
+            }
+        }
+    }
+
+    /**
      * Get the id of the page's owner map
      * @return id
      */
@@ -277,6 +339,16 @@ public abstract class Page implements Cloneable
      * @return the child page
      */
     public abstract Page getChildPage(int index);
+
+    /**
+     * Get the child page at the given index only if is
+     * already loaded. Does not make any attempt to load
+     * the page or retrieve it from the cache.
+     *
+     * @param index the index
+     * @return the child page, null if it is not loaded
+     */
+    public abstract Page getChildPageIfLoaded(int index);
 
     /**
      * Get the position of the child.
@@ -350,8 +422,26 @@ public abstract class Page implements Cloneable
      * @return a mutable copy of this page
      */
     public final Page copy() {
+        return copy(false);
+    }
+
+    /**
+     * Create a copy of this page.
+     *
+     * @param countRemoval When {@code true} the current page is removed,
+     *                     when {@code false} just copy the page.
+     * @return a mutable copy of this page
+     */
+    public final Page copy(boolean countRemoval) {
         Page newPage = clone();
         newPage.pos = 0;
+        // mark the old as deleted
+        if(countRemoval) {
+            removePage();
+            if(isPersistent()) {
+                map.store.registerUnsavedPage(newPage.getMemory());
+            }
+        }
         return newPage;
     }
 
@@ -569,9 +659,7 @@ public abstract class Page implements Cloneable
      * @param chunkId the chunk id
      */
     private void read(ByteBuffer buff, int chunkId) {
-        // size of int + short + varint, since we've read page length, check and
-        // mapId already
-        int pageLength = buff.remaining() + 10;
+        int pageLength = buff.remaining() + 4;  // size of int, since we've read page length already
         int len = DataUtils.readVarInt(buff);
         keys = createKeyStorage(len);
         int type = buff.get();
@@ -619,32 +707,6 @@ public abstract class Page implements Cloneable
 
     public final boolean isSaved() {
         return DataUtils.isPageSaved(pos);
-    }
-
-    public final boolean isRemoved() {
-        return DataUtils.isPageRemoved(pos);
-    }
-
-    /**
-     * Mark this page as removed "in memory". That means that only adjustment of
-     * "unsaved memory" amount is required. On the other hand, if page was
-     * persisted, it's removal should be reflected in occupancy of the
-     * containing chunk.
-     *
-     * @return true if it was marked by this call or has been marked already,
-     *         false if page has been saved already.
-     */
-    private boolean markAsRemoved() {
-        assert getTotalCount() > 0 : this;
-        long pagePos;
-        do {
-            pagePos = pos;
-            if (DataUtils.isPageSaved(pagePos)) {
-                return false;
-            }
-            assert !DataUtils.isPageRemoved(pagePos);
-        } while (!posUpdater.compareAndSet(this, 0L, 1L));
-        return true;
     }
 
     /**
@@ -707,24 +769,25 @@ public abstract class Page implements Cloneable
             throw DataUtils.newIllegalStateException(
                     DataUtils.ERROR_INTERNAL, "Page already stored");
         }
-        long pagePos = DataUtils.getPagePos(chunkId, start, pageLength, type);
-        boolean isDeleted = isRemoved();
-        while (!posUpdater.compareAndSet(this, isDeleted ? 1L : 0L, pagePos)) {
-            isDeleted = isRemoved();
-        }
+        pos = DataUtils.getPagePos(chunkId, start, pageLength, type);
         store.cachePage(this);
         if (type == DataUtils.PAGE_TYPE_NODE) {
             // cache again - this will make sure nodes stays in the cache
             // for a longer time
             store.cachePage(this);
         }
-        int pageLengthEncoded = DataUtils.getPageMaxLength(pos);
-        boolean singleWriter = map.isSingleWriter();
-        chunk.accountForWrittenPage(pageLengthEncoded, singleWriter);
-        if (isDeleted) {
-            store.accountForRemovedPage(pagePos, chunk.version + 1, singleWriter);
+        int max = DataUtils.getPageMaxLength(pos);
+        chunk.maxLen += max;
+        chunk.maxLenLive += max;
+        chunk.pageCount++;
+        chunk.pageCountLive++;
+        if (removedInMemory) {
+            // if the page was removed _before_ the position was assigned, we
+            // need to mark it removed here, so the fields are updated
+            // when the next chunk is stored
+            map.removePage(pos, memory);
         }
-        diskSpaceUsed = pageLengthEncoded != DataUtils.PAGE_LARGE ? pageLengthEncoded : pageLength;
+        diskSpaceUsed = max != DataUtils.PAGE_LARGE ? max : pageLength;
         return typePos + 1;
     }
 
@@ -791,12 +854,12 @@ public abstract class Page implements Cloneable
         long r = 0;
         if (isPersistent()) {
             r += diskSpaceUsed;
-            if (!isLeaf()) {
-                for (int i = 0; i < getRawChildPageCount(); i++) {
-                    long pos = getChildPagePos(i);
-                    if (pos != 0) {
-                        r += getChildPage(i).getDiskSpaceUsed();
-                    }
+        }
+        if (!isLeaf()) {
+            for (int i = 0; i < getRawChildPageCount(); i++) {
+                long pos = getChildPagePos(i);
+                if (pos != 0) {
+                    r += getChildPage(i).getDiskSpaceUsed();
                 }
             }
         }
@@ -845,49 +908,30 @@ public abstract class Page implements Cloneable
     public void setComplete() {}
 
     /**
-     * Make accounting changes (chunk occupancy or "unsaved" RAM), related to
-     * this page removal.
-     *
-     * @param version at which page was removed
-     * @return amount (negative), by which "unsaved memory" should be adjusted,
-     *         if page is unsaved one, and 0 for page that was already saved, or
-     *         in case of non-persistent map
+     * Remove the page.
      */
-    public final int removePage(long version) {
-        if(isPersistent() && getTotalCount() > 0) {
-            MVStore store = map.store;
-            if (!markAsRemoved()) { // only if it has been saved already
-                long pagePos = pos;
-                store.accountForRemovedPage(pagePos, version, map.isSingleWriter());
-            } else {
-                return -memory;
+    public final void removePage() {
+        if(isPersistent()) {
+            long p = pos;
+            if (p == 0) {
+                removedInMemory = true;
             }
+            map.removePage(p, memory);
         }
-        return 0;
     }
 
     /**
-     * Extend path from a given CursorPos chain to "prepend point" in a B-tree, rooted at this Page.
+     * Update given CursorPos chain to correspond to "append point" in a B-tree rooted at this Page.
      *
-     * @param cursorPos presumably pointing to this Page (null if real root), to build upon
-     * @return new head of the CursorPos chain
-     */
-    public abstract CursorPos getPrependCursorPos(CursorPos cursorPos);
-
-    /**
-     * Extend path from a given CursorPos chain to "append point" in a B-tree, rooted at this Page.
-     *
-     * @param cursorPos presumably pointing to this Page (null if real root), to build upon
+     * @param cursorPos to update, presumably pointing to this Page
      * @return new head of the CursorPos chain
      */
     public abstract CursorPos getAppendCursorPos(CursorPos cursorPos);
 
     /**
      * Remove all page data recursively.
-     * @param version at which page got removed
-     * @return adjustment for "unsaved memory" amount
      */
-    public abstract int removeAllRecursive(long version);
+    public abstract void removeAllRecursive();
 
     /**
      * Create array for keys storage.
@@ -989,10 +1033,9 @@ public abstract class Page implements Cloneable
 
         @Override
         public String toString() {
-            return "Cnt:" + count + ", pos:" + (pos == 0 ? "0" : DataUtils.getPageChunkId(pos) +
-                    "-" + DataUtils.getPageOffset(pos) + ":" + DataUtils.getPageMaxLength(pos)) +
-                    ((page == null ? DataUtils.getPageType(pos) == 0 : page.isLeaf()) ? " leaf" : " node") +
-                    ", page:{" + page + "}";
+            return "Cnt:" + count + ", pos:" + DataUtils.getPageChunkId(pos) +
+                    "-" + DataUtils.getPageOffset(pos) + ":" + DataUtils.getPageMaxLength(pos) +
+                    (page == null ? DataUtils.getPageType(pos) == 0 : page.isLeaf() ? " leaf" : " node") + ", " + page;
         }
     }
 
@@ -1045,6 +1088,11 @@ public abstract class Page implements Cloneable
                 assert ref.count == page.getTotalCount();
             }
             return page;
+        }
+
+        @Override
+        public Page getChildPageIfLoaded(int index) {
+            return children[index].getPage();
         }
 
         @Override
@@ -1105,7 +1153,7 @@ public abstract class Page implements Cloneable
             return check;
         }
 
-        void recalculateTotalCount() {
+        protected void recalculateTotalCount() {
             totalCount = calculateTotalCount();
         }
 
@@ -1165,32 +1213,26 @@ public abstract class Page implements Cloneable
         }
 
         @Override
-        public int removeAllRecursive(long version) {
-            int unsavedMemory = removePage(version);
+        public void removeAllRecursive() {
             if (isPersistent()) {
                 for (int i = 0, size = map.getChildPageCount(this); i < size; i++) {
                     PageReference ref = children[i];
                     Page page = ref.getPage();
                     if (page != null) {
-                        unsavedMemory += page.removeAllRecursive(version);
+                        page.removeAllRecursive();
                     } else {
-                        long pagePos = ref.getPos();
-                        assert DataUtils.isPageSaved(pagePos);
-                        if (DataUtils.isLeafPosition(pagePos)) {
-                            map.store.accountForRemovedPage(pagePos, version, map.isSingleWriter());
+                        long c = ref.getPos();
+                        int type = DataUtils.getPageType(c);
+                        if (type == PAGE_TYPE_LEAF) {
+                            int mem = DataUtils.getPageMaxLength(c);
+                            map.removePage(c, mem);
                         } else {
-                            unsavedMemory += map.readPage(pagePos).removeAllRecursive(version);
+                            map.readPage(c).removeAllRecursive();
                         }
                     }
                 }
             }
-            return unsavedMemory;
-        }
-
-        @Override
-        public CursorPos getPrependCursorPos(CursorPos cursorPos) {
-            Page childPage = getChildPage(0);
-            return childPage.getPrependCursorPos(new CursorPos(this, 0, cursorPos));
+            removePage();
         }
 
         @Override
@@ -1376,6 +1418,9 @@ public abstract class Page implements Cloneable
         }
 
         @Override
+        public Page getChildPageIfLoaded(int index) { throw new UnsupportedOperationException(); }
+
+        @Override
         public long getChildPagePos(int index) {
             throw new UnsupportedOperationException();
         }
@@ -1489,13 +1534,8 @@ public abstract class Page implements Cloneable
         }
 
         @Override
-        public int removeAllRecursive(long version) {
-            return removePage(version);
-        }
-
-        @Override
-        public CursorPos getPrependCursorPos(CursorPos cursorPos) {
-            return new CursorPos(this, -1, cursorPos);
+        public void removeAllRecursive() {
+            removePage();
         }
 
         @Override

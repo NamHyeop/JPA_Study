@@ -1,6 +1,6 @@
 /*
  * Copyright 2004-2019 H2 Group. Multiple-Licensed under the MPL 2.0,
- * and the EPL 1.0 (https://h2database.com/html/license.html).
+ * and the EPL 1.0 (http://h2database.com/html/license.html).
  * Initial Developer: H2 Group
  */
 package org.h2.test;
@@ -13,7 +13,6 @@ import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
-
 import org.h2.Driver;
 import org.h2.engine.Constants;
 import org.h2.store.fs.FilePathRec;
@@ -36,6 +35,7 @@ import org.h2.test.db.TestCompatibilitySQLServer;
 import org.h2.test.db.TestCsv;
 import org.h2.test.db.TestDateStorage;
 import org.h2.test.db.TestDeadlock;
+import org.h2.test.db.TestDrop;
 import org.h2.test.db.TestDuplicateKeyUpdate;
 import org.h2.test.db.TestEncryptedDb;
 import org.h2.test.db.TestExclusive;
@@ -43,7 +43,6 @@ import org.h2.test.db.TestFullText;
 import org.h2.test.db.TestFunctionOverload;
 import org.h2.test.db.TestFunctions;
 import org.h2.test.db.TestGeneralCommonTableQueries;
-import org.h2.test.db.TestIgnoreCatalogs;
 import org.h2.test.db.TestIndex;
 import org.h2.test.db.TestIndexHints;
 import org.h2.test.db.TestLargeBlob;
@@ -189,6 +188,7 @@ import org.h2.test.unit.TestExit;
 import org.h2.test.unit.TestFile;
 import org.h2.test.unit.TestFileLock;
 import org.h2.test.unit.TestFileLockProcess;
+import org.h2.test.unit.TestFileLockSerialized;
 import org.h2.test.unit.TestFileSystem;
 import org.h2.test.unit.TestFtp;
 import org.h2.test.unit.TestGeometryUtils;
@@ -197,7 +197,6 @@ import org.h2.test.unit.TestIntIntHashMap;
 import org.h2.test.unit.TestIntPerfectHash;
 import org.h2.test.unit.TestInterval;
 import org.h2.test.unit.TestJmx;
-import org.h2.test.unit.TestJsonUtils;
 import org.h2.test.unit.TestKeywords;
 import org.h2.test.unit.TestLocalResultFactory;
 import org.h2.test.unit.TestLocale;
@@ -312,6 +311,11 @@ java org.h2.test.TestAll timer
      * If code coverage is enabled.
      */
     public boolean codeCoverage;
+
+    /**
+     * If the multi-threaded mode should be used.
+     */
+    public boolean multiThreaded;
 
     /**
      * If lazy queries should be used.
@@ -483,6 +487,7 @@ reopen org.h2.test.unit.TestPageStore
 -Xmx1500m -D reopenOffset=3 -D reopenShift=1
 
 power failure test
+power failure test: MULTI_THREADED=TRUE
 power failure test: larger binaries and additional index.
 power failure test with randomly generating / dropping indexes and tables.
 
@@ -613,6 +618,7 @@ kill -9 `jps -l | grep "org.h2.test." | cut -d " " -f 1`
         // memory is a good match for multi-threaded, makes things happen
         // faster, more chance of exposing race conditions
         memory = true;
+        multiThreaded = true;
         test();
         if (vmlens) {
             return;
@@ -627,22 +633,32 @@ kill -9 `jps -l | grep "org.h2.test." | cut -d " " -f 1`
         // lazy
         lazy = true;
         memory = true;
+        multiThreaded = true;
         test();
         lazy = false;
 
         // but sometimes race conditions need bigger windows
         memory = false;
+        multiThreaded = true;
+        test();
+        testAdditional();
+
+        // a more normal setup
+        memory = false;
+        multiThreaded = false;
         test();
         testAdditional();
 
         // basic pagestore testing
         memory = false;
+        multiThreaded = false;
         mvStore = false;
         test();
         testAdditional();
 
         mvStore = true;
         memory = true;
+        multiThreaded = false;
         networked = true;
         test();
 
@@ -704,10 +720,12 @@ kill -9 `jps -l | grep "org.h2.test." | cut -d " " -f 1`
         cipher = null;
 
         memory = true;
+        multiThreaded = true;
         test();
         testAdditional();
         testUtils();
 
+        multiThreaded = false;
         mvStore = false;
         test();
         // testUnit();
@@ -740,6 +758,7 @@ kill -9 `jps -l | grep "org.h2.test." | cut -d " " -f 1`
         if (vmlens) {
             return;
         }
+        addTest(new TestDrop());
         addTest(new TestDuplicateKeyUpdate());
         addTest(new TestEncryptedDb());
         addTest(new TestExclusive());
@@ -865,8 +884,6 @@ kill -9 `jps -l | grep "org.h2.test." | cut -d " " -f 1`
         // other unsafe
         addTest(new TestOptimizations());
         addTest(new TestOutOfMemory());
-        addTest(new TestIgnoreCatalogs());
-
 
         runAddedTests(1);
 
@@ -909,6 +926,7 @@ kill -9 `jps -l | grep "org.h2.test." | cut -d " " -f 1`
         runAddedTests();
 
         addTest(new TestCluster());
+        addTest(new TestFileLockSerialized());
         addTest(new TestFileLockProcess());
         addTest(new TestDefrag());
         addTest(new TestTools());
@@ -961,7 +979,6 @@ kill -9 `jps -l | grep "org.h2.test." | cut -d " " -f 1`
         addTest(new TestIntArray());
         addTest(new TestIntIntHashMap());
         addTest(new TestIntPerfectHash());
-        addTest(new TestJsonUtils());
         addTest(new TestKeywords());
         addTest(new TestMathUtils());
         addTest(new TestMemoryUnmapper());
@@ -1108,7 +1125,7 @@ kill -9 `jps -l | grep "org.h2.test." | cut -d " " -f 1`
      */
     public static void printSystemInfo() {
         Properties prop = System.getProperties();
-        System.out.println("H2 " + Constants.FULL_VERSION +
+        System.out.println("H2 " + Constants.getFullVersion() +
                 " @ " + new java.sql.Timestamp(System.currentTimeMillis()).toString());
         System.out.println("Java " +
                 prop.getProperty("java.runtime.version") + ", " +
@@ -1143,6 +1160,7 @@ kill -9 `jps -l | grep "org.h2.test." | cut -d " " -f 1`
         appendIf(buff, networked, "net");
         appendIf(buff, memory, "memory");
         appendIf(buff, codeCoverage, "codeCoverage");
+        appendIf(buff, multiThreaded, "multiThreaded");
         appendIf(buff, cipher != null, cipher);
         appendIf(buff, cacheType != null, cacheType);
         appendIf(buff, smallLog, "smallLog");

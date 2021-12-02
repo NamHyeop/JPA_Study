@@ -1,6 +1,6 @@
 /*
  * Copyright 2004-2019 H2 Group. Multiple-Licensed under the MPL 2.0,
- * and the EPL 1.0 (https://h2database.com/html/license.html).
+ * and the EPL 1.0 (http://h2database.com/html/license.html).
  * Initial Developer: H2 Group
  */
 package org.h2.test.jdbc;
@@ -333,7 +333,8 @@ public class TestMetaData extends TestDb {
         checkCrossRef(rs);
         rs = meta.getExportedKeys(null, "PUBLIC", "PARENT");
         checkCrossRef(rs);
-        stat.execute("DROP TABLE PARENT, CHILD");
+        stat.execute("DROP TABLE PARENT");
+        stat.execute("DROP TABLE CHILD");
         conn.close();
     }
 
@@ -456,14 +457,13 @@ public class TestMetaData extends TestDb {
 
         assertEquals(ResultSet.CLOSE_CURSORS_AT_COMMIT,
                 meta.getResultSetHoldability());
-        assertEquals(DatabaseMetaData.sqlStateSQL, meta.getSQLStateType());
+        assertEquals(DatabaseMetaData.sqlStateSQL99,
+                meta.getSQLStateType());
         assertFalse(meta.locatorsUpdateCopy());
 
         assertEquals("schema", meta.getSchemaTerm());
         assertEquals("\\", meta.getSearchStringEscape());
-        assertEquals("CURRENT_CATALOG," //
-                + "CURRENT_SCHEMA," //
-                + "GROUPS," //
+        assertEquals("GROUPS," //
                 + "IF,ILIKE,INTERSECTS," //
                 + "LIMIT," //
                 + "MINUS," //
@@ -617,12 +617,17 @@ public class TestMetaData extends TestDb {
         assertTrue(meta.supportsSubqueriesInQuantifieds());
         assertTrue(meta.supportsTableCorrelationNames());
         assertTrue(meta.supportsTransactions());
-        assertFalse(meta.supportsTransactionIsolationLevel(Connection.TRANSACTION_NONE));
-        assertTrue(meta.supportsTransactionIsolationLevel(Connection.TRANSACTION_READ_COMMITTED));
-        assertTrue(meta.supportsTransactionIsolationLevel(Connection.TRANSACTION_READ_UNCOMMITTED));
-        assertTrue(meta.supportsTransactionIsolationLevel(Connection.TRANSACTION_REPEATABLE_READ));
-        assertTrue(meta.supportsTransactionIsolationLevel(Constants.TRANSACTION_SNAPSHOT));
-        assertTrue(meta.supportsTransactionIsolationLevel(Connection.TRANSACTION_SERIALIZABLE));
+        assertFalse(meta.supportsTransactionIsolationLevel(
+                Connection.TRANSACTION_NONE));
+        assertTrue(meta.supportsTransactionIsolationLevel(
+                Connection.TRANSACTION_READ_COMMITTED));
+        assertEquals(config.mvStore || !config.multiThreaded,
+                meta.supportsTransactionIsolationLevel(
+                        Connection.TRANSACTION_READ_UNCOMMITTED));
+        assertTrue(meta.supportsTransactionIsolationLevel(
+                Connection.TRANSACTION_REPEATABLE_READ));
+        assertTrue(meta.supportsTransactionIsolationLevel(
+                Connection.TRANSACTION_SERIALIZABLE));
         assertTrue(meta.supportsUnion());
         assertTrue(meta.supportsUnionAll());
         assertFalse(meta.updatesAreDetected(ResultSet.TYPE_FORWARD_ONLY));
@@ -1196,18 +1201,11 @@ public class TestMetaData extends TestDb {
         stat.execute("DROP TABLE TEST");
 
         rs = stat.executeQuery("SELECT * FROM INFORMATION_SCHEMA.SETTINGS");
-        int mvStoreSettingsCount = 0, pageStoreSettingsCount = 0;
         while (rs.next()) {
             String name = rs.getString("NAME");
-            trace(name + '=' + rs.getString("VALUE"));
-            if ("COMPRESS".equals(name) || "REUSE_SPACE".equals(name)) {
-                mvStoreSettingsCount++;
-            } else if (name.startsWith("PAGE_STORE_")) {
-                pageStoreSettingsCount++;
-            }
+            String value = rs.getString("VALUE");
+            trace(name + "=" + value);
         }
-        assertEquals(config.mvStore ? 2 : 0, mvStoreSettingsCount);
-        assertEquals(config.mvStore ? 0 : 3, pageStoreSettingsCount);
 
         testMore();
 

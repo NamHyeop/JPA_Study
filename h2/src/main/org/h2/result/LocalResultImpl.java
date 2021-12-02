@@ -1,6 +1,6 @@
 /*
  * Copyright 2004-2019 H2 Group. Multiple-Licensed under the MPL 2.0,
- * and the EPL 1.0 (https://h2database.com/html/license.html).
+ * and the EPL 1.0 (http://h2database.com/html/license.html).
  * Initial Developer: H2 Group
  */
 package org.h2.result;
@@ -30,7 +30,6 @@ public class LocalResultImpl implements LocalResult {
     private int maxMemoryRows;
     private Session session;
     private int visibleColumnCount;
-    private int resultColumnCount;
     private Expression[] expressions;
     private int rowId, rowCount;
     private ArrayList<Value[]> rows;
@@ -61,18 +60,12 @@ public class LocalResultImpl implements LocalResult {
     /**
      * Construct a local result object.
      *
-     * @param session
-     *            the session
-     * @param expressions
-     *            the expression array
-     * @param visibleColumnCount
-     *            the number of visible columns
-     * @param resultColumnCount
-     *            the number of columns including visible columns and additional
-     *            virtual columns for ORDER BY and DISTINCT ON clauses
+     * @param session the session
+     * @param expressions the expression array
+     * @param visibleColumnCount the number of visible columns
      */
     public LocalResultImpl(Session session, Expression[] expressions,
-            int visibleColumnCount, int resultColumnCount) {
+            int visibleColumnCount) {
         this.session = session;
         if (session == null) {
             this.maxMemoryRows = Integer.MAX_VALUE;
@@ -86,7 +79,6 @@ public class LocalResultImpl implements LocalResult {
         }
         rows = Utils.newSmallArrayList();
         this.visibleColumnCount = visibleColumnCount;
-        this.resultColumnCount = resultColumnCount;
         rowId = -1;
         this.expressions = expressions;
     }
@@ -127,7 +119,6 @@ public class LocalResultImpl implements LocalResult {
         copy.maxMemoryRows = this.maxMemoryRows;
         copy.session = (Session) targetSession;
         copy.visibleColumnCount = this.visibleColumnCount;
-        copy.resultColumnCount = this.resultColumnCount;
         copy.expressions = this.expressions;
         copy.rowId = -1;
         copy.rowCount = this.rowCount;
@@ -311,7 +302,7 @@ public class LocalResultImpl implements LocalResult {
 
     private void createExternalResult() {
         external = MVTempResult.of(session.getDatabase(), expressions, distinct, distinctIndexes, visibleColumnCount,
-                resultColumnCount, sort);
+                sort);
     }
 
     /**
@@ -320,8 +311,7 @@ public class LocalResultImpl implements LocalResult {
      * @param values the row to add
      */
     @Override
-    public void addRow(Value... values) {
-        assert values.length == resultColumnCount;
+    public void addRow(Value[] values) {
         cloneLobs(values);
         if (isAnyDistinct()) {
             if (distinctRows != null) {

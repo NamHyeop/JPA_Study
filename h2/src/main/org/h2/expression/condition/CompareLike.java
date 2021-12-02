@@ -1,6 +1,6 @@
 /*
  * Copyright 2004-2019 H2 Group. Multiple-Licensed under the MPL 2.0,
- * and the EPL 1.0 (https://h2database.com/html/license.html).
+ * and the EPL 1.0 (http://h2database.com/html/license.html).
  * Initial Developer: H2 Group
  */
 package org.h2.expression.condition;
@@ -13,7 +13,6 @@ import org.h2.engine.Session;
 import org.h2.expression.Expression;
 import org.h2.expression.ExpressionColumn;
 import org.h2.expression.ExpressionVisitor;
-import org.h2.expression.TypedValueExpression;
 import org.h2.expression.ValueExpression;
 import org.h2.index.IndexCondition;
 import org.h2.message.DbException;
@@ -108,7 +107,7 @@ public class CompareLike extends Condition {
             Value l = left.getValue(session);
             if (l == ValueNull.INSTANCE) {
                 // NULL LIKE something > NULL
-                return TypedValueExpression.getUnknown();
+                return ValueExpression.getNull();
             }
         }
         if (escape != null) {
@@ -116,25 +115,26 @@ public class CompareLike extends Condition {
         }
         if (right.isValueSet() && (escape == null || escape.isValueSet())) {
             if (left.isValueSet()) {
-                return ValueExpression.getBoolean(getValue(session));
+                return ValueExpression.get(getValue(session));
             }
             Value r = right.getValue(session);
             if (r == ValueNull.INSTANCE) {
                 // something LIKE NULL > NULL
-                return TypedValueExpression.getUnknown();
+                return ValueExpression.getNull();
             }
             Value e = escape == null ? null : escape.getValue(session);
             if (e == ValueNull.INSTANCE) {
-                return TypedValueExpression.getUnknown();
+                return ValueExpression.getNull();
             }
             String p = r.getString();
             initPattern(p, getEscapeChar(e));
             if (invalidPattern) {
-                return TypedValueExpression.getUnknown();
+                return ValueExpression.getNull();
             }
             if ("%".equals(p)) {
                 // optimization for X LIKE '%': convert to X IS NOT NULL
-                return new NullPredicate(left, true).optimize(session);
+                return new Comparison(session,
+                        Comparison.IS_NOT_NULL, left, null).optimize(session);
             }
             if (isFullMatch()) {
                 // optimization for X LIKE 'Hello': convert to X = 'Hello'

@@ -1,6 +1,6 @@
 /*
  * Copyright 2004-2019 H2 Group. Multiple-Licensed under the MPL 2.0,
- * and the EPL 1.0 (https://h2database.com/html/license.html).
+ * and the EPL 1.0 (http://h2database.com/html/license.html).
  * Initial Developer: H2 Group
  */
 package org.h2.test.db;
@@ -18,7 +18,6 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.SimpleTimeZone;
 import java.util.TimeZone;
-import org.h2.store.Data;
 import org.h2.test.TestBase;
 import org.h2.test.TestDb;
 import org.h2.test.unit.TestDate;
@@ -56,16 +55,13 @@ public class TestDateStorage extends TestDb {
         Calendar utcCalendar = new GregorianCalendar(new SimpleTimeZone(0, "Z"));
         TimeZone old = TimeZone.getDefault();
         DateTimeUtils.resetCalendar();
-        Data.resetCalendar();
         TimeZone.setDefault(TimeZone.getTimeZone("PST"));
         try {
-            // 2010-03-14T02:15:00Z
             Timestamp ts1 = Timestamp.valueOf("2010-03-13 18:15:00");
             Time t1 = new Time(ts1.getTime());
             Date d1 = new Date(ts1.getTime());
             // when converted to UTC, this is 03:15, which doesn't actually
             // exist because of summer time change at that day
-            // 2010-03-14T03:15:00Z
             Timestamp ts2 = Timestamp.valueOf("2010-03-13 19:15:00");
             Time t2 = new Time(ts2.getTime());
             Date d2 = new Date(ts2.getTime());
@@ -146,7 +142,6 @@ public class TestDateStorage extends TestDb {
         } finally {
             TimeZone.setDefault(old);
             DateTimeUtils.resetCalendar();
-            Data.resetCalendar();
         }
         stat.execute("drop table ts");
         stat.execute("drop table t");
@@ -189,7 +184,6 @@ public class TestDateStorage extends TestDb {
                 // println(tz.getID());
                 TimeZone.setDefault(tz);
                 DateTimeUtils.resetCalendar();
-                Data.resetCalendar();
                 for (int d = 101; d < 129; d++) {
                     test(prep, d);
                 }
@@ -197,7 +191,6 @@ public class TestDateStorage extends TestDb {
         } finally {
             TimeZone.setDefault(defaultTimeZone);
             DateTimeUtils.resetCalendar();
-            Data.resetCalendar();
         }
         conn.close();
         deleteDb(getTestName());

@@ -1,6 +1,6 @@
 /*
  * Copyright 2004-2019 H2 Group. Multiple-Licensed under the MPL 2.0,
- * and the EPL 1.0 (https://h2database.com/html/license.html).
+ * and the EPL 1.0 (http://h2database.com/html/license.html).
  * Initial Developer: H2 Group
  */
 package org.h2.value;
@@ -138,8 +138,6 @@ public class CompareMode implements Comparator<Value> {
             } else if (name.startsWith(DEFAULT)) {
                 useICU4J = false;
                 name = name.substring(DEFAULT.length());
-            } else if (name.startsWith(CHARSET)) {
-                useICU4J = false;
             } else {
                 useICU4J = CAN_USE_ICU4J;
             }

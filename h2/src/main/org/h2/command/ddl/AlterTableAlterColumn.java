@@ -1,6 +1,6 @@
 /*
  * Copyright 2004-2019 H2 Group. Multiple-Licensed under the MPL 2.0,
- * and the EPL 1.0 (https://h2database.com/html/license.html).
+ * and the EPL 1.0 (http://h2database.com/html/license.html).
  * Initial Developer: H2 Group
  */
 package org.h2.command.ddl;
@@ -128,7 +128,7 @@ public class AlterTableAlterColumn extends CommandWithColumns {
         }
         switch (type) {
         case CommandInterface.ALTER_TABLE_ALTER_COLUMN_NOT_NULL: {
-            if (oldColumn == null || !oldColumn.isNullable()) {
+            if (!oldColumn.isNullable()) {
                 // no change
                 break;
             }
@@ -138,7 +138,7 @@ public class AlterTableAlterColumn extends CommandWithColumns {
             break;
         }
         case CommandInterface.ALTER_TABLE_ALTER_COLUMN_DROP_NOT_NULL: {
-            if (oldColumn == null || oldColumn.isNullable()) {
+            if (oldColumn.isNullable()) {
                 // no change
                 break;
             }
@@ -148,10 +148,7 @@ public class AlterTableAlterColumn extends CommandWithColumns {
             break;
         }
         case CommandInterface.ALTER_TABLE_ALTER_COLUMN_DEFAULT: {
-            if (oldColumn == null) {
-                break;
-            }
-            Sequence sequence = oldColumn.getSequence();
+            Sequence sequence = oldColumn == null ? null : oldColumn.getSequence();
             checkDefaultReferencesTable(table, defaultExpression);
             oldColumn.setSequence(null);
             oldColumn.setDefaultExpression(session, defaultExpression);
@@ -160,18 +157,12 @@ public class AlterTableAlterColumn extends CommandWithColumns {
             break;
         }
         case CommandInterface.ALTER_TABLE_ALTER_COLUMN_ON_UPDATE: {
-            if (oldColumn == null) {
-                break;
-            }
             checkDefaultReferencesTable(table, defaultExpression);
             oldColumn.setOnUpdateExpression(session, defaultExpression);
             db.updateMeta(session, table);
             break;
         }
         case CommandInterface.ALTER_TABLE_ALTER_COLUMN_CHANGE_TYPE: {
-            if (oldColumn == null) {
-                break;
-            }
             // if the change is only increasing the precision, then we don't
             // need to copy the table because the length is only a constraint,
             // and does not affect the storage structure.
@@ -219,18 +210,12 @@ public class AlterTableAlterColumn extends CommandWithColumns {
             break;
         }
         case CommandInterface.ALTER_TABLE_ALTER_COLUMN_SELECTIVITY: {
-            if (oldColumn == null) {
-                break;
-            }
             int value = newSelectivity.optimize(session).getValue(session).getInt();
             oldColumn.setSelectivity(value);
             db.updateMeta(session, table);
             break;
         }
         case CommandInterface.ALTER_TABLE_ALTER_COLUMN_VISIBILITY: {
-            if (oldColumn == null) {
-                break;
-            }
             oldColumn.setVisible(newVisibility);
             table.setModified();
             db.updateMeta(session, table);

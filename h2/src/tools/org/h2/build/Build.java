@@ -1,6 +1,6 @@
 /*
  * Copyright 2004-2019 H2 Group. Multiple-Licensed under the MPL 2.0,
- * and the EPL 1.0 (https://h2database.com/html/license.html).
+ * and the EPL 1.0 (http://h2database.com/html/license.html).
  * Initial Developer: H2 Group
  */
 package org.h2.build;
@@ -236,8 +236,7 @@ public class Build extends BuildBase {
     private void compileMVStore(boolean debugInfo) {
         clean();
         mkdir("temp");
-        String classpath = "temp" +
-                File.pathSeparator + "src/java8/precompiled";
+        String classpath = "temp";
         FileList files;
         files = files("src/main/org/h2/mvstore").
                 exclude("src/main/org/h2/mvstore/db/*");
@@ -262,7 +261,6 @@ public class Build extends BuildBase {
         mkdir("temp");
         download();
         String classpath = "temp" +
-                File.pathSeparator + "src/java8/precompiled" +
                 File.pathSeparator + "ext/servlet-api-3.1.0.jar" +
                 File.pathSeparator + "ext/lucene-core-5.5.5.jar" +
                 File.pathSeparator + "ext/lucene-analyzers-common-5.5.5.jar" +
@@ -297,8 +295,6 @@ public class Build extends BuildBase {
 
         files = files("src/main/META-INF/services");
         copy("temp", files, "src/main");
-        files = files("src/main/META-INF/services");
-        copy("temp", files("src/java8/precompiled"), "src/java8/precompiled");
 
         if (!clientOnly) {
             files = files("src/test");
@@ -340,6 +336,7 @@ public class Build extends BuildBase {
         java("org.h2.build.code.CheckTextFiles", null);
         java("org.h2.build.doc.GenerateDoc", null);
         java("org.h2.build.doc.GenerateHelp", null);
+        java("org.h2.build.i18n.PrepareTranslation", null);
         java("org.h2.build.indexer.Indexer", null);
         java("org.h2.build.doc.MergeDocs", null);
         java("org.h2.build.doc.WebSite", null);
@@ -409,7 +406,7 @@ public class Build extends BuildBase {
     private void downloadTest() {
         // for TestUpgrade
         download("ext/h2mig_pagestore_addon.jar",
-                "https://h2database.com/h2mig_pagestore_addon.jar",
+                "http://h2database.com/h2mig_pagestore_addon.jar",
                 "6dfafe1b86959c3ba4f7cf03e99535e8b9719965");
         // for TestOldVersion
         downloadUsingMaven("ext/h2-1.2.127.jar",
@@ -426,7 +423,7 @@ public class Build extends BuildBase {
     }
 
     private static String getVersion() {
-        return getStaticField("org.h2.engine.Constants", "VERSION");
+        return getStaticValue("org.h2.engine.Constants", "getVersion");
     }
 
     private static String getJarSuffix() {
@@ -518,13 +515,10 @@ public class Build extends BuildBase {
      *
      * @param includeCurrentTimestamp include CurrentTimestamp implementation
      */
-    private void addVersions(boolean includeCurrentTimestamp, boolean addNetUtils) {
+    private void addVersions(boolean includeCurrentTimestamp) {
         copy("temp/META-INF/versions/9", files("src/java9/precompiled"), "src/java9/precompiled");
         if (!includeCurrentTimestamp) {
             delete(files("temp/META-INF/versions/9/org/h2/util/CurrentTimestamp.class"));
-        }
-        if (addNetUtils) {
-            copy("temp/META-INF/versions/10", files("src/java10/precompiled"), "src/java10/precompiled");
         }
     }
 
@@ -534,7 +528,7 @@ public class Build extends BuildBase {
     @Description(summary = "Create the regular h2.jar file.")
     public void jar() {
         compile();
-        addVersions(true, true);
+        addVersions(true);
         manifest("src/main/META-INF/MANIFEST.MF");
         FileList files = files("temp").
             exclude("temp/org/h2/build/*").
@@ -563,7 +557,7 @@ public class Build extends BuildBase {
     @Description(summary = "Create h2client.jar with only the remote JDBC implementation.")
     public void jarClient() {
         compile(true, true, false);
-        addVersions(true, false);
+        addVersions(false);
         manifest("src/installer/client/MANIFEST.MF");
         FileList files = files("temp").
             exclude("temp/org/h2/build/*").
@@ -590,7 +584,7 @@ public class Build extends BuildBase {
     @Description(summary = "Create h2mvstore.jar containing only the MVStore.")
     public void jarMVStore() {
         compileMVStore(true);
-        addVersions(false, false);
+        addVersions(false);
         manifest("src/installer/mvstore/MANIFEST.MF");
         FileList files = files("temp");
         files.exclude("*.DS_Store");
@@ -605,7 +599,7 @@ public class Build extends BuildBase {
     @Description(summary = "Create h2small.jar containing only the embedded database.")
     public void jarSmall() {
         compile(false, false, true);
-        addVersions(true, false);
+        addVersions(true);
         manifest("src/installer/small/MANIFEST.MF");
         FileList files = files("temp").
             exclude("temp/org/h2/build/*").
@@ -980,9 +974,6 @@ public class Build extends BuildBase {
         int version = getJavaVersion();
         if (version >= 9) {
             cp = "src/java9/precompiled" + File.pathSeparator + cp;
-            if (version >= 10) {
-                cp = "src/java10/precompiled" + File.pathSeparator + cp;
-            }
         }
         int ret;
         if (travis) {

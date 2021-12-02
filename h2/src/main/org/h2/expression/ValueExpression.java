@@ -1,6 +1,6 @@
 /*
  * Copyright 2004-2019 H2 Group. Multiple-Licensed under the MPL 2.0,
- * and the EPL 1.0 (https://h2database.com/html/license.html).
+ * and the EPL 1.0 (http://h2database.com/html/license.html).
  * Initial Developer: H2 Group
  */
 package org.h2.expression;
@@ -21,7 +21,6 @@ import org.h2.value.ValueNull;
  * An expression representing a constant value.
  */
 public class ValueExpression extends Expression {
-
     /**
      * The expression represents ValueNull.INSTANCE.
      */
@@ -34,22 +33,9 @@ public class ValueExpression extends Expression {
      */
     private static final Object DEFAULT = new ValueExpression(ValueNull.INSTANCE);
 
-    /**
-     * The expression represents ValueBoolean.TRUE.
-     */
-    private static final Object TRUE = new ValueExpression(ValueBoolean.TRUE);
+    private final Value value;
 
-    /**
-     * The expression represents ValueBoolean.FALSE.
-     */
-    private static final Object FALSE = new ValueExpression(ValueBoolean.FALSE);
-
-    /**
-     * The value.
-     */
-    final Value value;
-
-    ValueExpression(Value value) {
+    private ValueExpression(Value value) {
         this.value = value;
     }
 
@@ -81,33 +67,7 @@ public class ValueExpression extends Expression {
         if (value == ValueNull.INSTANCE) {
             return getNull();
         }
-        if (value.getValueType() == Value.BOOLEAN) {
-            return getBoolean(value.getBoolean());
-        }
         return new ValueExpression(value);
-    }
-
-    /**
-     * Create a new expression with the given boolean value.
-     *
-     * @param value the boolean value
-     * @return the expression
-     */
-    public static ValueExpression getBoolean(Value value) {
-        if (value == ValueNull.INSTANCE) {
-            return TypedValueExpression.getUnknown();
-        }
-        return getBoolean(value.getBoolean());
-    }
-
-    /**
-     * Create a new expression with the given boolean value.
-     *
-     * @param value the boolean value
-     * @return the expression
-     */
-    public static ValueExpression getBoolean(boolean value) {
-        return (ValueExpression) (value ? TRUE : FALSE);
     }
 
     @Override
@@ -122,14 +82,18 @@ public class ValueExpression extends Expression {
 
     @Override
     public void createIndexConditions(Session session, TableFilter filter) {
-        if (value.getValueType() == Value.BOOLEAN && !value.getBoolean()) {
-            filter.addIndexCondition(IndexCondition.get(Comparison.FALSE, null, this));
+        if (value.getValueType() == Value.BOOLEAN) {
+            boolean v = ((ValueBoolean) value).getBoolean();
+            if (!v) {
+                filter.addIndexCondition(IndexCondition.get(Comparison.FALSE, null, this));
+            }
         }
     }
 
     @Override
     public Expression getNotIfPossible(Session session) {
-        return new Comparison(session, Comparison.EQUAL, this, ValueExpression.getBoolean(false));
+        return new Comparison(session, Comparison.EQUAL, this,
+                ValueExpression.get(ValueBoolean.FALSE));
     }
 
     @Override
@@ -145,11 +109,6 @@ public class ValueExpression extends Expression {
     @Override
     public boolean isConstant() {
         return true;
-    }
-
-    @Override
-    public boolean isNullConstant() {
-        return this == NULL;
     }
 
     @Override

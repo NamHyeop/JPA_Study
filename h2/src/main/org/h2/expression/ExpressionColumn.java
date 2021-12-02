@@ -1,6 +1,6 @@
 /*
  * Copyright 2004-2019 H2 Group. Multiple-Licensed under the MPL 2.0,
- * and the EPL 1.0 (https://h2database.com/html/license.html).
+ * and the EPL 1.0 (http://h2database.com/html/license.html).
  * Initial Developer: H2 Group
  */
 package org.h2.expression;
@@ -35,11 +35,12 @@ public class ExpressionColumn extends Expression {
     private final Database database;
     private final String schemaName;
     private final String tableAlias;
-    private String columnName;
+    private final String columnName;
     private final boolean rowId;
     private ColumnResolver columnResolver;
     private int queryLevel;
     private Column column;
+    private String derivedName;
 
     public ExpressionColumn(Database database, Column column) {
         this.database = database;
@@ -68,8 +69,8 @@ public class ExpressionColumn extends Expression {
             Parser.quoteIdentifier(builder, tableAlias, alwaysQuote).append('.');
         }
         if (column != null) {
-            if (columnResolver != null && columnResolver.hasDerivedColumnList()) {
-                Parser.quoteIdentifier(builder, columnResolver.getColumnName(column), alwaysQuote);
+            if (derivedName != null) {
+                Parser.quoteIdentifier(builder, derivedName, alwaysQuote);
             } else {
                 column.getSQL(builder, alwaysQuote);
             }
@@ -102,14 +103,26 @@ public class ExpressionColumn extends Expression {
             }
             return;
         }
-        Column col = resolver.findColumn(columnName);
-        if (col != null) {
-            mapColumn(resolver, col, level);
-            return;
+        for (Column col : resolver.getColumns()) {
+            String n = resolver.getDerivedColumnName(col);
+            boolean derived;
+            if (n == null) {
+                n = col.getName();
+                derived  = false;
+            } else {
+                derived = true;
+            }
+            if (database.equalsIdentifiers(columnName, n)) {
+                mapColumn(resolver, col, level);
+                if (derived) {
+                    derivedName = n;
+                }
+                return;
+            }
         }
         Column[] columns = resolver.getSystemColumns();
         for (int i = 0; columns != null && i < columns.length; i++) {
-            col = columns[i];
+            Column col = columns[i];
             if (database.equalsIdentifiers(columnName, col.getName())) {
                 mapColumn(resolver, col, level);
                 return;
@@ -242,13 +255,7 @@ public class ExpressionColumn extends Expression {
 
     @Override
     public String getColumnName() {
-        if (column != null) {
-            if (columnResolver != null) {
-                return columnResolver.getColumnName(column);
-            }
-            return column.getName();
-        }
-        return columnName;
+        return columnName != null ? columnName : column.getName();
     }
 
     @Override
@@ -267,12 +274,15 @@ public class ExpressionColumn extends Expression {
     public String getAlias() {
         if (column != null) {
             if (columnResolver != null) {
-                return columnResolver.getColumnName(column);
+                String name = columnResolver.getDerivedColumnName(column);
+                if (name != null) {
+                    return name;
+                }
             }
             return column.getName();
         }
         if (tableAlias != null) {
-            return tableAlias + '.' + columnName;
+            return tableAlias + "." + columnName;
         }
         return columnName;
     }
@@ -353,7 +363,8 @@ public class ExpressionColumn extends Expression {
 
     @Override
     public Expression getNotIfPossible(Session session) {
-        return new Comparison(session, Comparison.EQUAL, this, ValueExpression.getBoolean(false));
+        return new Comparison(session, Comparison.EQUAL, this,
+                ValueExpression.get(ValueBoolean.FALSE));
     }
 
 }

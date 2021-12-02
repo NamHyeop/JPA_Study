@@ -1,5 +1,5 @@
 -- Copyright 2004-2019 H2 Group. Multiple-Licensed under the MPL 2.0,
--- and the EPL 1.0 (https://h2database.com/html/license.html).
+-- and the EPL 1.0 (http://h2database.com/html/license.html).
 -- Initial Developer: H2 Group
 --
 
@@ -72,18 +72,6 @@ select group_concat(distinct v order by v desc) from test;
 > --------------------------------------------------
 > 9,8,7,3,2,-1
 > rows: 1
-
-INSERT INTO TEST(V) VALUES NULL;
-> update count: 1
-
-SELECT LISTAGG(V, ',') WITHIN GROUP (ORDER BY ID) FROM TEST;
->> 7,2,8,3,7,3,9,-1
-
-SELECT LISTAGG(COALESCE(CAST(V AS VARCHAR), 'null'), ',') WITHIN GROUP (ORDER BY ID) FROM TEST;
->> 7,2,8,3,7,3,9,-1,null
-
-SELECT LISTAGG(V, ',') WITHIN GROUP (ORDER BY V) FROM TEST;
->> -1,2,3,3,7,7,8,9
 
 drop table test;
 > ok

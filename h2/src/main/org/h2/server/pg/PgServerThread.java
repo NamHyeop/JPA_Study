@@ -1,6 +1,6 @@
 /*
  * Copyright 2004-2019 H2 Group. Multiple-Licensed under the MPL 2.0,
- * and the EPL 1.0 (https://h2database.com/html/license.html).
+ * and the EPL 1.0 (http://h2database.com/html/license.html).
  * Initial Developer: H2 Group
  */
 package org.h2.server.pg;
@@ -42,8 +42,6 @@ import org.h2.message.DbException;
 import org.h2.util.DateTimeUtils;
 import org.h2.util.JdbcUtils;
 import org.h2.util.MathUtils;
-import org.h2.util.NetUtils;
-import org.h2.util.NetworkConnectionInfo;
 import org.h2.util.ScriptReader;
 import org.h2.util.StringUtils;
 import org.h2.util.Utils;
@@ -225,13 +223,8 @@ public class PgServerThread implements Runnable {
                     ci.setBaseDir(baseDir);
                 }
                 if (server.getIfExists()) {
-                    ci.setProperty("FORBID_CREATION", "TRUE");
+                    ci.setProperty("IFEXISTS", "TRUE");
                 }
-                ci.setNetworkConnectionInfo(new NetworkConnectionInfo( //
-                        NetUtils.ipToShortForm(new StringBuilder("pg://"), //
-                                socket.getLocalAddress().getAddress(), true) //
-                                .append(':').append(socket.getLocalPort()).toString(), //
-                        socket.getInetAddress().getAddress(), socket.getPort(), null));
                 conn = new JdbcConnection(ci, false);
                 // can not do this because when called inside
                 // DriverManager.getConnection, a deadlock occurs
@@ -537,7 +530,7 @@ public class PgServerThread implements Runnable {
     }
 
     private static long toPostgreDays(long dateValue) {
-        return DateTimeUtils.absoluteDayFromDateValue(dateValue) - 10_957;
+        return DateTimeUtils.prolepticGregorianAbsoluteDayFromDateValue(dateValue) - 10_957;
     }
 
     private void writeDataColumn(ResultSet rs, int column, int pgType, boolean text)

@@ -1,5 +1,5 @@
 # Copyright 2004-2019 H2 Group. Multiple-Licensed under the MPL 2.0,
-# and the EPL 1.0 (https://h2database.com/html/license.html).
+# and the EPL 1.0 (http://h2database.com/html/license.html).
 # Initial Developer: H2 Group
 "SECTION","TOPIC","SYNTAX","TEXT"
 "Commands (DML)","SELECT","
@@ -8,10 +8,10 @@ SELECT [ TOP term [ PERCENT ] [ WITH TIES ] ]
 selectExpression [,...]
 [ FROM tableExpression [,...] ]
 [ WHERE expression ]
-[ GROUP BY groupingElement [,...] ] [ HAVING expression ]
+[ GROUP BY expression [,...] ] [ HAVING expression ]
 [ WINDOW { { windowName AS windowSpecification } [,...] } ]
 [ QUALIFY expression ]
-[ { UNION [ ALL ] | EXCEPT | MINUS | INTERSECT } query ]
+[ { UNION [ ALL ] | EXCEPT | MINUS | INTERSECT } select ]
 [ ORDER BY order [,...] ]
 [ LIMIT expression [ OFFSET expression ] [ SAMPLE_SIZE rowCountInt ] ]
 [ [ OFFSET expression { ROW | ROWS } ]
@@ -41,24 +41,20 @@ Backs up the database files to a ."
 CALL expression
 ","
 Calculates a simple expression."
-"Commands (DML)","EXECUTE IMMEDIATE","
-EXECUTE IMMEDIATE sqlString
-","
-Dynamically prepares and executes the SQL command specified as a string."
 "Commands (DML)","EXPLAIN","
 EXPLAIN { [ PLAN FOR ] | ANALYZE }
-{ query | insert | update | delete | mergeInto | mergeUsing }
+{ select | insert | update | delete | merge }
 ","
 Shows the execution plan for a statement."
-"Commands (DML)","MERGE INTO","
+"Commands (DML)","MERGE","
 MERGE INTO tableName [ ( columnName [,...] ) ]
 [ KEY ( columnName [,...] ) ]
-{ insertValues | query }
+{ insertValues | select }
 ","
 Updates existing rows, and insert rows that don't exist."
 "Commands (DML)","MERGE USING","
 MERGE INTO targetTableName [ [AS] targetAlias]
-USING { ( query ) | sourceTableName }[ [AS] sourceAlias ]
+USING { ( select ) | sourceTableName }[ [AS] sourceAlias ]
 ON expression
 mergeWhenClause [,...]
 ","
@@ -100,8 +96,8 @@ VALUES rowValueExpression [,...]
 ","
 A list of rows that can be used like a table."
 "Commands (DML)","WITH","
-WITH [ RECURSIVE ] { name [( columnName [,...] )] AS ( query ) [,...] }
-{ query | insert | update | delete | mergeInto | mergeUsing | createTable }
+WITH [ RECURSIVE ] { name [( columnName [,...] )] AS ( select ) [,...] }
+{ select | insert | update | merge | delete | createTable }
 ","
 Can be used to create a recursive or non-recursive query (common table expression)."
 "Commands (DDL)","ALTER INDEX RENAME","
@@ -109,11 +105,17 @@ ALTER INDEX [ IF EXISTS ] indexName RENAME TO newIndexName
 ","
 Renames an index."
 "Commands (DDL)","ALTER SCHEMA RENAME","
-ALTER SCHEMA [ IF EXISTS ] schemaName RENAME TO newSchemaName
+ALTER SCHEMA [ IF EXISTS ] schema RENAME TO newSchemaName
 ","
 Renames a schema."
 "Commands (DDL)","ALTER SEQUENCE","
-ALTER SEQUENCE [ IF EXISTS ] sequenceName sequenceOptions
+ALTER SEQUENCE [ IF EXISTS ] sequenceName
+[ RESTART WITH long ]
+[ INCREMENT BY long ]
+[ MINVALUE long | NOMINVALUE | NO MINVALUE ]
+[ MAXVALUE long | NOMAXVALUE | NO MAXVALUE ]
+[ CYCLE long | NOCYCLE | NO CYCLE ]
+[ CACHE long | NOCACHE | NO CACHE ]
 ","
 Changes the parameters of a sequence."
 "Commands (DDL)","ALTER TABLE ADD","
@@ -133,8 +135,7 @@ TO newConstraintName
 ","
 Renames a constraint."
 "Commands (DDL)","ALTER TABLE ALTER COLUMN","
-ALTER TABLE [ IF EXISTS ] tableName
-ALTER COLUMN [ IF EXISTS ] columnName
+ALTER TABLE [ IF EXISTS ] tableName ALTER COLUMN columnName
 { { columnDefinition }
     | { RENAME TO name }
     | { RESTART WITH long }
@@ -207,7 +208,7 @@ CREATE AGGREGATE [ IF NOT EXISTS ] newAggregateName FOR className
 Creates a new user-defined aggregate function."
 "Commands (DDL)","CREATE ALIAS","
 CREATE ALIAS [ IF NOT EXISTS ] newFunctionAliasName [ DETERMINISTIC ]
-{ FOR classAndMethodName | AS sourceCodeString }
+[ NOBUFFER ] { FOR classAndMethodName | AS sourceCodeString }
 ","
 Creates a new function alias."
 "Commands (DDL)","CREATE CONSTANT","
@@ -216,7 +217,7 @@ CREATE CONSTANT [ IF NOT EXISTS ] newConstantName VALUE expression
 Creates a new constant."
 "Commands (DDL)","CREATE DOMAIN","
 CREATE DOMAIN [ IF NOT EXISTS ] newDomainName AS dataType
-[ DEFAULT expression ] [ [ NOT ] NULL ] [ SELECTIVITY selectivityInt ]
+[ DEFAULT expression ] [ [ NOT ] NULL ] [ SELECTIVITY selectivity ]
 [ CHECK condition ]
 ","
 Creates a new data type (domain)."
@@ -245,7 +246,8 @@ CREATE SCHEMA [ IF NOT EXISTS ] name
 ","
 Creates a new schema."
 "Commands (DDL)","CREATE SEQUENCE","
-CREATE SEQUENCE [ IF NOT EXISTS ] newSequenceName [ sequenceOptions ]
+CREATE SEQUENCE [ IF NOT EXISTS ] newSequenceName
+sequenceOptions
 ","
 Creates a new sequence."
 "Commands (DDL)","CREATE TABLE","
@@ -255,7 +257,7 @@ TABLE [ IF NOT EXISTS ] name
 [ ENGINE tableEngineName ]
 [ WITH tableEngineParamName [,...] ]
 [ NOT PERSISTENT ] [ TRANSACTIONAL ]
-[ AS query [ WITH [ NO ] DATA ] ]","
+[ AS select [ WITH [ NO ] DATA ] ]","
 Creates a new table."
 "Commands (DDL)","CREATE TRIGGER","
 CREATE TRIGGER [ IF NOT EXISTS ] newTriggerName
@@ -273,7 +275,7 @@ CREATE USER [ IF NOT EXISTS ] newUserName
 Creates a new user."
 "Commands (DDL)","CREATE VIEW","
 CREATE [ OR REPLACE ] [ FORCE ] VIEW [ IF NOT EXISTS ] newViewName
-[ ( columnName [,...] ) ] AS query
+[ ( columnName [,...] ) ] AS select
 ","
 Creates a new view."
 "Commands (DDL)","DROP AGGREGATE","
@@ -429,10 +431,6 @@ SET BUILTIN_ALIAS_OVERRIDE { TRUE | FALSE }
 ","
 Allows the overriding of the builtin system date/time functions
 for unit testing purposes."
-"Commands (Other)","SET CATALOG","
-SET CATALOG { catalogString | catalogName }
-","
-This command has no effect if the specified name matches the name of the database, otherwise it throws an exception."
 "Commands (Other)","SET COLLATION","
 SET [ DATABASE ] COLLATION
 { OFF | collationName
@@ -469,10 +467,6 @@ SET IGNORECASE { TRUE | FALSE }
 ","
 If IGNORECASE is enabled, text columns in newly created tables will be
 case-insensitive."
-"Commands (Other)","SET IGNORE_CATALOGS","
-SET IGNORE_CATALOGS { TRUE | FALSE }
-","
-If IGNORE_CATALOGS is enabled, catalog names in front of schema names will be ignored."
 "Commands (Other)","SET JAVA_OBJECT_SERIALIZER","
 SET JAVA_OBJECT_SERIALIZER
 { null | className }
@@ -518,6 +512,10 @@ Sets the maximum memory used for large operations (delete and insert), in bytes.
 SET MODE { REGULAR | DB2 | DERBY | HSQLDB | MSSQLSERVER | MYSQL | ORACLE | POSTGRESQL }
 ","
 Changes to another database compatibility mode."
+"Commands (Other)","SET MULTI_THREADED","
+SET MULTI_THREADED { 0 | 1 }
+","
+Enabled (1) or disabled (0) multi-threading inside the database engine."
 "Commands (Other)","SET OPTIMIZE_REUSE_RESULTS","
 SET OPTIMIZE_REUSE_RESULTS { 0 | 1 }
 ","
@@ -551,18 +549,13 @@ SET SALT bytes HASH bytes
 ","
 Sets the password salt and hash for the current user."
 "Commands (Other)","SET SCHEMA","
-SET SCHEMA { schemaString | schemaName }
+SET SCHEMA schemaName
 ","
 Changes the default schema of the current connection."
 "Commands (Other)","SET SCHEMA_SEARCH_PATH","
 SET SCHEMA_SEARCH_PATH schemaName [,...]
 ","
 Changes the schema search path of the current connection."
-"Commands (Other)","SET SESSION CHARACTERISTICS","
-SET SESSION CHARACTERISTICS AS TRANSACTION ISOLATION LEVEL
-{ READ UNCOMMITTED | READ COMMITTED | REPEATABLE READ | SERIALIZABLE }
-","
-Changes the transaction isolation level of the current session."
 "Commands (Other)","SET THROTTLE","
 SET THROTTLE int
 ","
@@ -590,27 +583,27 @@ This statement closes all open connections to the database and closes the
 database."
 "Literals","Value","
 string | dollarQuotedString | numeric | dateAndTime | boolean | bytes
-    | interval | array | json | null
+    | interval | array | null
 ","
 A literal value of any data type, or null."
 "Literals","Array","
-ARRAY '[' [ expression [,...] ] ']'
+ARRAY '[' [ expression, [,...] ] ']'
 ","
 An array of values."
 "Literals","Boolean","
-TRUE | FALSE | UNKNOWN
+TRUE | FALSE
 ","
 A boolean value."
 "Literals","Bytes","
-X'hex' [ 'hex' [...] ]
+X'hex'
 ","
 A binary value."
 "Literals","Date","
-DATE '[-]yyyy-MM-dd'
+DATE 'yyyy-MM-dd'
 ","
 A date literal."
 "Literals","Date and time","
-date | time | timeWithTimeZone | timestamp | timestampWithTimeZone
+date | time | timestamp | timestampWithTimeZone
 ","
 A literal value of any date-time data type."
 "Literals","Decimal","
@@ -623,17 +616,13 @@ $$anythingExceptTwoDollarSigns$$
 ","
 A string starts and ends with two dollar signs."
 "Literals","Hex Number","
-[ + | - ] 0x { digit | a-f | A-F } [...]
+[ + | - ] 0x hex
 ","
 A number written in hexadecimal notation."
 "Literals","Int","
 [ + | - ] number
 ","
 The maximum integer number is 2147483647, the minimum is -2147483648."
-"Literals","JSON","
-JSON { bytes | string }
-","
-A binary or character string with a RFC 8259-compliant JSON text and data format."
 "Literals","Long","
 [ + | - ] number
 ","
@@ -651,23 +640,19 @@ decimal | int | long | hexNumber
 ","
 The data type of a numeric value is always the lowest possible for the given value."
 "Literals","String","
-'anythingExceptSingleQuote' [ 'anythingExceptSingleQuote' [...] ]
+'anythingExceptSingleQuote'
 ","
 A string starts and ends with a single quote."
 "Literals","Time","
 TIME [ WITHOUT TIME ZONE ] 'hh:mm:ss[.nnnnnnnnn]'
 ","
 A time literal."
-"Literals","Time with time zone","
-TIME WITH TIME ZONE 'hh:mm:ss[.nnnnnnnnn]{Z | { - | + } timeZoneOffsetString}'
-","
-A time with time zone literal."
 "Literals","Timestamp","
-TIMESTAMP [ WITHOUT TIME ZONE ] '[-]yyyy-MM-dd hh:mm:ss[.nnnnnnnnn]'
+TIMESTAMP [ WITHOUT TIME ZONE ] 'yyyy-MM-dd hh:mm:ss[.nnnnnnnnn]'
 ","
 A timestamp literal."
 "Literals","Timestamp with time zone","
-TIMESTAMP WITH TIME ZONE '[-]yyyy-MM-dd hh:mm:ss[.nnnnnnnnn]
+TIMESTAMP WITH TIME ZONE 'yyyy-MM-dd hh:mm:ss[.nnnnnnnnn]
 [Z | { - | + } timeZoneOffsetString | timeZoneNameString ]'
 ","
 A timestamp with time zone literal."
@@ -734,7 +719,7 @@ An INTERVAL MINUTE TO SECOND literal."
 yearField | monthField | dayOfMonthField
     | hourField | minuteField | secondField
     | millisecondField | microsecondField | nanosecondField
-    | timezoneHourField | timezoneMinuteField | timezoneSecondField
+    | timezoneHourField | timezoneMinuteField
     | dayOfWeekField | isoWeekYearField | isoDayOfWeekField
     | weekOfYearField | isoWeekOfYearField
     | quarterField | dayOfYearField | epochField
@@ -784,10 +769,6 @@ Timezone hour (from -18 to +18)."
 TIMEZONE_MINUTE
 ","
 Timezone minute (from -59 to +59)."
-"Datetime fields","Timezone second field","
-TIMEZONE_SECOND
-","
-Timezone second (from -59 to +59)."
 "Datetime fields","Day of week field","
 DAY_OF_WEEK | DAYOFWEEK | DOW
 ","
@@ -849,7 +830,7 @@ dataType [ VISIBLE | INVISIBLE ]
     | GENERATED {ALWAYS | BY DEFAULT} AS IDENTITY [(sequenceOptions)]} ]
 [ ON UPDATE expression ] [ [ NOT ] NULL ]
 [ { AUTO_INCREMENT | IDENTITY } [ ( startInt [, incrementInt ] ) ] ]
-[ SELECTIVITY selectivityInt ] [ COMMENT expression ]
+[ SELECTIVITY selectivity ] [ COMMENT expression ]
 [ PRIMARY KEY [ HASH ] | UNIQUE ] [ CHECK condition ]
 ","
 Default expressions are used if no explicit value was used when adding a row."
@@ -862,23 +843,15 @@ Comments can be used anywhere in a command and are ignored by the database."
 ","
 Comparison operator."
 "Other Grammar","Condition","
-operand [ conditionRightHandSide ]
-    | NOT condition
-    | EXISTS ( query )
-    | UNIQUE ( query )
-    | INTERSECTS (operand, operand)
+operand [ conditionRightHandSide ] | NOT condition | EXISTS ( select )
 ","
 Boolean value or condition."
 "Other Grammar","Condition Right Hand Side","
-compare { { { ALL | ANY | SOME } ( query ) } | operand }
+compare { { { ALL | ANY | SOME } ( select ) } | operand }
     | IS [ NOT ] NULL
     | IS [ NOT ] [ DISTINCT FROM ] operand
-    | IS [ NOT ] { TRUE | FALSE | UNKNOWN }
-    | IS [ NOT ] OF (dataType [,...])
-    | IS [ NOT ] JSON [ VALUE | ARRAY | OBJECT | SCALAR ]
-        [ [ WITH | WITHOUT ] UNIQUE [ KEYS ] ]
     | BETWEEN operand AND operand
-    | IN ( { query | expression [,...] } )
+    | IN ( { select | expression [,...] } )
     | [ NOT ] [ LIKE | ILIKE ] operand [ ESCAPE string ]
     | [ NOT ] REGEXP operand
 ","
@@ -900,17 +873,12 @@ charsetString [, fieldSepString [, fieldDelimString [, escString [, nullString]]
     | optionString
 ","
 Optional parameters for CSVREAD and CSVWRITE."
-"Other Grammar","Data Change Delta Table","
-{ OLD | NEW | FINAL } TABLE
-( { insert | update | delete | mergeInto | mergeUsing } )
-","
-Executes the inner data change command and returns old, new, or final rows."
 "Other Grammar","Data Type","
 intType | booleanType | tinyintType | smallintType | bigintType | identityType
-    | decimalType | doubleType | realType | dateType | timeType
-    | timeWithTimeZoneType | timestampType | timestampWithTimeZoneType
-    | binaryType | otherType | varcharType | varcharIgnorecaseType | charType
-    | blobType | clobType | uuidType | arrayType | enumType | intervalType
+    | decimalType | doubleType | realType | dateType | timeType | timestampType
+    | timestampWithTimeZoneType | binaryType | otherType | varcharType
+    | varcharIgnorecaseType | charType | blobType | clobType | uuidType
+    | arrayType | enumType | intervalType
 ","
 A data type definition."
 "Other Grammar","Digit","
@@ -925,21 +893,17 @@ Value or condition."
 term [ { { * | / | % } term } [...] ]
 ","
 A value or a numeric factor."
-"Other Grammar","Grouping element","
-expression | (expression [, ...]) | ()
-","
-A grouping element of GROUP BY clause."
 "Other Grammar","Hex","
-[' ' [...]] { { digit | a-f | A-F } [' ' [...]] { digit | a-f | A-F } [' ' [...]] } [...]
+{ { digit | a-f | A-F } { digit | a-f | A-F } } [...]
 ","
-The hexadecimal representation of a number or of bytes with optional space characters."
+The hexadecimal representation of a number or of bytes."
 "Other Grammar","Index Column","
 columnName [ ASC | DESC ] [ NULLS { FIRST | LAST } ]
 ","
 Indexes this column in ascending or descending order."
 "Other Grammar","Insert columns and source","
 { [ ( columnName [,...] ) ]
-    { insertValues | [ DIRECT ] [ SORTED ] query | DEFAULT VALUES } }
+    { insertValues | [ DIRECT ] [ SORTED ] select | DEFAULT VALUES } }
     | { SET { columnName = { DEFAULT | expression } } [,...] }
 ","
 Names of columns and their values for INSERT statement."
@@ -947,10 +911,6 @@ Names of columns and their values for INSERT statement."
 VALUES { DEFAULT|expression | [ROW] ({DEFAULT|expression} [,...]) }, [,...]
 ","
 Values for INSERT statement."
-"Other Grammar","Join specification","
-ON expression | USING (columnName [,...])
-","
-Specifies a join condition or column names."
 "Other Grammar","Merge when clause","
 mergeWhenMatchedClause|mergeWhenNotMatchedClause
 ","
@@ -969,23 +929,19 @@ WHEN NOT MATCHED clause for MERGE USING command."
 "Other Grammar","Name","
 { { A-Z|_ } [ { A-Z|_|0-9 } [...] ] } | quotedName
 ","
-With default settings unquoted names are converted to upper case."
+Names are not case sensitive."
 "Other Grammar","Operand","
 summand [ { || summand } [...] ]
 ","
-Performs the concatenation of character string, binary string, or array values."
+A value or a concatenation of values."
 "Other Grammar","Order","
 { int | expression } [ ASC | DESC ] [ NULLS { FIRST | LAST } ]
 ","
 Sorts the result by the given column number, or by an expression."
-"Other Grammar","Query","
-select | explicitTable | tableValue
-","
-A query, such as SELECT, explicit table, or table value."
 "Other Grammar","Quoted Name","
 ""anythingExceptDoubleQuote""
 ","
-Case of characters in quoted names is preserved as is."
+Quoted names are case sensitive, and can contain spaces."
 "Other Grammar","Referential Constraint","
 FOREIGN KEY ( columnName [,...] )
 REFERENCES [ refTableName ] [ ( refColumnName [,...] ) ]
@@ -1011,26 +967,18 @@ A row value expression."
 wildcardExpression | expression [ [ AS ] columnAlias ]
 ","
 An expression in a SELECT statement."
-"Other Grammar","Sequence value expression","
-{ NEXT | CURRENT } VALUE FOR [schemaName.]sequenceName
-","
-The next or current value of a sequence."
 "Other Grammar","Sequence options","
-sequenceOption [...]
+[ START WITH long ]
+[ INCREMENT BY long ]
+[ MINVALUE long | NOMINVALUE | NO MINVALUE ]
+[ MAXVALUE long | NOMAXVALUE | NO MAXVALUE ]
+[ CYCLE long | NOCYCLE | NO CYCLE ]
+[ CACHE long | NOCACHE | NO CACHE ]
 ","
 Options of a sequence."
-"Other Grammar","Sequence option","
-{ START | RESTART } WITH long
-    | INCREMENT BY long
-    | MINVALUE long | NO MINVALUE | NOMINVALUE
-    | MAXVALUE long | NO MAXVALUE | NOMAXVALUE
-    | CYCLE | NO CYCLE | NOCYCLE
-    | CACHE long | NO CACHE | NOCACHE
-","
-Option of a sequence."
 "Other Grammar","Set clause list","
-{ { columnName = { DEFAULT | expression } }
-    | { ( columnName [,...] ) = { rowValueExpression | (query) } } } [,...]
+{ { columnName = { DEFAULT | expression } } [,...] }
+    | { ( columnName [,...] ) = {rowValueExpression|(select)} }
 ","
 List of SET clauses."
 "Other Grammar","Summand","
@@ -1038,15 +986,11 @@ factor [ { { + | - } factor } [...] ]
 ","
 A value or a numeric sum."
 "Other Grammar","Table Expression","
-{ [ schemaName. ] tableName
-    | ( query )
-    | unnest
-    | table
-    | dataChangeDeltaTable }
+{ [ schemaName. ] tableName | ( select ) | valuesExpression }
 [ [ AS ] newTableAlias [ ( columnName [,...] ) ] ]
 [ USE INDEX ([ indexName [,...] ]) ]
 [ { { LEFT | RIGHT } [ OUTER ] | [ INNER ] | CROSS | NATURAL }
-    JOIN tableExpression [ joinSpecification ] ]
+    JOIN tableExpression [ ON expression ] ]
 ","
 Joins a table."
 "Other Grammar","Within group specification","
@@ -1083,24 +1027,19 @@ UNBOUNDED PRECEDING|value PRECEDING|CURRENT ROW
 ","
 A window frame bound clause."
 "Other Grammar","Term","
-{ value
+value
     | column
     | ?[ int ]
-    | sequenceValueExpression
+    | NEXT VALUE FOR sequenceName
     | function
     | { - | + } term
     | ( expression )
-    | query
+    | select
     | case
     | caseWhen
-    | userDefinedFunctionName }
-[ timeZone ]
+    | userDefinedFunctionName
 ","
 A value."
-"Other Grammar","Time zone","
-AT { TIME ZONE { intervalHourToMinute | intervalHourToSecond | string } | LOCAL }
-","
-A time zone."
 "Other Grammar","Column","
 [[schemaName.]tableAlias.] { columnName | _ROWID_ }
 ","
@@ -1112,7 +1051,7 @@ Possible values: -2147483648 to 2147483647."
 "Data Types","BOOLEAN Type","
 BOOLEAN | BIT | BOOL
 ","
-Possible values: TRUE, FALSE, and UNKNOWN (NULL)."
+Possible values: TRUE and FALSE."
 "Data Types","TINYINT Type","
 TINYINT
 ","
@@ -1145,10 +1084,6 @@ A single precision floating point number."
 TIME [ ( precisionInt ) ] [ WITHOUT TIME ZONE ]
 ","
 The time data type."
-"Data Types","TIME WITH TIME ZONE Type","
-TIME [ ( precisionInt ) ] WITH TIME ZONE
-","
-The time with time zone data type."
 "Data Types","DATE Type","
 DATE
 ","
@@ -1202,7 +1137,7 @@ UUID
 ","
 Universally unique identifier."
 "Data Types","ARRAY Type","
-ARRAY [ '[' maximumCardinalityInt ']' ]
+ARRAY
 ","
 An array of values."
 "Data Types","ENUM Type","
@@ -1222,10 +1157,6 @@ GEOMETRY
     [, sridInt] )]
 ","
 A spatial geometry type."
-"Data Types","JSON Type","
-JSON
-","
-A RFC 8259-compliant JSON text."
 "Data Types","INTERVAL Type","
 intervalYearType | intervalMonthType | intervalDayType
     | intervalHourType| intervalMinuteType | intervalSecondType
@@ -1287,6 +1218,141 @@ Interval data type."
 INTERVAL MINUTE [ ( precisionInt ) ] TO SECOND [ ( fractionalPrecisionInt ) ]
 ","
 Interval data type."
+"Functions (Aggregate)","AVG","
+AVG ( [ DISTINCT|ALL ] { numeric } )
+[FILTER (WHERE expression)] [OVER windowNameOrSpecification]
+","
+The average (mean) value."
+"Functions (Aggregate)","BIT_AND","
+BIT_AND(expression)
+[FILTER (WHERE expression)] [OVER windowNameOrSpecification]
+","
+The bitwise AND of all non-null values."
+"Functions (Aggregate)","BIT_OR","
+BIT_OR(expression)
+[FILTER (WHERE expression)] [OVER windowNameOrSpecification]
+","
+The bitwise OR of all non-null values."
+"Functions (Aggregate)","EVERY","
+{EVERY|BOOL_AND}(boolean)
+[FILTER (WHERE expression)] [OVER windowNameOrSpecification]
+","
+Returns true if all expressions are true."
+"Functions (Aggregate)","ANY","
+{ANY|SOME|BOOL_OR}(boolean)
+[FILTER (WHERE expression)] [OVER windowNameOrSpecification]
+","
+Returns true if any expression is true."
+"Functions (Aggregate)","COUNT","
+COUNT( { * | { [ DISTINCT|ALL ] expression } } )
+[FILTER (WHERE expression)] [OVER windowNameOrSpecification]
+","
+The count of all row, or of the non-null values."
+"Functions (Aggregate)","LISTAGG","
+{ LISTAGG ( [ DISTINCT|ALL ] string [, separatorString] [ ON OVERFLOW ERROR ] )
+    withinGroupSpecification }
+| { GROUP_CONCAT ( [ DISTINCT|ALL ] string
+    [ ORDER BY { expression [ ASC | DESC ] } [,...] ]
+    [ SEPARATOR separatorString ] ) }
+[FILTER (WHERE expression)] [OVER windowNameOrSpecification]
+","
+Concatenates strings with a separator."
+"Functions (Aggregate)","ARRAY_AGG","
+ARRAY_AGG ( [ DISTINCT|ALL ] string
+[ ORDER BY { expression [ ASC | DESC ] } [,...] ] )
+[FILTER (WHERE expression)] [OVER windowNameOrSpecification]
+","
+Aggregate the value into an array."
+"Functions (Aggregate)","MAX","
+MAX(value)
+[FILTER (WHERE expression)] [OVER windowNameOrSpecification]
+","
+The highest value."
+"Functions (Aggregate)","MIN","
+MIN(value)
+[FILTER (WHERE expression)] [OVER windowNameOrSpecification]
+","
+The lowest value."
+"Functions (Aggregate)","SUM","
+SUM( [ DISTINCT|ALL ] { numeric } )
+[FILTER (WHERE expression)] [OVER windowNameOrSpecification]
+","
+The sum of all values."
+"Functions (Aggregate)","SELECTIVITY","
+SELECTIVITY(value)
+[FILTER (WHERE expression)] [OVER windowNameOrSpecification]
+","
+Estimates the selectivity (0-100) of a value."
+"Functions (Aggregate)","STDDEV_POP","
+STDDEV_POP( [ DISTINCT|ALL ] numeric )
+[FILTER (WHERE expression)] [OVER windowNameOrSpecification]
+","
+The population standard deviation."
+"Functions (Aggregate)","STDDEV_SAMP","
+STDDEV_SAMP( [ DISTINCT|ALL ] numeric )
+[FILTER (WHERE expression)] [OVER windowNameOrSpecification]
+","
+The sample standard deviation."
+"Functions (Aggregate)","VAR_POP","
+VAR_POP( [ DISTINCT|ALL ] numeric )
+[FILTER (WHERE expression)] [OVER windowNameOrSpecification]
+","
+The population variance (square of the population standard deviation)."
+"Functions (Aggregate)","VAR_SAMP","
+VAR_SAMP( [ DISTINCT|ALL ] numeric )
+[FILTER (WHERE expression)] [OVER windowNameOrSpecification]
+","
+The sample variance (square of the sample standard deviation)."
+"Functions (Aggregate)","RANK aggregate","
+RANK(value [,...])
+withinGroupSpecification
+[FILTER (WHERE expression)] [OVER windowNameOrSpecification]
+","
+Returns the rank of the hypothetical row in specified collection of rows."
+"Functions (Aggregate)","DENSE_RANK aggregate","
+DENSE_RANK(value [,...])
+withinGroupSpecification
+[FILTER (WHERE expression)] [OVER windowNameOrSpecification]
+","
+Returns the dense rank of the hypothetical row in specified collection of rows."
+"Functions (Aggregate)","PERCENT_RANK aggregate","
+PERCENT_RANK(value [,...])
+withinGroupSpecification
+[FILTER (WHERE expression)] [OVER windowNameOrSpecification]
+","
+Returns the relative rank of the hypothetical row in specified collection of rows."
+"Functions (Aggregate)","CUME_DIST aggregate","
+CUME_DIST(value [,...])
+withinGroupSpecification
+[FILTER (WHERE expression)] [OVER windowNameOrSpecification]
+","
+Returns the relative rank of the hypothetical row in specified collection of rows."
+"Functions (Aggregate)","PERCENTILE_CONT","
+PERCENTILE_CONT(numeric) WITHIN GROUP (ORDER BY value [ASC|DESC])
+[FILTER (WHERE expression)] [OVER windowNameOrSpecification]
+","
+Return percentile of values from the group with interpolation."
+"Functions (Aggregate)","PERCENTILE_DISC","
+PERCENTILE_DISC(numeric) WITHIN GROUP (ORDER BY value [ASC|DESC])
+[FILTER (WHERE expression)] [OVER windowNameOrSpecification]
+","
+Return percentile of values from the group."
+"Functions (Aggregate)","MEDIAN","
+MEDIAN( [ DISTINCT|ALL ] value )
+[FILTER (WHERE expression)] [OVER windowNameOrSpecification]
+","
+The value separating the higher half of a values from the lower half."
+"Functions (Aggregate)","MODE","
+{ MODE( value ) [ ORDER BY expression [ ASC | DESC ] ] }
+    | { MODE() WITHIN GROUP (ORDER BY expression [ ASC | DESC ]) }
+[FILTER (WHERE expression)] [OVER windowNameOrSpecification]
+","
+Returns the value that occurs with the greatest frequency."
+"Functions (Aggregate)","ENVELOPE","
+ENVELOPE( value )
+[FILTER (WHERE expression)] [OVER windowNameOrSpecification]
+","
+Returns the minimum bounding box that encloses all specified GEOMETRY values."
 "Functions (Numeric)","ABS","
 ABS( { numeric | interval } )
 ","
@@ -1344,10 +1410,6 @@ BITGET(long, int)
 ","
 Returns true if and only if the first parameter has a bit set in the
 position specified by the second parameter."
-"Functions (Numeric)","BITNOT","
-BITNOT(long)
-","
-The bitwise NOT operation."
 "Functions (Numeric)","BITOR","
 BITOR(long, long)
 ","
@@ -1356,14 +1418,6 @@ The bitwise OR operation."
 BITXOR(long, long)
 ","
 The bitwise XOR operation."
-"Functions (Numeric)","LSHIFT","
-LSHIFT(long, int)
-","
-The bitwise left shift operation."
-"Functions (Numeric)","RSHIFT","
-RSHIFT(long, int)
-","
-The bitwise right shift operation."
 "Functions (Numeric)","MOD","
 MOD(long, long)
 ","
@@ -1371,7 +1425,7 @@ The modulo operation."
 "Functions (Numeric)","CEILING","
 { CEILING | CEIL } (numeric)
 ","
-Returns the smallest integer value that is greater than or equal to the argument."
+See also Java ""Math.ceil""."
 "Functions (Numeric)","DEGREES","
 DEGREES(numeric)
 ","
@@ -1383,15 +1437,11 @@ See also Java ""Math.exp""."
 "Functions (Numeric)","FLOOR","
 FLOOR(numeric)
 ","
-Returns the largest integer value that is less than or equal to the argument."
+See also Java ""Math.floor""."
 "Functions (Numeric)","LN","
-LN(numeric)
+{LN|LOG}(numeric)
 ","
 Calculates the natural (base e) logarithm as a double value."
-"Functions (Numeric)","LOG","
-LOG([baseNumeric,] numeric)
-","
-Calculates the logarithm with specified base as a double value."
 "Functions (Numeric)","LOG10","
 LOG10(numeric)
 ","
@@ -1427,7 +1477,7 @@ Returns a new UUID with 122 pseudo random bits."
 "Functions (Numeric)","ROUND","
 ROUND(numeric [, digitsInt])
 ","
-Rounds to a number of fractional digits."
+Rounds to a number of digits, or to the nearest long if the number of digits if not set."
 "Functions (Numeric)","ROUNDMAGIC","
 ROUNDMAGIC(numeric)
 ","
@@ -1453,11 +1503,10 @@ HASH(algorithmString, expression [, iterationInt])
 ","
 Calculate the hash value using an algorithm, and repeat this process for a number of iterations."
 "Functions (Numeric)","TRUNCATE","
-{ TRUNC | TRUNCATE } ( { {numeric [, digitsInt] }
+{ TRUNC | TRUNCATE } ( { {numeric, digitsInt}
     | timestamp | timestampWithTimeZone | date | timestampString } )
 ","
-When a numeric argument is specified, truncates it to a number of digits (to the next value closer to 0)
-and returns a double, float, or numeric value depending on type of the argument."
+Truncates to a number of digits (to the next value closer to 0)."
 "Functions (Numeric)","COMPRESS","
 COMPRESS(dataBytes [, algorithmString])
 ","
@@ -1507,9 +1556,9 @@ HEXTORAW(string)
 ","
 Converts a hex representation of a string to a string."
 "Functions (String)","RAWTOHEX","
-RAWTOHEX(string|bytes)
+RAWTOHEX(string)
 ","
-Converts a string or bytes to the hex representation."
+Converts a string to the hex representation."
 "Functions (String)","INSTR","
 INSTR(string, searchString, [, startInt])
 ","
@@ -1599,18 +1648,13 @@ STRINGTOUTF8(string)
 ","
 Encodes a string to a byte array using the UTF8 encoding format."
 "Functions (String)","SUBSTRING","
-SUBSTRING ( {string|bytes} FROM startInt [ FOR lengthInt ] )
-    | { SUBSTRING | SUBSTR } ( {string|bytes}, startInt [, lengthInt ] )
+{ SUBSTRING | SUBSTR } ( string, startInt [, lengthInt ] )
 ","
 Returns a substring of a string starting at a position."
 "Functions (String)","UTF8TOSTRING","
 UTF8TOSTRING(bytes)
 ","
 Decodes a byte array in the UTF8 format to a string."
-"Functions (String)","QUOTE_IDENT","
-QUOTE_IDENT(string)
-","
-Quotes the specified identifier."
 "Functions (String)","XMLATTR","
 XMLATTR(nameString, valueString)
 ","
@@ -1644,23 +1688,23 @@ TRANSLATE(value, searchString, replacementString)
 ","
 Oracle-compatible TRANSLATE function that replaces a sequence of characters in a string with another set of characters."
 "Functions (Time and Date)","CURRENT_DATE","
-CURRENT_DATE | CURDATE() | SYSDATE | TODAY
+{ CURRENT_DATE | CURDATE() | SYSDATE | TODAY }
 ","
 Returns the current date."
 "Functions (Time and Date)","CURRENT_TIME","
 CURRENT_TIME [ (int) ]
 ","
-Returns the current time with time zone."
+Returns the current time."
 "Functions (Time and Date)","CURRENT_TIMESTAMP","
 CURRENT_TIMESTAMP [ (int) ]
 ","
 Returns the current timestamp with time zone."
 "Functions (Time and Date)","LOCALTIME","
-LOCALTIME [ (int) ] | CURTIME([ int ])
+{ LOCALTIME [ (int) ] | CURTIME([ int ]) }
 ","
-Returns the current time without time zone."
+Returns the current time."
 "Functions (Time and Date)","LOCALTIMESTAMP","
-LOCALTIMESTAMP [ (int) ] | NOW( [ int ] )
+{ LOCALTIMESTAMP [ (int) ] | NOW( [ int ] ) }
 ","
 Returns the current timestamp without time zone."
 "Functions (Time and Date)","DATEADD","
@@ -1794,9 +1838,9 @@ CONVERT(value, dataType)
 ","
 Converts a value to another data type."
 "Functions (System)","CURRVAL","
-CURRVAL( [ schemaNameString, ] sequenceString )
+CURRVAL( [ schemaName, ] sequenceString )
 ","
-Returns the latest generated value of the sequence for the current session."
+Returns the current (last) value of the sequence, independent of the session."
 "Functions (System)","CSVREAD","
 CSVREAD(fileNameString [, columnsString [, csvOptions ] ] )
 ","
@@ -1805,12 +1849,8 @@ Returns the result set of reading the CSV (comma separated values) file."
 CSVWRITE ( fileNameString, queryString [, csvOptions [, lineSepString] ] )
 ","
 Writes a CSV (comma separated values)."
-"Functions (System)","CURRENT_SCHEMA","
-CURRENT_SCHEMA | SCHEMA()
-","
-Returns the name of the default schema for this session."
-"Functions (System)","CURRENT_CATALOG","
-CURRENT_CATALOG | DATABASE()
+"Functions (System)","DATABASE","
+DATABASE()
 ","
 Returns the name of the database."
 "Functions (System)","DATABASE_PATH","
@@ -1879,9 +1919,9 @@ MEMORY_USED()
 ","
 Returns the used memory in KB (where 1024 bytes is a KB)."
 "Functions (System)","NEXTVAL","
-NEXTVAL ( [ schemaNameString, ] sequenceString )
+NEXTVAL ( [ schemaName, ] sequenceString )
 ","
-Increments the sequence and returns its value."
+Returns the next value of the sequence."
 "Functions (System)","NULLIF","
 NULLIF(aValue, bValue)
 ","
@@ -1898,6 +1938,10 @@ Returns true if the database is read-only."
 ROWNUM()
 ","
 Returns the number of the current row."
+"Functions (System)","SCHEMA","
+SCHEMA()
+","
+Returns the name of the default schema for this session."
 "Functions (System)","SCOPE_IDENTITY","
 SCOPE_IDENTITY()
 ","
@@ -1936,220 +1980,56 @@ Returns the name of the current user of this session."
 H2VERSION()
 ","
 Returns the H2 version as a String."
-"Functions (JSON)","JSON_OBJECT","
-JSON_OBJECT(
-[{[KEY] string VALUE expression} | {string : expression} [,...]]
-[ { NULL | ABSENT } ON NULL ]
-[ { WITH | WITHOUT } UNIQUE KEYS ]
-)
-","
-Returns a JSON object constructed from the specified properties."
-"Functions (JSON)","JSON_ARRAY","
-JSON_ARRAY(
-[expression [,...]]|{(query) [FORMAT JSON]}
-[ { NULL | ABSENT } ON NULL ]
-)
-","
-Returns a JSON array constructed from the specified values or from the specified single-column subquery."
-"Aggregate Functions (General)","AVG","
-AVG ( [ DISTINCT|ALL ] { numeric } )
-[FILTER (WHERE expression)] [OVER windowNameOrSpecification]
-","
-The average (mean) value."
-"Aggregate Functions (General)","MAX","
-MAX(value)
-[FILTER (WHERE expression)] [OVER windowNameOrSpecification]
-","
-The highest value."
-"Aggregate Functions (General)","MIN","
-MIN(value)
-[FILTER (WHERE expression)] [OVER windowNameOrSpecification]
-","
-The lowest value."
-"Aggregate Functions (General)","SUM","
-SUM( [ DISTINCT|ALL ] { numeric } )
-[FILTER (WHERE expression)] [OVER windowNameOrSpecification]
-","
-The sum of all values."
-"Aggregate Functions (General)","EVERY","
-{EVERY|BOOL_AND}(boolean)
-[FILTER (WHERE expression)] [OVER windowNameOrSpecification]
-","
-Returns true if all expressions are true."
-"Aggregate Functions (General)","ANY","
-{ANY|SOME|BOOL_OR}(boolean)
-[FILTER (WHERE expression)] [OVER windowNameOrSpecification]
-","
-Returns true if any expression is true."
-"Aggregate Functions (General)","COUNT","
-COUNT( { * | { [ DISTINCT|ALL ] expression } } )
-[FILTER (WHERE expression)] [OVER windowNameOrSpecification]
-","
-The count of all row, or of the non-null values."
-"Aggregate Functions (General)","STDDEV_POP","
-STDDEV_POP( [ DISTINCT|ALL ] numeric )
-[FILTER (WHERE expression)] [OVER windowNameOrSpecification]
-","
-The population standard deviation."
-"Aggregate Functions (General)","STDDEV_SAMP","
-STDDEV_SAMP( [ DISTINCT|ALL ] numeric )
-[FILTER (WHERE expression)] [OVER windowNameOrSpecification]
-","
-The sample standard deviation."
-"Aggregate Functions (General)","VAR_POP","
-VAR_POP( [ DISTINCT|ALL ] numeric )
-[FILTER (WHERE expression)] [OVER windowNameOrSpecification]
-","
-The population variance (square of the population standard deviation)."
-"Aggregate Functions (General)","VAR_SAMP","
-VAR_SAMP( [ DISTINCT|ALL ] numeric )
-[FILTER (WHERE expression)] [OVER windowNameOrSpecification]
-","
-The sample variance (square of the sample standard deviation)."
-"Aggregate Functions (General)","BIT_AND","
-BIT_AND(expression)
-[FILTER (WHERE expression)] [OVER windowNameOrSpecification]
-","
-The bitwise AND of all non-null values."
-"Aggregate Functions (General)","BIT_OR","
-BIT_OR(expression)
-[FILTER (WHERE expression)] [OVER windowNameOrSpecification]
-","
-The bitwise OR of all non-null values."
-"Aggregate Functions (General)","SELECTIVITY","
-SELECTIVITY(value)
-[FILTER (WHERE expression)] [OVER windowNameOrSpecification]
-","
-Estimates the selectivity (0-100) of a value."
-"Aggregate Functions (General)","ENVELOPE","
-ENVELOPE( value )
-[FILTER (WHERE expression)] [OVER windowNameOrSpecification]
-","
-Returns the minimum bounding box that encloses all specified GEOMETRY values."
-"Aggregate Functions (Ordered)","LISTAGG","
-{ LISTAGG ( [ DISTINCT|ALL ] string [, separatorString] [ ON OVERFLOW ERROR ] )
-    withinGroupSpecification }
-| { GROUP_CONCAT ( [ DISTINCT|ALL ] string
-    [ ORDER BY { expression [ ASC | DESC ] } [,...] ]
-    [ SEPARATOR separatorString ] ) }
-[FILTER (WHERE expression)] [OVER windowNameOrSpecification]
-","
-Concatenates strings with a separator."
-"Aggregate Functions (Ordered)","ARRAY_AGG","
-ARRAY_AGG ( [ DISTINCT|ALL ] value
-[ ORDER BY { expression [ ASC | DESC ] } [,...] ] )
-[FILTER (WHERE expression)] [OVER windowNameOrSpecification]
-","
-Aggregate the value into an array."
-"Aggregate Functions (Hypothetical Set)","RANK aggregate","
-RANK(value [,...])
-withinGroupSpecification
-[FILTER (WHERE expression)] [OVER windowNameOrSpecification]
-","
-Returns the rank of the hypothetical row in specified collection of rows."
-"Aggregate Functions (Hypothetical Set)","DENSE_RANK aggregate","
-DENSE_RANK(value [,...])
-withinGroupSpecification
-[FILTER (WHERE expression)] [OVER windowNameOrSpecification]
-","
-Returns the dense rank of the hypothetical row in specified collection of rows."
-"Aggregate Functions (Hypothetical Set)","PERCENT_RANK aggregate","
-PERCENT_RANK(value [,...])
-withinGroupSpecification
-[FILTER (WHERE expression)] [OVER windowNameOrSpecification]
-","
-Returns the relative rank of the hypothetical row in specified collection of rows."
-"Aggregate Functions (Hypothetical Set)","CUME_DIST aggregate","
-CUME_DIST(value [,...])
-withinGroupSpecification
-[FILTER (WHERE expression)] [OVER windowNameOrSpecification]
-","
-Returns the relative rank of the hypothetical row in specified collection of rows."
-"Aggregate Functions (Inverse Distribution)","PERCENTILE_CONT","
-PERCENTILE_CONT(numeric) WITHIN GROUP (ORDER BY value [ASC|DESC])
-[FILTER (WHERE expression)] [OVER windowNameOrSpecification]
-","
-Return percentile of values from the group with interpolation."
-"Aggregate Functions (Inverse Distribution)","PERCENTILE_DISC","
-PERCENTILE_DISC(numeric) WITHIN GROUP (ORDER BY value [ASC|DESC])
-[FILTER (WHERE expression)] [OVER windowNameOrSpecification]
-","
-Return percentile of values from the group."
-"Aggregate Functions (Inverse Distribution)","MEDIAN","
-MEDIAN( [ DISTINCT|ALL ] value )
-[FILTER (WHERE expression)] [OVER windowNameOrSpecification]
-","
-The value separating the higher half of a values from the lower half."
-"Aggregate Functions (Inverse Distribution)","MODE","
-{ MODE( value ) [ ORDER BY value [ ASC | DESC ] ] }
-    | { MODE() WITHIN GROUP (ORDER BY expression [ ASC | DESC ]) }
-[FILTER (WHERE expression)] [OVER windowNameOrSpecification]
-","
-Returns the value that occurs with the greatest frequency."
-"Aggregate Functions (JSON)","JSON_OBJECTAGG","
-JSON_OBJECTAGG(
-{[KEY] string VALUE value} | {string : value}
-[ { NULL | ABSENT } ON NULL ]
-[ { WITH | WITHOUT } UNIQUE KEYS ]
-)
-[FILTER (WHERE expression)] [OVER windowNameOrSpecification]
-","
-Aggregates the keys with values into a JSON object."
-"Aggregate Functions (JSON)","JSON_ARRAYAGG","
-JSON_ARRAYAGG(expression [ { NULL | ABSENT } ON NULL ])
-[FILTER (WHERE expression)] [OVER windowNameOrSpecification]
-","
-Aggregates the values into a JSON array."
-"Window Functions (Row Number)","ROW_NUMBER","
+"Functions (Window)","ROW_NUMBER","
 ROW_NUMBER() OVER windowNameOrSpecification
 ","
 Returns the number of the current row starting with 1."
-"Window Functions (Rank)","RANK","
+"Functions (Window)","RANK","
 RANK() OVER windowNameOrSpecification
 ","
 Returns the rank of the current row."
-"Window Functions (Rank)","DENSE_RANK","
+"Functions (Window)","DENSE_RANK","
 DENSE_RANK() OVER windowNameOrSpecification
 ","
 Returns the dense rank of the current row."
-"Window Functions (Rank)","PERCENT_RANK","
+"Functions (Window)","PERCENT_RANK","
 PERCENT_RANK() OVER windowNameOrSpecification
 ","
 Returns the relative rank of the current row."
-"Window Functions (Rank)","CUME_DIST","
+"Functions (Window)","CUME_DIST","
 CUME_DIST() OVER windowNameOrSpecification
 ","
 Returns the relative rank of the current row."
-"Window Functions (Lead or Lag)","LEAD","
+"Functions (Window)","NTILE","
+NTILE(long) OVER windowNameOrSpecification
+","
+Distributes the rows into a specified number of groups."
+"Functions (Window)","LEAD","
 LEAD(value [, offsetInt [, defaultValue]]) [{RESPECT|IGNORE} NULLS]
 OVER windowNameOrSpecification
 ","
 Returns the value in a next row with specified offset relative to the current row."
-"Window Functions (Lead or Lag)","LAG","
+"Functions (Window)","LAG","
 LAG(value [, offsetInt [, defaultValue]]) [{RESPECT|IGNORE} NULLS]
 OVER windowNameOrSpecification
 ","
 Returns the value in a previous row with specified offset relative to the current row."
-"Window Functions (Nth Value)","FIRST_VALUE","
+"Functions (Window)","FIRST_VALUE","
 FIRST_VALUE(value) [{RESPECT|IGNORE} NULLS]
 OVER windowNameOrSpecification
 ","
 Returns the first value in a window."
-"Window Functions (Nth Value)","LAST_VALUE","
+"Functions (Window)","LAST_VALUE","
 LAST_VALUE(value) [{RESPECT|IGNORE} NULLS]
 OVER windowNameOrSpecification
 ","
 Returns the last value in a window."
-"Window Functions (Nth Value)","NTH_VALUE","
+"Functions (Window)","NTH_VALUE","
 NTH_VALUE(value, nInt) [FROM {FIRST|LAST}] [{RESPECT|IGNORE} NULLS]
 OVER windowNameOrSpecification
 ","
 Returns the value in a row with a specified relative number in a window."
-"Window Functions (Other)","NTILE","
-NTILE(long) OVER windowNameOrSpecification
-","
-Distributes the rows into a specified number of groups."
-"Window Functions (Other)","RATIO_TO_REPORT","
+"Functions (Window)","RATIO_TO_REPORT","
 RATIO_TO_REPORT(value)
 OVER windowNameOrSpecification
 ","

@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <!--
 Copyright 2004-2019 H2 Group. Multiple-Licensed under the MPL 2.0,
-and the EPL 1.0 (https://h2database.com/html/license.html).
+and the EPL 1.0 (http://h2database.com/html/license.html).
 Initial Developer: H2 Group
 -->
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
@@ -21,16 +21,14 @@ Data Types
 <img src="images/h2-logo-2.png"
     alt="H2 database logo"
     onclick="document.location='main.html'"
-    width="136" height="74"/>
-&nbsp;&nbsp;<span id = "goTop" onclick="window.scrollTo(0,0)" style="color: #fff; position:fixed; font-size: 20px; cursor: pointer;">&#x25b2;</span>
-</div>
+    width="136" height="74"/> &nbsp;&nbsp;<span id = "goTop" onclick="window.scrollTo(0,0)" style="color: #fff; position:fixed; font-size: 20px; cursor: pointer;">&#x25b2;</span> </div>
 
 <form action="submit" onsubmit="return goFirst();">
 <table width="100%" class="search">
     <tr class="search">
         <td class="search" colspan="2">
 <!-- translate
-<a href="https://translate.google.com/translate?u=https%3A%2F%2Fh2database.com"
+<a href="http://translate.google.com/translate?u=http%3A%2F%2Fh2database.com"
     onclick="javascript:startTranslate();return false;">Translate</a>
 <div id = "translate" style="display:none"><div id = "google_translate_element"></div></div>
 translate -->
@@ -80,9 +78,6 @@ translate -->
 <b>Reference</b><br />
 <a href="commands.html">Commands</a><br />
 <a href="functions.html">Functions</a><br />
-&#8226;&nbsp;<a href="functions-aggregate.html">Aggregate</a>
-&#8226;&nbsp;<a href="functions-window.html">Window</a>
-<br /><br />
 <a href="datatypes.html">Data Types</a><br />
 <a href="grammar.html">SQL Grammar</a><br />
 <a href="systemtables.html">System Tables</a><br />
@@ -139,8 +134,6 @@ translate -->
 
     <a href="#time_type" >TIME</a><br />
 
-    <a href="#time_with_time_zone_type" >TIME WITH TIME ZONE</a><br />
-
     <a href="#date_type" >DATE</a><br />
 
     <a href="#timestamp_type" >TIMESTAMP</a><br />
@@ -168,8 +161,6 @@ translate -->
     <a href="#enum_type" >ENUM</a><br />
 
     <a href="#geometry_type" >GEOMETRY</a><br />
-
-    <a href="#json_type" >JSON</a><br />
 
     <a href="#interval_type" >INTERVAL</a><br />
 </p>
@@ -200,8 +191,6 @@ syntax-end -->
             
                 <a href="#time_type" >TIME</a><br />
             
-                <a href="#time_with_time_zone_type" >TIME WITH TIME ZONE</a><br />
-            
                 <a href="#date_type" >DATE</a><br />
             
                 <a href="#timestamp_type" >TIMESTAMP</a><br />
@@ -215,9 +204,9 @@ syntax-end -->
                 <a href="#varchar_type" >VARCHAR</a><br />
             
                 <a href="#varchar_ignorecase_type" >VARCHAR_IGNORECASE</a><br />
-                    </td><td class="index">
             
                 <a href="#char_type" >CHAR</a><br />
+                    </td><td class="index">
             
                 <a href="#blob_type" >BLOB</a><br />
             
@@ -230,8 +219,6 @@ syntax-end -->
                 <a href="#enum_type" >ENUM</a><br />
             
                 <a href="#geometry_type" >GEOMETRY</a><br />
-            
-                <a href="#json_type" >JSON</a><br />
             
                 <a href="#interval_type" >INTERVAL</a><br />
                     </td>
@@ -259,7 +246,7 @@ INT | INTEGER | MEDIUMINT | INT4 | SIGNED
 INT | INTEGER | MEDIUMINT | INT4 | SIGNED
 </pre>
 syntax-end -->
-<p>Possible values: -2147483648 to 2147483647.</p><p>See also <a href="grammar.html#int">integer</a> literal grammar. Mapped to <code>java.lang.Integer</code>.</p>
+<p>Possible values: -2147483648 to 2147483647.</p><p>Mapped to <code>java.lang.Integer</code>.</p>
 <p>Example:</p>
 <p class="notranslate">INT</p>
 
@@ -277,7 +264,7 @@ BOOLEAN | BIT | BOOL
 BOOLEAN | BIT | BOOL
 </pre>
 syntax-end -->
-<p>Possible values: <code>TRUE, FALSE</code>, and <code>UNKNOWN</code> (<code>NULL</code>).</p><p>See also <a href="grammar.html#boolean">boolean</a> literal grammar. Mapped to <code>java.lang.Boolean</code>.</p>
+<p>Possible values: <code>TRUE</code> and <code>FALSE</code>.</p><p>Mapped to <code>java.lang.Boolean</code>.</p>
 <p>Example:</p>
 <p class="notranslate">BOOLEAN</p>
 
@@ -295,7 +282,7 @@ TINYINT
 TINYINT
 </pre>
 syntax-end -->
-<p>Possible values are: -128 to 127.</p><p>See also <a href="grammar.html#int">integer</a> literal grammar. Mapped to <code>java.lang.Byte</code>.</p>
+<p>Possible values are: -128 to 127.</p><p>Mapped to <code>java.lang.Byte</code>.</p>
 <p>Example:</p>
 <p class="notranslate">TINYINT</p>
 
@@ -313,7 +300,7 @@ SMALLINT | INT2 | YEAR
 SMALLINT | INT2 | YEAR
 </pre>
 syntax-end -->
-<p>Possible values: -32768 to 32767.</p><p>See also <a href="grammar.html#int">integer</a> literal grammar. Mapped to <code>java.lang.Short</code>.</p>
+<p>Possible values: -32768 to 32767.</p><p>Mapped to <code>java.lang.Short</code>.</p>
 <p>Example:</p>
 <p class="notranslate">SMALLINT</p>
 
@@ -331,7 +318,7 @@ BIGINT | INT8
 BIGINT | INT8
 </pre>
 syntax-end -->
-<p>Possible values: -9223372036854775808 to 9223372036854775807.</p><p>See also <a href="grammar.html#long">long</a> literal grammar. Mapped to <code>java.lang.Long</code>.</p>
+<p>Possible values: -9223372036854775808 to 9223372036854775807.</p><p>Mapped to <code>java.lang.Long</code>.</p>
 <p>Example:</p>
 <p class="notranslate">BIGINT</p>
 
@@ -349,7 +336,7 @@ IDENTITY
 IDENTITY
 </pre>
 syntax-end -->
-<p>Auto-Increment value. Possible values: -9223372036854775808 to 9223372036854775807. Used values are never re-used, even when the transaction is rolled back.</p><p>See also <a href="grammar.html#long">long</a> literal grammar. Mapped to <code>java.lang.Long</code>.</p>
+<p>Auto-Increment value. Possible values: -9223372036854775808 to 9223372036854775807. Used values are never re-used, even when the transaction is rolled back.</p><p>Mapped to <code>java.lang.Long</code>.</p>
 <p>Example:</p>
 <p class="notranslate">IDENTITY</p>
 
@@ -367,7 +354,7 @@ syntax-end -->
 { DECIMAL | NUMBER | DEC | NUMERIC } ( <a href="grammar.html#int">precisionInt</a> [ , <a href="grammar.html#int">scaleInt</a> ] )
 </pre>
 syntax-end -->
-<p>Data type with fixed precision and scale. This data type is recommended for storing currency values.</p><p>See also <a href="grammar.html#numeric">numeric</a> literal grammar. Mapped to <code>java.math.BigDecimal</code>.</p>
+<p>Data type with fixed precision and scale. This data type is recommended for storing currency values.</p><p>Mapped to <code>java.math.BigDecimal</code>.</p>
 <p>Example:</p>
 <p class="notranslate">DECIMAL(20, 2)</p>
 
@@ -385,7 +372,7 @@ syntax-end -->
 { DOUBLE [ PRECISION ] | FLOAT [ ( <a href="grammar.html#int">precisionInt</a> ) ] | FLOAT8 }
 </pre>
 syntax-end -->
-<p>A floating point number. Should not be used to represent currency values, because of rounding problems. If precision value is specified for <code>FLOAT</code> type name, it should be from 25 to 53.</p><p>See also <a href="grammar.html#numeric">numeric</a> literal grammar. Mapped to <code>java.lang.Double</code>.</p>
+<p>A floating point number. Should not be used to represent currency values, because of rounding problems. If precision value is specified for <code>FLOAT</code> type name, it should be from 25 to 53.</p><p>Mapped to <code>java.lang.Double</code>.</p>
 <p>Example:</p>
 <p class="notranslate">DOUBLE</p>
 
@@ -403,7 +390,7 @@ syntax-end -->
 { REAL | FLOAT ( <a href="grammar.html#int">precisionInt</a> ) | FLOAT4 }
 </pre>
 syntax-end -->
-<p>A single precision floating point number. Should not be used to represent currency values, because of rounding problems. Precision value for <code>FLOAT</code> type name should be from 0 to 24.</p><p>See also <a href="grammar.html#numeric">numeric</a> literal grammar. Mapped to <code>java.lang.Float</code>.</p>
+<p>A single precision floating point number. Should not be used to represent currency values, because of rounding problems. Precision value for <code>FLOAT</code> type name should be from 0 to 24.</p><p>Mapped to <code>java.lang.Float</code>.</p>
 <p>Example:</p>
 <p class="notranslate">REAL</p>
 
@@ -421,27 +408,9 @@ TIME [ ( <a href="grammar.html#int">precisionInt</a> ) ] [ WITHOUT TIME ZONE ]
 TIME [ ( <a href="grammar.html#int">precisionInt</a> ) ] [ WITHOUT TIME ZONE ]
 </pre>
 syntax-end -->
-<p>The time data type. The format is hh:mm:ss[.nnnnnnnnn]. If fractional seconds precision is specified it should be from 0 to 9, 0 is default.</p><p>See also <a href="grammar.html#time">time</a> literal grammar. Mapped to <code>java.sql.Time</code>. <code>java.time.LocalTime</code> is also supported and recommended on Java 8 and later versions. Use <code>java.time.LocalTime</code> or <code>String</code> instead of <code>java.sql.Time</code> when non-zero precision is needed. Cast from higher fractional seconds precision to lower fractional seconds precision performs round half up; if result of rounding is higher than maximum supported value 23:59:59.999999999 the value is rounded down instead. The <code>CAST</code> operation to <code>TIMESTAMP</code> and <code>TIMESTAMP WITH TIME ZONE</code> data types uses the <code>CURRENT_DATE</code> for date fields, comparison operations with values of these data types use the 1970-01-01 instead.</p>
+<p>The time data type. The format is hh:mm:ss[.nnnnnnnnn]. If fractional seconds precision is specified it should be from 0 to 9, 0 is default.</p><p>Mapped to <code>java.sql.Time</code>. When converted to a <code>java.sql.Date</code>, the date is set to <code>1970-01-01</code>. <code>java.time.LocalTime</code> is also supported on Java 8 and later versions. Use <code>java.time.LocalTime</code> or <code>String</code> instead of <code>java.sql.Time</code> when non-zero precision is needed. Cast from higher fractional seconds precision to lower fractional seconds precision performs round half up; if result of rounding is higher than maximum supported value 23:59:59.999999999 it is saturated to 23:59:59.999999999.</p>
 <p>Example:</p>
 <p class="notranslate">TIME<br />TIME(9)</p>
-
-<h2 id="time_with_time_zone_type" class="notranslate" onclick="switchBnf(this)">TIME WITH TIME ZONE</h2>
-<!-- railroad-start -->
-<pre name="bnf" style="display: none">
-TIME [ ( <a href="grammar.html#int">precisionInt</a> ) ] WITH TIME ZONE
-</pre>
-<div name="railroad">
-<table class="railroad"><tr class="railroad"><td class="d"><code class="c">TIME</code></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><code class="c">( <a href="grammar.html#int">precisionInt</a> )</code></td></tr></table></td><td class="le"></td></tr></table></td><td class="d"><code class="c">WITH TIME ZONE</code></td></tr></table>
-</div>
-<!-- railroad-end -->
-<!-- syntax-start
-<pre>
-TIME [ ( <a href="grammar.html#int">precisionInt</a> ) ] WITH TIME ZONE
-</pre>
-syntax-end -->
-<p>The time with time zone data type. If fractional seconds precision is specified it should be from 0 to 9, 0 is default.</p><p>See also <a href="grammar.html#time_with_time_zone">time with time zone</a> literal grammar. Mapped to <code>java.time.OffsetTime</code> on Java 8 and later versions. Cast from higher fractional seconds precision to lower fractional seconds precision performs round half up; if result of rounding is higher than maximum supported value 23:59:59.999999999 the value is rounded down instead. The <code>CAST</code> operation to <code>TIMESTAMP</code> and <code>TIMESTAMP WITH TIME ZONE</code> data types uses the <code>CURRENT_DATE</code> for date fields, comparison operations with values of these data types use the 1970-01-01 instead.</p>
-<p>Example:</p>
-<p class="notranslate">TIME WITH TIME ZONE<br />TIME(9) WITH TIME ZONE</p>
 
 <h2 id="date_type" class="notranslate" onclick="switchBnf(this)">DATE</h2>
 <!-- railroad-start -->
@@ -457,7 +426,7 @@ DATE
 DATE
 </pre>
 syntax-end -->
-<p>The date data type. The proleptic Gregorian calendar is used.</p><p>See also <a href="grammar.html#date">date</a> literal grammar. Mapped to <code>java.sql.Date</code>, with the time set to <code>00:00:00</code> (or to the next possible time if midnight doesn&#39;t exist for the given date and time zone due to a daylight saving change). <code>java.time.LocalDate</code> is also supported and recommended on Java 8 and later versions.</p><p>If your time zone had <code>LMT</code> (local mean time) in the past and you use such old dates (depends on the time zone, usually 100 or more years ago), don&#39;t use <code>java.sql.Date</code> to read and write them.</p><p>If you deal with very old dates (before 1582-10-15) note that <code>java.sql.Date</code> uses a mixed Julian/Gregorian calendar, <code>java.util.GregorianCalendar</code> can be configured to proleptic Gregorian with <code>setGregorianChange(new java.util.Date(Long.MIN_VALUE))</code> and used to read or write fields of dates.</p>
+<p>The date data type. The format is yyyy-<code>MM</code>-dd.</p><p>Mapped to <code>java.sql.Date</code>, with the time set to <code>00:00:00</code> (or to the next possible time if midnight doesn&#39;t exist for the given date and timezone due to a daylight saving change). <code>java.time.LocalDate</code> is also supported on Java 8 and later versions.</p>
 <p>Example:</p>
 <p class="notranslate">DATE</p>
 
@@ -477,7 +446,7 @@ syntax-end -->
 | DATETIME [ ( <a href="grammar.html#int">precisionInt</a> ) ] | SMALLDATETIME }
 </pre>
 syntax-end -->
-<p>The timestamp data type. The proleptic Gregorian calendar is used. If fractional seconds precision is specified it should be from 0 to 9, 6 is default. Fractional seconds precision of <code>SMALLDATETIME</code> is always 0 and cannot be specified.</p><p>This data type holds the local date and time without time zone information. It cannot distinguish timestamps near transitions from <code>DST</code> to normal time. For absolute timestamps use the <a href="datatypes.html#timestamp_with_time_zone_type"><code>TIMESTAMP WITH TIME ZONE</code></a> data type instead.</p><p>See also <a href="grammar.html#timestamp">timestamp</a> literal grammar. Mapped to <code>java.sql.Timestamp</code> (<code>java.util.Date</code> may be used too). <code>java.time.LocalDateTime</code> is also supported and recommended on Java 8 and later versions.</p><p>If your time zone had <code>LMT</code> (local mean time) in the past and you use such old dates (depends on the time zone, usually 100 or more years ago), don&#39;t use <code>java.sql.Timestamp</code> and <code>java.util.Date</code> to read and write them.</p><p>If you deal with very old dates (before 1582-10-15) note that <code>java.sql.Timestamp</code> and <code>java.util.Date</code> use a mixed Julian/Gregorian calendar, <code>java.util.GregorianCalendar</code> can be configured to proleptic Gregorian with <code>setGregorianChange(new java.util.Date(Long.MIN_VALUE))</code> and used to read or write fields of timestamps.</p><p>Cast from higher fractional seconds precision to lower fractional seconds precision performs round half up.</p>
+<p>The timestamp data type. The format is yyyy-<code>MM</code>-dd hh:mm:ss[.nnnnnnnnn]. Stored internally as a <code>BCD</code>-encoded date, and nanoseconds since midnight. If fractional seconds precision is specified it should be from 0 to 9, 6 is default. Fractional seconds precision of <code>SMALLDATETIME</code> is always 0 and cannot be specified.</p><p>Mapped to <code>java.sql.Timestamp</code> (<code>java.util.Date</code> may be used too). <code>java.time.LocalDateTime</code> is also supported on Java 8 and later versions. Cast from higher fractional seconds precision to lower fractional seconds precision performs round half up.</p>
 <p>Example:</p>
 <p class="notranslate">TIMESTAMP<br />TIMESTAMP(9)</p>
 
@@ -495,7 +464,7 @@ TIMESTAMP [ ( <a href="grammar.html#int">precisionInt</a> ) ] WITH TIME ZONE
 TIMESTAMP [ ( <a href="grammar.html#int">precisionInt</a> ) ] WITH TIME ZONE
 </pre>
 syntax-end -->
-<p>The timestamp with time zone data type. The proleptic Gregorian calendar is used. If fractional seconds precision is specified it should be from 0 to 9, 6 is default.</p><p>See also <a href="grammar.html#timestamp_with_time_zone">timestamp with time zone</a> literal grammar. Mapped to <code>org.h2.api.TimestampWithTimeZone</code> by default and can be optionally mapped to <code>java.time.OffsetDateTime</code>. <code>java.time.ZonedDateTime</code> and <code>java.time.Instant</code> are also supported on Java 8 and later versions.</p><p>Values of this data type are compared by <code>UTC</code> values. It means that <code>2010-01-01 10:00:00+01</code> is greater than <code>2010-01-01 11:00:00+03</code>.</p><p>Conversion to <code>TIMESTAMP</code> uses time zone offset to get <code>UTC</code> time and converts it to local time using the system time zone. Conversion from <code>TIMESTAMP</code> does the same operations in reverse and sets time zone offset to offset of the system time zone. Cast from higher fractional seconds precision to lower fractional seconds precision performs round half up.</p>
+<p>The timestamp with time zone data type. Stored internally as a <code>BCD</code>-encoded date, nanoseconds since midnight, and time zone offset in minutes. If fractional seconds precision is specified it should be from 0 to 9, 6 is default.</p><p>Mapped to <code>org.h2.api.TimestampWithTimeZone</code>. <code>java.time.OffsetDateTime</code> and <code>java.time.Instant</code> are also supported on Java 8 and later versions.</p><p>Values of this data type are compared by <code>UTC</code> values. It means that <code>2010-01-01 10:00:00+01</code> is greater than <code>2010-01-01 11:00:00+03</code>.</p><p>Conversion to <code>TIMESTAMP</code> uses time zone offset to get <code>UTC</code> time and converts it to local time using the system time zone. Conversion from <code>TIMESTAMP</code> does the same operations in reverse and sets time zone offset to offset of the system time zone. Cast from higher fractional seconds precision to lower fractional seconds precision performs round half up.</p>
 <p>Example:</p>
 <p class="notranslate">TIMESTAMP WITH TIME ZONE<br />TIMESTAMP(9) WITH TIME ZONE</p>
 
@@ -517,7 +486,7 @@ syntax-end -->
 [ ( <a href="grammar.html#int">precisionInt</a> ) ]
 </pre>
 syntax-end -->
-<p>Represents a byte array. For very long arrays, use <code>BLOB</code>. The maximum size is 2 GB, but the whole object is kept in memory when using this data type. The precision is a size constraint; only the actual data is persisted. For large text data <code>BLOB</code> or <code>CLOB</code> should be used.</p><p>See also <a href="grammar.html#bytes">bytes</a> literal grammar. Mapped to byte[].</p>
+<p>Represents a byte array. For very long arrays, use <code>BLOB</code>. The maximum size is 2 GB, but the whole object is kept in memory when using this data type. The precision is a size constraint; only the actual data is persisted. For large text data <code>BLOB</code> or <code>CLOB</code> should be used.</p><p>Mapped to byte[].</p>
 <p>Example:</p>
 <p class="notranslate">BINARY(1000)</p>
 
@@ -555,7 +524,7 @@ syntax-end -->
 | NVARCHAR2 | VARCHAR_CASESENSITIVE} [ ( <a href="grammar.html#int">precisionInt</a> ) ]
 </pre>
 syntax-end -->
-<p>A Unicode String. Use two single quotes (&#39;&#39;) to create a quote.</p><p>The maximum precision is <code>Integer.MAX_VALUE</code>. The precision is a size constraint; only the actual data is persisted.</p><p>The whole text is loaded into memory when using this data type. For large text data <code>CLOB</code> should be used; see there for details.</p><p>See also <a href="grammar.html#string">string</a> literal grammar. Mapped to <code>java.lang.String</code>.</p>
+<p>A Unicode String. Use two single quotes (&#39;&#39;) to create a quote.</p><p>The maximum precision is <code>Integer.MAX_VALUE</code>. The precision is a size constraint; only the actual data is persisted.</p><p>The whole text is loaded into memory when using this data type. For large text data <code>CLOB</code> should be used; see there for details.</p><p>Mapped to <code>java.lang.String</code>.</p>
 <p>Example:</p>
 <p class="notranslate">VARCHAR(255)</p>
 
@@ -573,7 +542,7 @@ VARCHAR_IGNORECASE [ ( <a href="grammar.html#int">precisionInt</a> ) ]
 VARCHAR_IGNORECASE [ ( <a href="grammar.html#int">precisionInt</a> ) ]
 </pre>
 syntax-end -->
-<p>Same as <code>VARCHAR</code>, but not case sensitive when comparing. Stored in mixed case.</p><p>The maximum precision is <code>Integer.MAX_VALUE</code>. The precision is a size constraint; only the actual data is persisted.</p><p>The whole text is loaded into memory when using this data type. For large text data <code>CLOB</code> should be used; see there for details.</p><p>See also <a href="grammar.html#string">string</a> literal grammar. Mapped to <code>java.lang.String</code>.</p>
+<p>Same as <code>VARCHAR</code>, but not case sensitive when comparing. Stored in mixed case.</p><p>The maximum precision is <code>Integer.MAX_VALUE</code>. The precision is a size constraint; only the actual data is persisted.</p><p>The whole text is loaded into memory when using this data type. For large text data <code>CLOB</code> should be used; see there for details.</p><p>Mapped to <code>java.lang.String</code>.</p>
 <p>Example:</p>
 <p class="notranslate">VARCHAR_IGNORECASE</p>
 
@@ -591,7 +560,7 @@ syntax-end -->
 { CHAR | CHARACTER | NCHAR } [ ( <a href="grammar.html#int">precisionInt</a> ) ]
 </pre>
 syntax-end -->
-<p>A Unicode String. This type is supported for compatibility with other databases and older applications. The difference to <code>VARCHAR</code> is that trailing spaces are ignored and not persisted.</p><p>The maximum precision is <code>Integer.MAX_VALUE</code>. The precision is a size constraint; only the actual data is persisted.</p><p>The whole text is kept in memory when using this data type. For large text data <code>CLOB</code> should be used; see there for details.</p><p>See also <a href="grammar.html#string">string</a> literal grammar. Mapped to <code>java.lang.String</code>.</p>
+<p>A Unicode String. This type is supported for compatibility with other databases and older applications. The difference to <code>VARCHAR</code> is that trailing spaces are ignored and not persisted.</p><p>The maximum precision is <code>Integer.MAX_VALUE</code>. The precision is a size constraint; only the actual data is persisted.</p><p>The whole text is kept in memory when using this data type. For large text data <code>CLOB</code> should be used; see there for details.</p><p>Mapped to <code>java.lang.String</code>.</p>
 <p>Example:</p>
 <p class="notranslate">CHAR(10)</p>
 
@@ -660,20 +629,20 @@ syntax-end -->
 <h2 id="array_type" class="notranslate" onclick="switchBnf(this)">ARRAY</h2>
 <!-- railroad-start -->
 <pre name="bnf" style="display: none">
-ARRAY [ &#39;[&#39; <a href="grammar.html#int">maximumCardinalityInt</a> &#39;]&#39; ]
+ARRAY
 </pre>
 <div name="railroad">
-<table class="railroad"><tr class="railroad"><td class="d"><code class="c">ARRAY</code></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><code class="c">[ <a href="grammar.html#int">maximumCardinalityInt</a> ]</code></td></tr></table></td><td class="le"></td></tr></table></td></tr></table>
+<code class="c">ARRAY</code>
 </div>
 <!-- railroad-end -->
 <!-- syntax-start
 <pre>
-ARRAY [ &#39;[&#39; <a href="grammar.html#int">maximumCardinalityInt</a> &#39;]&#39; ]
+ARRAY
 </pre>
 syntax-end -->
-<p>An array of values. Maximum cardinality, if any, specifies maximum allowed number of elements in the array.</p><p>See also <a href="grammar.html#array">array</a> literal grammar. Mapped to <code>java.lang.Object[]</code> (arrays of any non-primitive type are also supported).</p><p>Use <code>PreparedStatement.setArray(..)</code> or <code>PreparedStatement.setObject(.., new Object[] {..})</code> to store values, and <code>ResultSet.getObject(..)</code> or <code>ResultSet.getArray(..)</code> to retrieve the values.</p>
+<p>An array of values. Mapped to <code>java.lang.Object[]</code> (arrays of any non-primitive type are also supported).</p><p>Use a value list (1, 2) or <code>PreparedStatement.setObject(.., new Object[] {..})</code> to store values, and <code>ResultSet.getObject(..)</code> or <code>ResultSet.getArray(..)</code> to retrieve the values.</p>
 <p>Example:</p>
-<p class="notranslate">ARRAY<br />ARRAY[10]</p>
+<p class="notranslate">ARRAY</p>
 
 <h2 id="enum_type" class="notranslate" onclick="switchBnf(this)">ENUM</h2>
 <!-- railroad-start -->
@@ -729,24 +698,6 @@ syntax-end -->
 <p>Example:</p>
 <p class="notranslate">GEOMETRY<br />GEOMETRY(POINT)<br />GEOMETRY(POINT Z)<br />GEOMETRY(POINT Z, 4326)<br />GEOMETRY(GEOMETRY, 4326)</p>
 
-<h2 id="json_type" class="notranslate" onclick="switchBnf(this)">JSON</h2>
-<!-- railroad-start -->
-<pre name="bnf" style="display: none">
-JSON
-</pre>
-<div name="railroad">
-<code class="c">JSON</code>
-</div>
-<!-- railroad-end -->
-<!-- syntax-start
-<pre>
-JSON
-</pre>
-syntax-end -->
-<p>A <code>RFC</code> 8259-compliant <code>JSON</code> text.</p><p>See also <a href="grammar.html#json">json</a> literal grammar. Mapped to <code>byte[]</code>. To set a <code>JSON</code> value with <code>java.lang.String</code> in a PreparedStatement use a <code>FORMAT JSON</code> data format (<code>INSERT INTO TEST(ID, DATA) VALUES (?, ? FORMAT JSON)</code>). Without the data format <code>VARCHAR</code> values are converted to a <code>JSON</code> string values.</p><p>Order of object members is preserved as is. Duplicate object member names are allowed.</p>
-<p>Example:</p>
-<p class="notranslate">JSON</p>
-
 <h2 id="interval_type" class="notranslate" onclick="switchBnf(this)">INTERVAL</h2>
 <!-- railroad-start -->
 <pre name="bnf" style="display: none">
@@ -792,7 +743,7 @@ INTERVAL YEAR [ ( <a href="grammar.html#int">precisionInt</a> ) ]
 INTERVAL YEAR [ ( <a href="grammar.html#int">precisionInt</a> ) ]
 </pre>
 syntax-end -->
-<p>Interval data type. If precision is specified it should be from 1 to 18, 2 is default.</p><p>See also <a href="grammar.html#interval_year">year interval</a> literal grammar. Mapped to <code>org.h2.api.Interval</code>. <code>java.time.Period</code> is also supported on Java 8 and later versions.</p>
+<p>Interval data type. If precision is specified it should be from 1 to 18, 2 is default.</p><p>Mapped to <code>org.h2.api.Interval</code>. <code>java.time.Period</code> is also supported on Java 8 and later versions.</p>
 <p>Example:</p>
 <p class="notranslate">INTERVAL YEAR</p>
 
@@ -810,7 +761,7 @@ INTERVAL MONTH [ ( <a href="grammar.html#int">precisionInt</a> ) ]
 INTERVAL MONTH [ ( <a href="grammar.html#int">precisionInt</a> ) ]
 </pre>
 syntax-end -->
-<p>Interval data type. If precision is specified it should be from 1 to 18, 2 is default.</p><p>See also <a href="grammar.html#interval_month">month interval</a> literal grammar. Mapped to <code>org.h2.api.Interval</code>. <code>java.time.Period</code> is also supported on Java 8 and later versions.</p>
+<p>Interval data type. If precision is specified it should be from 1 to 18, 2 is default.</p><p>Mapped to <code>org.h2.api.Interval</code>. <code>java.time.Period</code> is also supported on Java 8 and later versions.</p>
 <p>Example:</p>
 <p class="notranslate">INTERVAL MONTH</p>
 
@@ -828,7 +779,7 @@ INTERVAL DAY [ ( <a href="grammar.html#int">precisionInt</a> ) ]
 INTERVAL DAY [ ( <a href="grammar.html#int">precisionInt</a> ) ]
 </pre>
 syntax-end -->
-<p>Interval data type. If precision is specified it should be from 1 to 18, 2 is default.</p><p>See also <a href="grammar.html#interval_day">day interval</a> literal grammar. Mapped to <code>org.h2.api.Interval</code>. <code>java.time.Duration</code> is also supported on Java 8 and later versions.</p>
+<p>Interval data type. If precision is specified it should be from 1 to 18, 2 is default.</p><p>Mapped to <code>org.h2.api.Interval</code>. <code>java.time.Duration</code> is also supported on Java 8 and later versions.</p>
 <p>Example:</p>
 <p class="notranslate">INTERVAL DAY</p>
 
@@ -846,7 +797,7 @@ INTERVAL HOUR [ ( <a href="grammar.html#int">precisionInt</a> ) ]
 INTERVAL HOUR [ ( <a href="grammar.html#int">precisionInt</a> ) ]
 </pre>
 syntax-end -->
-<p>Interval data type. If precision is specified it should be from 1 to 18, 2 is default.</p><p>See also <a href="grammar.html#interval_hour">hour interval</a> literal grammar. Mapped to <code>org.h2.api.Interval</code>. <code>java.time.Duration</code> is also supported on Java 8 and later versions.</p>
+<p>Interval data type. If precision is specified it should be from 1 to 18, 2 is default.</p><p>Mapped to <code>org.h2.api.Interval</code>. <code>java.time.Duration</code> is also supported on Java 8 and later versions.</p>
 <p>Example:</p>
 <p class="notranslate">INTERVAL HOUR</p>
 
@@ -864,7 +815,7 @@ INTERVAL MINUTE [ ( <a href="grammar.html#int">precisionInt</a> ) ]
 INTERVAL MINUTE [ ( <a href="grammar.html#int">precisionInt</a> ) ]
 </pre>
 syntax-end -->
-<p>Interval data type. If precision is specified it should be from 1 to 18, 2 is default.</p><p>See also <a href="grammar.html#interval_minute">minute interval</a> literal grammar. Mapped to <code>org.h2.api.Interval</code>. <code>java.time.Duration</code> is also supported on Java 8 and later versions.</p>
+<p>Interval data type. If precision is specified it should be from 1 to 18, 2 is default.</p><p>Mapped to <code>org.h2.api.Interval</code>. <code>java.time.Duration</code> is also supported on Java 8 and later versions.</p>
 <p>Example:</p>
 <p class="notranslate">INTERVAL MINUTE</p>
 
@@ -882,7 +833,7 @@ INTERVAL SECOND [ ( <a href="grammar.html#int">precisionInt</a> [, <a href="gram
 INTERVAL SECOND [ ( <a href="grammar.html#int">precisionInt</a> [, <a href="grammar.html#int">fractionalPrecisionInt</a> ] ) ]
 </pre>
 syntax-end -->
-<p>Interval data type. If precision is specified it should be from 1 to 18, 2 is default. If fractional seconds precision is specified it should be from 0 to 9, 6 is default.</p><p>See also <a href="grammar.html#interval_second">second interval</a> literal grammar. Mapped to <code>org.h2.api.Interval</code>. <code>java.time.Duration</code> is also supported on Java 8 and later versions.</p>
+<p>Interval data type. If precision is specified it should be from 1 to 18, 2 is default. If fractional seconds precision is specified it should be from 0 to 9, 6 is default.</p><p>Mapped to <code>org.h2.api.Interval</code>. <code>java.time.Duration</code> is also supported on Java 8 and later versions.</p>
 <p>Example:</p>
 <p class="notranslate">INTERVAL SECOND</p>
 
@@ -900,7 +851,7 @@ INTERVAL YEAR [ ( <a href="grammar.html#int">precisionInt</a> ) ] TO MONTH
 INTERVAL YEAR [ ( <a href="grammar.html#int">precisionInt</a> ) ] TO MONTH
 </pre>
 syntax-end -->
-<p>Interval data type. If leading field precision is specified it should be from 1 to 18, 2 is default.</p><p>See also <a href="grammar.html#interval_year_to_month">year to month interval</a> literal grammar. Mapped to <code>org.h2.api.Interval</code>. <code>java.time.Period</code> is also supported on Java 8 and later versions.</p>
+<p>Interval data type. If leading field precision is specified it should be from 1 to 18, 2 is default.</p><p>Mapped to <code>org.h2.api.Interval</code>. <code>java.time.Period</code> is also supported on Java 8 and later versions.</p>
 <p>Example:</p>
 <p class="notranslate">INTERVAL YEAR TO MONTH</p>
 
@@ -918,7 +869,7 @@ INTERVAL DAY [ ( <a href="grammar.html#int">precisionInt</a> ) ] TO HOUR
 INTERVAL DAY [ ( <a href="grammar.html#int">precisionInt</a> ) ] TO HOUR
 </pre>
 syntax-end -->
-<p>Interval data type. If leading field precision is specified it should be from 1 to 18, 2 is default.</p><p>See also <a href="grammar.html#interval_day_to_hour">day to hour interval</a> literal grammar. Mapped to <code>org.h2.api.Interval</code>. <code>java.time.Duration</code> is also supported on Java 8 and later versions.</p>
+<p>Interval data type. If leading field precision is specified it should be from 1 to 18, 2 is default.</p><p>Mapped to <code>org.h2.api.Interval</code>. <code>java.time.Duration</code> is also supported on Java 8 and later versions.</p>
 <p>Example:</p>
 <p class="notranslate">INTERVAL DAY TO HOUR</p>
 
@@ -936,7 +887,7 @@ INTERVAL DAY [ ( <a href="grammar.html#int">precisionInt</a> ) ] TO MINUTE
 INTERVAL DAY [ ( <a href="grammar.html#int">precisionInt</a> ) ] TO MINUTE
 </pre>
 syntax-end -->
-<p>Interval data type. If leading field precision is specified it should be from 1 to 18, 2 is default.</p><p>See also <a href="grammar.html#interval_day_to_minute">day to minute interval</a> literal grammar. Mapped to <code>org.h2.api.Interval</code>. <code>java.time.Duration</code> is also supported on Java 8 and later versions.</p>
+<p>Interval data type. If leading field precision is specified it should be from 1 to 18, 2 is default.</p><p>Mapped to <code>org.h2.api.Interval</code>. <code>java.time.Duration</code> is also supported on Java 8 and later versions.</p>
 <p>Example:</p>
 <p class="notranslate">INTERVAL DAY TO MINUTE</p>
 
@@ -954,7 +905,7 @@ INTERVAL DAY [ ( <a href="grammar.html#int">precisionInt</a> ) ] TO SECOND [ ( <
 INTERVAL DAY [ ( <a href="grammar.html#int">precisionInt</a> ) ] TO SECOND [ ( <a href="grammar.html#int">fractionalPrecisionInt</a> ) ]
 </pre>
 syntax-end -->
-<p>Interval data type. If leading field precision is specified it should be from 1 to 18, 2 is default. If fractional seconds precision is specified it should be from 0 to 9, 6 is default.</p><p>See also <a href="grammar.html#interval_day_to_second">day to second interval</a> literal grammar. Mapped to <code>org.h2.api.Interval</code>. <code>java.time.Duration</code> is also supported on Java 8 and later versions.</p>
+<p>Interval data type. If leading field precision is specified it should be from 1 to 18, 2 is default. If fractional seconds precision is specified it should be from 0 to 9, 6 is default.</p><p>Mapped to <code>org.h2.api.Interval</code>. <code>java.time.Duration</code> is also supported on Java 8 and later versions.</p>
 <p>Example:</p>
 <p class="notranslate">INTERVAL DAY TO SECOND</p>
 
@@ -972,7 +923,7 @@ INTERVAL HOUR [ ( <a href="grammar.html#int">precisionInt</a> ) ] TO MINUTE
 INTERVAL HOUR [ ( <a href="grammar.html#int">precisionInt</a> ) ] TO MINUTE
 </pre>
 syntax-end -->
-<p>Interval data type. If leading field precision is specified it should be from 1 to 18, 2 is default.</p><p>See also <a href="grammar.html#interval_hour_to_minute">hour to minute interval</a> literal grammar. Mapped to <code>org.h2.api.Interval</code>. <code>java.time.Duration</code> is also supported on Java 8 and later versions.</p>
+<p>Interval data type. If leading field precision is specified it should be from 1 to 18, 2 is default.</p><p>Mapped to <code>org.h2.api.Interval</code>. <code>java.time.Duration</code> is also supported on Java 8 and later versions.</p>
 <p>Example:</p>
 <p class="notranslate">INTERVAL HOUR TO MINUTE</p>
 
@@ -990,7 +941,7 @@ INTERVAL HOUR [ ( <a href="grammar.html#int">precisionInt</a> ) ] TO SECOND [ ( 
 INTERVAL HOUR [ ( <a href="grammar.html#int">precisionInt</a> ) ] TO SECOND [ ( <a href="grammar.html#int">fractionalPrecisionInt</a> ) ]
 </pre>
 syntax-end -->
-<p>Interval data type. If leading field precision is specified it should be from 1 to 18, 2 is default. If fractional seconds precision is specified it should be from 0 to 9, 6 is default.</p><p>See also <a href="grammar.html#interval_hour_to_second">hour to second interval</a> literal grammar. Mapped to <code>org.h2.api.Interval</code>. <code>java.time.Duration</code> is also supported on Java 8 and later versions.</p>
+<p>Interval data type. If leading field precision is specified it should be from 1 to 18, 2 is default. If fractional seconds precision is specified it should be from 0 to 9, 6 is default.</p><p>Mapped to <code>org.h2.api.Interval</code>. <code>java.time.Duration</code> is also supported on Java 8 and later versions.</p>
 <p>Example:</p>
 <p class="notranslate">INTERVAL HOUR TO SECOND</p>
 
@@ -1008,7 +959,7 @@ INTERVAL MINUTE [ ( <a href="grammar.html#int">precisionInt</a> ) ] TO SECOND [ 
 INTERVAL MINUTE [ ( <a href="grammar.html#int">precisionInt</a> ) ] TO SECOND [ ( <a href="grammar.html#int">fractionalPrecisionInt</a> ) ]
 </pre>
 syntax-end -->
-<p>Interval data type. If leading field precision is specified it should be from 1 to 18, 2 is default. If fractional seconds precision is specified it should be from 0 to 9, 6 is default.</p><p>See also <a href="grammar.html#interval_minute_to_second">minute to second interval</a> literal grammar. Mapped to <code>org.h2.api.Interval</code>. <code>java.time.Duration</code> is also supported on Java 8 and later versions.</p>
+<p>Interval data type. If leading field precision is specified it should be from 1 to 18, 2 is default. If fractional seconds precision is specified it should be from 0 to 9, 6 is default.</p><p>Mapped to <code>org.h2.api.Interval</code>. <code>java.time.Duration</code> is also supported on Java 8 and later versions.</p>
 <p>Example:</p>
 <p class="notranslate">INTERVAL MINUTE TO SECOND</p>
 
@@ -1023,7 +974,7 @@ function startTranslate() {
     document.getElementById('translate').style.display='';
     var script=document.createElement('script');
     script.setAttribute("type","text/javascript");
-    script.setAttribute("src", "https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit");
+    script.setAttribute("src", "http://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit");
     document.getElementsByTagName("head")[0].appendChild(script);
 }
 function googleTranslateElementInit() {

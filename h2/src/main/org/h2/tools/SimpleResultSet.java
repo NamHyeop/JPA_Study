@@ -1,6 +1,6 @@
 /*
  * Copyright 2004-2019 H2 Group. Multiple-Licensed under the MPL 2.0,
- * and the EPL 1.0 (https://h2database.com/html/license.html).
+ * and the EPL 1.0 (http://h2database.com/html/license.html).
  * Initial Developer: H2 Group
  */
 package org.h2.tools;
@@ -840,48 +840,48 @@ public class SimpleResultSet implements ResultSet, ResultSetMetaData,
      * @param type the class of the returned value
      * @return the value
      */
-    @SuppressWarnings("unchecked")
     @Override
     public <T> T getObject(int columnIndex, Class<T> type) throws SQLException {
-        if (get(columnIndex) == null) {
+        if (wasNull()) {
             return null;
         }
+
         if (type == BigDecimal.class) {
-            return (T) getBigDecimal(columnIndex);
+            return type.cast(getBigDecimal(columnIndex));
         } else if (type == BigInteger.class) {
-            return (T) getBigDecimal(columnIndex).toBigInteger();
+            return type.cast(getBigDecimal(columnIndex).toBigInteger());
         } else if (type == String.class) {
-            return (T) getString(columnIndex);
+            return type.cast(getString(columnIndex));
         } else if (type == Boolean.class) {
-            return (T) (Boolean) getBoolean(columnIndex);
+            return type.cast(getBoolean(columnIndex));
         } else if (type == Byte.class) {
-            return (T) (Byte) getByte(columnIndex);
+            return type.cast(getByte(columnIndex));
         } else if (type == Short.class) {
-            return (T) (Short) getShort(columnIndex);
+            return type.cast(getShort(columnIndex));
         } else if (type == Integer.class) {
-            return (T) (Integer) getInt(columnIndex);
+            return type.cast(getInt(columnIndex));
         } else if (type == Long.class) {
-            return (T) (Long) getLong(columnIndex);
+            return type.cast(getLong(columnIndex));
         } else if (type == Float.class) {
-            return (T) (Float) getFloat(columnIndex);
+            return type.cast(getFloat(columnIndex));
         } else if (type == Double.class) {
-            return (T) (Double) getDouble(columnIndex);
+            return type.cast(getDouble(columnIndex));
         } else if (type == Date.class) {
-            return (T) getDate(columnIndex);
+            return type.cast(getDate(columnIndex));
         } else if (type == Time.class) {
-            return (T) getTime(columnIndex);
+            return type.cast(getTime(columnIndex));
         } else if (type == Timestamp.class) {
-            return (T) getTimestamp(columnIndex);
+            return type.cast(getTimestamp(columnIndex));
         } else if (type == UUID.class) {
-            return (T) getObject(columnIndex);
+            return type.cast(getObject(columnIndex));
         } else if (type == byte[].class) {
-            return (T) getBytes(columnIndex);
+            return type.cast(getBytes(columnIndex));
         } else if (type == java.sql.Array.class) {
-            return (T) getArray(columnIndex);
+            return type.cast(getArray(columnIndex));
         } else if (type == Blob.class) {
-            return (T) getBlob(columnIndex);
+            return type.cast(getBlob(columnIndex));
         } else if (type == Clob.class) {
-            return (T) getClob(columnIndex);
+            return type.cast(getClob(columnIndex));
         } else {
             throw getUnsupportedException();
         }

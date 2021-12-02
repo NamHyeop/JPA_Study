@@ -1,14 +1,15 @@
 /*
  * Copyright 2004-2019 H2 Group. Multiple-Licensed under the MPL 2.0,
- * and the EPL 1.0 (https://h2database.com/html/license.html).
+ * and the EPL 1.0 (http://h2database.com/html/license.html).
  * Initial Developer: H2 Group
  */
 package org.h2.value;
 
 import org.h2.api.ErrorCode;
-import org.h2.engine.CastDataProvider;
 import org.h2.engine.Constants;
+import org.h2.engine.Mode;
 import org.h2.message.DbException;
+import org.h2.util.MathUtils;
 
 /**
  * Base class for ARRAY and ROW values.
@@ -49,13 +50,20 @@ public abstract class ValueCollectionBase extends Value {
     public TypeInfo getType() {
         TypeInfo type = this.type;
         if (type == null) {
-            this.type = type = TypeInfo.getTypeInfo(getValueType(), values.length, 0, null);
+            long precision = 0, displaySize = 0;
+            for (Value v : values) {
+                TypeInfo t = v.getType();
+                precision += t.getPrecision();
+                displaySize += t.getDisplaySize();
+            }
+            this.type = type = new TypeInfo(getValueType(), precision, 0, MathUtils.convertLongToInt(displaySize),
+                    null);
         }
         return type;
     }
 
     @Override
-    public int compareWithNull(Value v, boolean forEquality, CastDataProvider provider, CompareMode compareMode) {
+    public int compareWithNull(Value v, boolean forEquality, Mode databaseMode, CompareMode compareMode) {
         if (v == ValueNull.INSTANCE) {
             return Integer.MIN_VALUE;
         }
@@ -81,7 +89,7 @@ public abstract class ValueCollectionBase extends Value {
             for (int i = 0; i < leftLength; i++) {
                 Value v1 = leftArray[i];
                 Value v2 = rightArray[i];
-                int comp = v1.compareWithNull(v2, forEquality, provider, compareMode);
+                int comp = v1.compareWithNull(v2, forEquality, databaseMode, compareMode);
                 if (comp != 0) {
                     if (comp != Integer.MIN_VALUE) {
                         return comp;
@@ -95,7 +103,7 @@ public abstract class ValueCollectionBase extends Value {
         for (int i = 0; i < len; i++) {
             Value v1 = leftArray[i];
             Value v2 = rightArray[i];
-            int comp = v1.compareWithNull(v2, forEquality, provider, compareMode);
+            int comp = v1.compareWithNull(v2, forEquality, databaseMode, compareMode);
             if (comp != 0) {
                 return comp;
             }

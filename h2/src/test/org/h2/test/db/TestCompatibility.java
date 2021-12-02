@@ -1,6 +1,6 @@
 /*
  * Copyright 2004-2019 H2 Group. Multiple-Licensed under the MPL 2.0,
- * and the EPL 1.0 (https://h2database.com/html/license.html).
+ * and the EPL 1.0 (http://h2database.com/html/license.html).
  * Initial Developer: H2 Group
  */
 package org.h2.test.db;
@@ -59,7 +59,6 @@ public class TestCompatibility extends TestDb {
 
         conn.close();
         testIdentifiers();
-        testIdentifiersCaseInResultSet();
         deleteDb("compatibility");
 
         testUnknownURL();
@@ -150,7 +149,7 @@ public class TestCompatibility extends TestDb {
         String[] modes = { "PostgreSQL", "MySQL", "HSQLDB", "MSSQLServer",
                 "Derby", "Oracle", "Regular" };
         String columnAlias;
-        columnAlias = "HSQLDB,MySQL,Regular";
+        columnAlias = "MySQL,Regular";
         stat.execute("CREATE TABLE TEST(ID INT)");
         for (String mode : modes) {
             stat.execute("SET MODE " + mode);
@@ -175,7 +174,7 @@ public class TestCompatibility extends TestDb {
         Statement stat = conn.createStatement();
         String[] modes = { "PostgreSQL", "MySQL", "HSQLDB", "MSSQLServer",
                 "Derby", "Oracle", "Regular" };
-        String multiNull = "PostgreSQL,MySQL,HSQLDB,Oracle,Regular";
+        String multiNull = "PostgreSQL,MySQL,Oracle,Regular";
         for (String mode : modes) {
             stat.execute("SET MODE " + mode);
             stat.execute("CREATE TABLE TEST(ID INT)");
@@ -228,6 +227,11 @@ public class TestCompatibility extends TestDb {
                 "SELECT LIMIT ? 1 ID FROM TEST");
         prep.setInt(1, 2);
         prep.executeQuery();
+        stat.execute("DROP TABLE TEST IF EXISTS");
+
+        stat.execute("DROP TABLE TEST IF EXISTS");
+        stat.execute("CREATE TABLE TEST(ID INT)");
+        stat.executeQuery("SELECT * FROM TEST WHERE ID IN ()");
         stat.execute("DROP TABLE TEST IF EXISTS");
     }
 
@@ -407,23 +411,13 @@ public class TestCompatibility extends TestDb {
         stat.execute("CREATE TABLE TEST_4" +
                 "(ID INT PRIMARY KEY) charset=UTF8");
         stat.execute("CREATE TABLE TEST_5" +
-                "(ID INT AUTO_INCREMENT PRIMARY KEY) ENGINE=InnoDb auto_increment=3 default charset=UTF8");
+                "(ID INT PRIMARY KEY) ENGINE=InnoDb auto_increment=3 default charset=UTF8");
         stat.execute("CREATE TABLE TEST_6" +
-                "(ID INT AUTO_INCREMENT PRIMARY KEY) ENGINE=MyISAM default character set UTF8MB4, auto_increment 3");
+                "(ID INT PRIMARY KEY) ENGINE=InnoDb auto_increment=3 charset=UTF8");
         stat.execute("CREATE TABLE TEST_7" +
-                "(ID INT AUTO_INCREMENT PRIMARY KEY) ENGINE=InnoDb auto_increment=3 charset=UTF8 comment 'text'");
-        stat.execute("CREATE TABLE TEST_8" +
-                "(ID INT AUTO_INCREMENT PRIMARY KEY) ENGINE=InnoDb auto_increment=3 character set=UTF8");
-        stat.execute("CREATE TABLE TEST_9" +
                 "(ID INT, KEY TEST_7_IDX(ID) USING BTREE)");
-        stat.execute("CREATE TABLE TEST_10" +
-                "(ID INT, UNIQUE KEY TEST_10_IDX(ID) USING BTREE)");
-        assertThrows(ErrorCode.SYNTAX_ERROR_2, stat).execute("CREATE TABLE TEST_99" +
-                "(ID INT PRIMARY KEY) CHARSET UTF8,");
-        assertThrows(ErrorCode.COLUMN_NOT_FOUND_1, stat).execute("CREATE TABLE TEST_99" +
-                "(ID INT PRIMARY KEY) AUTO_INCREMENT 100");
-        assertThrows(ErrorCode.COLUMN_NOT_FOUND_1, stat).execute("CREATE TABLE TEST_99" +
-                "(ID INT) AUTO_INCREMENT 100");
+        stat.execute("CREATE TABLE TEST_8" +
+                "(ID INT, UNIQUE KEY TEST_8_IDX(ID) USING BTREE)");
 
         // this maps to SET REFERENTIAL_INTEGRITY TRUE/FALSE
         stat.execute("SET foreign_key_checks = 0");
@@ -693,7 +687,7 @@ public class TestCompatibility extends TestDb {
 
     private void testUnknownSet() throws SQLException {
         Statement stat = conn.createStatement();
-        assertThrows(ErrorCode.UNKNOWN_MODE_1, stat).execute("SET MODE UnknownMode");
+        assertThrows(ErrorCode.UNKNOWN_MODE_1, stat).execute("SET MODE Unknown");
     }
 
     private void testIdentifiers() throws SQLException {
@@ -761,7 +755,7 @@ public class TestCompatibility extends TestDb {
         }
     }
 
-    private void testUnknownURL() {
+    private void testUnknownURL() throws SQLException {
         try {
             getConnection("compatibility;MODE=Unknown").close();
             deleteDb("compatibility");
@@ -770,22 +764,6 @@ public class TestCompatibility extends TestDb {
             return;
         }
         fail();
-    }
-
-    private void testIdentifiersCaseInResultSet() throws SQLException {
-        try (Connection conn = getConnection(
-                "compatibility;DATABASE_TO_UPPER=FALSE;CASE_INSENSITIVE_IDENTIFIERS=TRUE")) {
-            Statement stat = conn.createStatement();
-            stat.execute("CREATE TABLE TEST(A INT)");
-            ResultSet rs = stat.executeQuery("SELECT a from test");
-            ResultSetMetaData md = rs.getMetaData();
-            assertEquals("A", md.getColumnName(1));
-            rs = stat.executeQuery("SELECT a FROM (SELECT 1) t(A)");
-            md = rs.getMetaData();
-            assertEquals("A", md.getColumnName(1));
-        } finally {
-            deleteDb("compatibility");
-        }
     }
 
 }

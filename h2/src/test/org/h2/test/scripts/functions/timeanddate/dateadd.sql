@@ -1,13 +1,22 @@
 -- Copyright 2004-2019 H2 Group. Multiple-Licensed under the MPL 2.0,
--- and the EPL 1.0 (https://h2database.com/html/license.html).
+-- and the EPL 1.0 (http://h2database.com/html/license.html).
 -- Initial Developer: H2 Group
 --
 
-select dateadd('month', 1, timestamp '2003-01-31 10:20:30.012345678');
+create memory table test(id int primary key, name varchar(255));
+> ok
+
+insert into test values(1, 'Hello');
+> update count: 1
+
+select dateadd('month', 1, timestamp '2003-01-31 10:20:30.012345678') from test;
 >> 2003-02-28 10:20:30.012345678
 
-select dateadd('year', -1, timestamp '2000-02-29 10:20:30.012345678');
+select dateadd('year', -1, timestamp '2000-02-29 10:20:30.012345678') from test;
 >> 1999-02-28 10:20:30.012345678
+
+drop table test;
+> ok
 
 create table test(d date, t time, ts timestamp);
 > ok
@@ -96,23 +105,8 @@ SELECT TIMESTAMPADD('TIMEZONE_HOUR', 1, TIMESTAMP WITH TIME ZONE '2010-01-01 10:
 SELECT TIMESTAMPADD('TIMEZONE_MINUTE', -45, TIMESTAMP WITH TIME ZONE '2010-01-01 10:00:00+07:30');
 >> 2010-01-01 10:00:00+06:45
 
-SELECT TIMESTAMPADD('TIMEZONE_SECOND', -45, TIMESTAMP WITH TIME ZONE '2010-01-01 10:00:00+07:30');
->> 2010-01-01 10:00:00+07:29:15
-
-SELECT TIMESTAMPADD('TIMEZONE_HOUR', 1, TIME WITH TIME ZONE '10:00:00+07:30');
->> 10:00:00+08:30
-
-SELECT TIMESTAMPADD('TIMEZONE_MINUTE', -45, TIME WITH TIME ZONE '10:00:00+07:30');
->> 10:00:00+06:45
-
 SELECT DATEADD(HOUR, 1, TIME '23:00:00');
 >> 00:00:00
-
-SELECT DATEADD(HOUR, 1, TIME WITH TIME ZONE '21:00:00+01');
->> 22:00:00+01
-
-SELECT DATEADD(HOUR, 1, TIME WITH TIME ZONE '23:00:00+01');
->> 00:00:00+01
 
 SELECT D FROM (SELECT '2010-01-01' D) WHERE D IN (SELECT D1 - 1 FROM (SELECT DATE '2010-01-02' D1));
 >> 2010-01-01

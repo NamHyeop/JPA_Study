@@ -1,5 +1,5 @@
 -- Copyright 2004-2019 H2 Group. Multiple-Licensed under the MPL 2.0,
--- and the EPL 1.0 (https://h2database.com/html/license.html).
+-- and the EPL 1.0 (http://h2database.com/html/license.html).
 -- Initial Developer: Alex Nordlund
 --
 
@@ -649,21 +649,6 @@ SELECT ID, VALUE,
 > 7  4     [7, 8] [7, 8] [7, 8]
 > 8  4     [7, 8] [7, 8] [7, 8]
 > rows: 8
-
-INSERT INTO TEST VALUES (9, NULL);
-> update count: 1
-
-SELECT ARRAY_AGG(VALUE ORDER BY ID) FROM TEST;
->> [1, 1, 2, 2, 3, 3, 4, 4, null]
-
-SELECT ARRAY_AGG(VALUE ORDER BY ID) FILTER (WHERE VALUE IS NOT NULL) FROM TEST;
->> [1, 1, 2, 2, 3, 3, 4, 4]
-
-SELECT ARRAY_AGG(VALUE ORDER BY VALUE) FROM TEST;
->> [null, 1, 1, 2, 2, 3, 3, 4, 4]
-
-SELECT ARRAY_AGG(VALUE ORDER BY VALUE NULLS LAST) FROM TEST;
->> [1, 1, 2, 2, 3, 3, 4, 4, null]
 
 DROP TABLE TEST;
 > ok

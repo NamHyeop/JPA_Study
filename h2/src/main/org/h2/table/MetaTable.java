@@ -1,6 +1,6 @@
 /*
  * Copyright 2004-2019 H2 Group. Multiple-Licensed under the MPL 2.0,
- * and the EPL 1.0 (https://h2database.com/html/license.html).
+ * and the EPL 1.0 (http://h2database.com/html/license.html).
  * Initial Developer: H2 Group
  */
 package org.h2.table;
@@ -14,8 +14,9 @@ import java.sql.ResultSet;
 import java.sql.Types;
 import java.text.Collator;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Locale;
-import java.util.Map;
 
 import org.h2.command.Command;
 import org.h2.constraint.Constraint;
@@ -44,7 +45,6 @@ import org.h2.message.DbException;
 import org.h2.mvstore.FileStore;
 import org.h2.mvstore.MVStore;
 import org.h2.mvstore.db.MVTableEngine.Store;
-import org.h2.pagestore.PageStore;
 import org.h2.result.Row;
 import org.h2.result.SearchRow;
 import org.h2.result.SortOrder;
@@ -54,10 +54,10 @@ import org.h2.schema.SchemaObject;
 import org.h2.schema.Sequence;
 import org.h2.schema.TriggerObject;
 import org.h2.store.InDoubtTransaction;
+import org.h2.store.PageStore;
 import org.h2.tools.Csv;
 import org.h2.util.DateTimeUtils;
 import org.h2.util.MathUtils;
-import org.h2.util.NetworkConnectionInfo;
 import org.h2.util.StringUtils;
 import org.h2.util.Utils;
 import org.h2.value.CompareMode;
@@ -513,11 +513,7 @@ public class MetaTable extends Table {
             cols = createColumns(
                     "ID INT",
                     "USER_NAME",
-                    "SERVER",
-                    "CLIENT_ADDR",
-                    "CLIENT_INFO",
                     "SESSION_START TIMESTAMP WITH TIME ZONE",
-                    "ISOLATION_LEVEL",
                     "STATEMENT",
                     "STATEMENT_START TIMESTAMP WITH TIME ZONE",
                     "CONTAINS_UNCOMMITTED BIT",
@@ -647,14 +643,14 @@ public class MetaTable extends Table {
 
     private Column[] createColumns(String... names) {
         Column[] cols = new Column[names.length];
-        int defaultType = database.getSettings().caseInsensitiveIdentifiers ? Value.STRING_IGNORECASE : Value.STRING;
         for (int i = 0; i < names.length; i++) {
             String nameType = names[i];
             int idx = nameType.indexOf(' ');
             int dataType;
             String name;
             if (idx < 0) {
-                dataType = defaultType;
+                dataType = database.getMode().lowerCaseIdentifiers ?
+                        Value.STRING_IGNORECASE : Value.STRING;
                 name = nameType;
             } else {
                 dataType = DataType.getTypeByName(nameType.substring(idx + 1), database.getMode()).type;
@@ -694,7 +690,7 @@ public class MetaTable extends Table {
     }
 
     private String identifier(String s) {
-        if (database.getSettings().databaseToLower) {
+        if (database.getMode().lowerCaseIdentifiers) {
             s = s == null ? null : StringUtils.toLowerEnglish(s);
         }
         return s;
@@ -724,7 +720,7 @@ public class MetaTable extends Table {
         }
         Database db = session.getDatabase();
         Value v;
-        if (database.getSettings().caseInsensitiveIdentifiers) {
+        if (database.getMode().lowerCaseIdentifiers) {
             v = ValueStringIgnoreCase.get(value);
         } else {
             v = ValueString.get(value);
@@ -862,7 +858,6 @@ public class MetaTable extends Table {
                     int type = dataType.type;
                     switch (type) {
                     case Value.TIME:
-                    case Value.TIME_TZ:
                     case Value.DATE:
                     case Value.TIMESTAMP:
                     case Value.TIMESTAMP_TZ:
@@ -1110,7 +1105,7 @@ public class MetaTable extends Table {
             add(rows, "info.BUILD_ID", "" + Constants.BUILD_ID);
             add(rows, "info.VERSION_MAJOR", "" + Constants.VERSION_MAJOR);
             add(rows, "info.VERSION_MINOR", "" + Constants.VERSION_MINOR);
-            add(rows, "info.VERSION", Constants.FULL_VERSION);
+            add(rows, "info.VERSION", Constants.getFullVersion());
             if (admin) {
                 String[] settings = {
                         "java.runtime.version", "java.vm.name",
@@ -1125,12 +1120,17 @@ public class MetaTable extends Table {
             add(rows, "EXCLUSIVE", database.getExclusiveSession() == null ?
                     "FALSE" : "TRUE");
             add(rows, "MODE", database.getMode().getName());
+            add(rows, "MULTI_THREADED", database.isMultiThreaded() ? "1" : "0");
             add(rows, "QUERY_TIMEOUT", Integer.toString(session.getQueryTimeout()));
             add(rows, "RETENTION_TIME", Integer.toString(database.getRetentionTime()));
             add(rows, "LOG", Integer.toString(database.getLogMode()));
             // database settings
-            for (Map.Entry<String, String> entry : database.getSettings().getSortedSettings()) {
-                add(rows, entry.getKey(), entry.getValue());
+            HashMap<String, String> s = database.getSettings().getSettings();
+            ArrayList<String> settingNames = new ArrayList<>(s.size());
+            settingNames.addAll(s.keySet());
+            Collections.sort(settingNames);
+            for (String k : settingNames) {
+                add(rows, k, s.get(k));
             }
             if (database.isPersistent()) {
                 PageStore pageStore = database.getPageStore();
@@ -1858,7 +1858,6 @@ public class MetaTable extends Table {
         case SESSIONS: {
             for (Session s : database.getSessions(false)) {
                 if (admin || s == session) {
-                    NetworkConnectionInfo networkConnectionInfo = s.getNetworkConnectionInfo();
                     Command command = s.getCurrentCommand();
                     int blockingSessionId = s.getBlockingSessionId();
                     add(rows,
@@ -1866,16 +1865,8 @@ public class MetaTable extends Table {
                             ValueInt.get(s.getId()),
                             // USER_NAME
                             s.getUser().getName(),
-                            // SERVER
-                            networkConnectionInfo == null ? null : networkConnectionInfo.getServer(),
-                            // CLIENT_ADDR
-                            networkConnectionInfo == null ? null : networkConnectionInfo.getClient(),
-                            // CLIENT_INFO
-                            networkConnectionInfo == null ? null : networkConnectionInfo.getClientInfo(),
                             // SESSION_START
                             DateTimeUtils.timestampTimeZoneFromMillis(s.getSessionStart()),
-                            // ISOLATION_LEVEL
-                            session.getIsolationLevel().getSQL(),
                             // STATEMENT
                             command == null ? null : command.toString(),
                             // STATEMENT_START
@@ -2290,7 +2281,7 @@ public class MetaTable extends Table {
         for (int i = 0; i < stringsOrValues.length; i++) {
             Object s = stringsOrValues[i];
             Value v = s == null ? ValueNull.INSTANCE : s instanceof String ? ValueString.get((String) s) : (Value) s;
-            values[i] = columns[i].convert(v, false);
+            values[i] = columns[i].convert(v);
         }
         Row row = database.createRow(values, 1);
         row.setKey(rows.size());

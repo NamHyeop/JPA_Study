@@ -1,6 +1,6 @@
 /*
  * Copyright 2004-2019 H2 Group. Multiple-Licensed under the MPL 2.0,
- * and the EPL 1.0 (https://h2database.com/html/license.html).
+ * and the EPL 1.0 (http://h2database.com/html/license.html).
  * Initial Developer: H2 Group
  */
 package org.h2.test.unit;
@@ -11,11 +11,11 @@ import java.sql.Time;
 import java.util.concurrent.TimeUnit;
 
 import org.h2.api.JavaObjectSerializer;
-import org.h2.pagestore.db.LobStorageBackend;
 import org.h2.result.SimpleResult;
 import org.h2.store.Data;
 import org.h2.store.DataHandler;
 import org.h2.store.FileStore;
+import org.h2.store.LobStorageBackend;
 import org.h2.test.TestBase;
 import org.h2.util.SmallLRUCache;
 import org.h2.util.TempFileDeleter;
@@ -165,12 +165,12 @@ public class TestDataPage extends TestBase implements DataHandler {
             }
             testValue(ValueDecimal.get(new BigDecimal(i * i)));
         }
-        testValue(ValueDate.get(null, new Date(System.currentTimeMillis())));
-        testValue(ValueDate.get(null, new Date(0)));
-        testValue(ValueTime.get(null, new Time(System.currentTimeMillis())));
-        testValue(ValueTime.get(null, new Time(0)));
-        testValue(ValueTimestamp.fromMillis(System.currentTimeMillis(), 0));
-        testValue(ValueTimestamp.fromMillis(0, 0));
+        testValue(ValueDate.get(new Date(System.currentTimeMillis())));
+        testValue(ValueDate.get(new Date(0)));
+        testValue(ValueTime.get(new Time(System.currentTimeMillis())));
+        testValue(ValueTime.get(new Time(0)));
+        testValue(ValueTimestamp.fromMillis(System.currentTimeMillis()));
+        testValue(ValueTimestamp.fromMillis(0));
         testValue(ValueTimestampTimeZone.parse("2000-01-01 10:00:00"));
         testValue(ValueJavaObject.getNoCopy(null, new byte[0], this));
         testValue(ValueJavaObject.getNoCopy(null, new byte[100], this));

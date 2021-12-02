@@ -1,6 +1,6 @@
 /*
  * Copyright 2004-2019 H2 Group. Multiple-Licensed under the MPL 2.0,
- * and the EPL 1.0 (https://h2database.com/html/license.html).
+ * and the EPL 1.0 (http://h2database.com/html/license.html).
  * Initial Developer: H2 Group
  */
 package org.h2.engine;
@@ -13,7 +13,6 @@ import org.h2.message.DbException;
 import org.h2.message.Trace;
 import org.h2.schema.Schema;
 import org.h2.security.SHA256;
-import org.h2.table.DualTable;
 import org.h2.table.MetaTable;
 import org.h2.table.RangeTable;
 import org.h2.table.Table;
@@ -121,7 +120,7 @@ public class User extends RightOwner {
         if (publicRole.isRightGrantedRecursive(table, rightMask)) {
             return true;
         }
-        if (table instanceof MetaTable || table instanceof DualTable || table instanceof RangeTable) {
+        if (table instanceof MetaTable || table instanceof RangeTable) {
             // everybody has access to the metadata information
             return true;
         }

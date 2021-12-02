@@ -1,6 +1,6 @@
 /*
  * Copyright 2004-2019 H2 Group. Multiple-Licensed under the MPL 2.0,
- * and the EPL 1.0 (https://h2database.com/html/license.html).
+ * and the EPL 1.0 (http://h2database.com/html/license.html).
  * Initial Developer: H2 Group
  */
 package org.h2.value;
@@ -10,9 +10,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.Arrays;
 
-import org.h2.engine.CastDataProvider;
 import org.h2.engine.SysProperties;
-import org.h2.util.MathUtils;
 
 /**
  * Implementation of the ARRAY data type.
@@ -85,7 +83,7 @@ public class ValueArray extends ValueCollectionBase {
     }
 
     @Override
-    public int compareTypeSafe(Value o, CompareMode mode, CastDataProvider provider) {
+    public int compareTypeSafe(Value o, CompareMode mode) {
         ValueArray v = (ValueArray) o;
         if (values == v.values) {
             return 0;
@@ -96,7 +94,7 @@ public class ValueArray extends ValueCollectionBase {
         for (int i = 0; i < len; i++) {
             Value v1 = values[i];
             Value v2 = v.values[i];
-            int comp = v1.compareTo(v2, provider, mode);
+            int comp = v1.compareTo(v2, /* TODO */ null, mode);
             if (comp != 0) {
                 return comp;
             }
@@ -175,12 +173,32 @@ public class ValueArray extends ValueCollectionBase {
     }
 
     @Override
-    public Value convertPrecision(long precision) {
-        int p = MathUtils.convertLongToInt(precision);
-        if (values.length <= p) {
+    public Value convertPrecision(long precision, boolean force) {
+        if (!force) {
             return this;
         }
-        return get(componentType, Arrays.copyOf(values, p));
+        int length = values.length;
+        Value[] newValues = new Value[length];
+        int i = 0;
+        boolean modified = false;
+        for (; i < length; i++) {
+            Value old = values[i];
+            Value v = old.convertPrecision(precision, true);
+            if (v != old) {
+                modified = true;
+            }
+            // empty byte arrays or strings have precision 0
+            // they count as precision 1 here
+            precision -= Math.max(1, v.getType().getPrecision());
+            if (precision < 0) {
+                break;
+            }
+            newValues[i] = v;
+        }
+        if (i < length) {
+            return get(componentType, Arrays.copyOf(newValues, i));
+        }
+        return modified ? get(componentType, newValues) : this;
     }
 
 }

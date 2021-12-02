@@ -1,6 +1,6 @@
 /*
  * Copyright 2004-2019 H2 Group. Multiple-Licensed under the MPL 2.0,
- * and the EPL 1.0 (https://h2database.com/html/license.html).
+ * and the EPL 1.0 (http://h2database.com/html/license.html).
  * Initial Developer: H2 Group
  */
 package org.h2.expression.function;
@@ -85,7 +85,7 @@ public class TableFunction extends Function {
             ExpressionColumn col = new ExpressionColumn(db, c);
             header[i] = col;
         }
-        LocalResult result = db.getResultFactory().create(session, header, totalColumns, totalColumns);
+        LocalResult result = db.getResultFactory().create(session, header, totalColumns);
         if (!onlyColumnList && info.type == TABLE_DISTINCT) {
             result.setDistinct();
         }
@@ -125,7 +125,8 @@ public class TableFunction extends Function {
                         Column c = columns[j];
                         v = l[row];
                         if (!unnest) {
-                            v = c.getType().cast(v, session, false, true, c);
+                            v = c.convert(v).convertPrecision(c.getType().getPrecision(), false)
+                                    .convertScale(true, c.getType().getScale());
                         }
                     }
                     r[j] = v;

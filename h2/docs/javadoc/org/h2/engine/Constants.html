@@ -8,6 +8,48 @@ Constants
 <table class="content"><tr class="content"><td class="content"><div class="contentDiv">
 <h1>Constants</h1>
 Constants are fixed values that are used in the whole database code.<br /><br />
+<table class="block"><tr onclick="return allDetails()"><th colspan="2">Methods</th></tr>
+<tr id="__0" onclick="return on(0)">
+<td class="return">static String</td><td class="method">
+<a id="getFullVersion" href="#getFullVersion">getFullVersion</a>()
+<div class="methodText">Get the complete version number of this database, consisting of
+ the major version, the minor version, the build id, and the build date.</div>
+</td></tr>
+<tr onclick="return off(0)" class="detail" id="_0">
+<td class="return">static String</td><td>
+<a id="getFullVersion" href="#getFullVersion">getFullVersion</a>()
+<div class="methodText">Get the complete version number of this database, consisting of
+ the major version, the minor version, the build id, and the build date.</div>
+<div class="itemTitle">Returns:</div>
+<div class="item">the complete version</div>
+</td></tr>
+<tr id="__1" onclick="return on(1)">
+<td class="return">static String</td><td class="method">
+<a id="getVersion" href="#getVersion">getVersion</a>()
+<div class="methodText">Get the version of this product, consisting of major version, minor
+ version, and build id.</div>
+</td></tr>
+<tr onclick="return off(1)" class="detail" id="_1">
+<td class="return">static String</td><td>
+<a id="getVersion" href="#getVersion">getVersion</a>()
+<div class="methodText">Get the version of this product, consisting of major version, minor
+ version, and build id.</div>
+<div class="itemTitle">Returns:</div>
+<div class="item">the version number</div>
+</td></tr>
+<tr id="__2" onclick="return on(2)">
+<td class="return">static Object</td><td class="method">
+<a id="getVersionStable" href="#getVersionStable">getVersionStable</a>()
+<div class="methodText">Get the last stable version name.</div>
+</td></tr>
+<tr onclick="return off(2)" class="detail" id="_2">
+<td class="return">static Object</td><td>
+<a id="getVersionStable" href="#getVersionStable">getVersionStable</a>()
+<div class="methodText">Get the last stable version name.</div>
+<div class="itemTitle">Returns:</div>
+<div class="item">the version number</div>
+</td></tr>
+</table>
 <br /><table><tr><th colspan="2">Fields</th></tr>
 <tr><td class="return">static int</td><td class="method">
 <a href="#c2">ALLOW_LITERALS_ALL</a> = 2
@@ -22,16 +64,16 @@ Constants are fixed values that are used in the whole database code.<br /><br />
 <a href="#false">BLOB_SEARCH</a> = false
 </td></tr>
 <tr><td class="return">static String</td><td class="method">
-<a href="#BUILD_DATE">BUILD_DATE</a> = "2019-10-14"
+<a href="#BUILD_DATE">BUILD_DATE</a> = "2019-03-13"
 </td></tr>
 <tr><td class="return">static String</td><td class="method">
-<a href="#BUILD_DATE_STABLE">BUILD_DATE_STABLE</a> = "2019-03-13"
+<a href="#BUILD_DATE_STABLE">BUILD_DATE_STABLE</a> = "2018-03-18"
 </td></tr>
 <tr><td class="return">static int</td><td class="method">
-<a href="#c200">BUILD_ID</a> = 200
+<a href="#c199">BUILD_ID</a> = 199
 </td></tr>
 <tr><td class="return">static int</td><td class="method">
-<a href="#c199">BUILD_ID_STABLE</a> = 199
+<a href="#c197">BUILD_ID_STABLE</a> = 197
 </td></tr>
 <tr><td class="return">static boolean</td><td class="method">
 <a href="#false">BUILD_SNAPSHOT</a> = false
@@ -101,9 +143,6 @@ Constants are fixed values that are used in the whole database code.<br /><br />
 </td></tr>
 <tr><td class="return">static int</td><td class="method">
 <a href="#c16">FILE_BLOCK_SIZE</a> = 16
-</td></tr>
-<tr><td class="return">static String</td><td class="method">
-<a href="#full_version">FULL_VERSION</a>
 </td></tr>
 <tr><td class="return">static int</td><td class="method">
 <a href="#-1">INFORMATION_SCHEMA_ID</a> = -1
@@ -274,22 +313,16 @@ Constants are fixed values that are used in the whole database code.<br /><br />
 <a href="#c18">TCP_PROTOCOL_VERSION_18</a> = 18
 </td></tr>
 <tr><td class="return">static int</td><td class="method">
-<a href="#c19">TCP_PROTOCOL_VERSION_19</a> = 19
-</td></tr>
-<tr><td class="return">static int</td><td class="method">
 <a href="#c9">TCP_PROTOCOL_VERSION_9</a> = 9
 </td></tr>
 <tr><td class="return">static int</td><td class="method">
-<a href="#c19">TCP_PROTOCOL_VERSION_MAX_SUPPORTED</a> = 19
+<a href="#c18">TCP_PROTOCOL_VERSION_MAX_SUPPORTED</a> = 18
 </td></tr>
 <tr><td class="return">static int</td><td class="method">
 <a href="#c9">TCP_PROTOCOL_VERSION_MIN_SUPPORTED</a> = 9
 </td></tr>
 <tr><td class="return">static int</td><td class="method">
 <a href="#c50">THROTTLE_DELAY</a> = 50
-</td></tr>
-<tr><td class="return">static int</td><td class="method">
-<a href="#c6">TRANSACTION_SNAPSHOT</a> = 6
 </td></tr>
 <tr><td class="return">static int</td><td class="method">
 <a href="#c1048576">UNDO_BLOCK_SIZE</a> = 1048576
@@ -300,17 +333,11 @@ Constants are fixed values that are used in the whole database code.<br /><br />
 <tr><td class="return">static String</td><td class="method">
 <a href="#USER_PACKAGE">USER_PACKAGE</a> = "org.h2.dynamic"
 </td></tr>
-<tr><td class="return">static String</td><td class="method">
-<a href="#version">VERSION</a>
-</td></tr>
 <tr><td class="return">static int</td><td class="method">
 <a href="#c1">VERSION_MAJOR</a> = 1
 </td></tr>
 <tr><td class="return">static int</td><td class="method">
 <a href="#c4">VERSION_MINOR</a> = 4
-</td></tr>
-<tr><td class="return">static String</td><td class="method">
-<a href="#VERSION_STABLE">VERSION_STABLE</a> = "1.4.199"
 </td></tr>
 <tr><td class="return">static int</td><td class="method">
 <a href="#c10000">VIEW_COST_CACHE_MAX_AGE</a> = 10000
@@ -382,18 +409,13 @@ Constants are fixed values that are used in the whole database code.<br /><br />
 </span></h4>
 <div class="item">The file name suffix of trace files.</div>
 <hr />
-<h4 id="VERSION_STABLE"><span class="methodName">VERSION_STABLE
- = "1.4.199"
-</span></h4>
-<div class="item">The last stable version name.</div>
-<hr />
 <h4 id="BUILD_DATE_STABLE"><span class="methodName">BUILD_DATE_STABLE
- = "2019-03-13"
+ = "2018-03-18"
 </span></h4>
 <div class="item">The build date of the last stable release.</div>
 <hr />
 <h4 id="BUILD_DATE"><span class="methodName">BUILD_DATE
- = "2019-10-14"
+ = "2019-03-13"
 </span></h4>
 <div class="item">The build date is updated for each public release.</div>
 <hr />
@@ -657,25 +679,25 @@ Constants are fixed values that are used in the whole database code.<br /><br />
 </span></h4>
 <div class="item">The TCP protocol version number 18.</div>
 <hr />
+<h4 id="c18"><span class="methodName">TCP_PROTOCOL_VERSION_MAX_SUPPORTED
+ = 18
+</span></h4>
+<div class="item">Maximum supported version of TCP protocol.</div>
+<hr />
 <h4 id="c184"><span class="methodName">MEMORY_PAGE_BTREE
  = 184
 </span></h4>
 <div class="item">The memory needed by an object of class PageBtree.</div>
 <hr />
-<h4 id="c19"><span class="methodName">TCP_PROTOCOL_VERSION_19
- = 19
-</span></h4>
-<div class="item">The TCP protocol version number 19.</div>
-<hr />
-<h4 id="c19"><span class="methodName">TCP_PROTOCOL_VERSION_MAX_SUPPORTED
- = 19
-</span></h4>
-<div class="item">Maximum supported version of TCP protocol.</div>
-<hr />
-<h4 id="c199"><span class="methodName">BUILD_ID_STABLE
- = 199
+<h4 id="c197"><span class="methodName">BUILD_ID_STABLE
+ = 197
 </span></h4>
 <div class="item">The build id of the last stable release.</div>
+<hr />
+<h4 id="c199"><span class="methodName">BUILD_ID
+ = 199
+</span></h4>
+<div class="item">The build id is incremented for each public release.</div>
 <hr />
 <h4 id="c2"><span class="methodName">ALLOW_LITERALS_ALL
  = 2
@@ -688,11 +710,6 @@ Constants are fixed values that are used in the whole database code.<br /><br />
 <div class="item">The lock mode that means table level locking is used for reads and
  writes. If a table is locked, System.gc is called to close forgotten
  connections.</div>
-<hr />
-<h4 id="c200"><span class="methodName">BUILD_ID
- = 200
-</span></h4>
-<div class="item">The build id is incremented for each public release.</div>
 <hr />
 <h4 id="c2000"><span class="methodName">INITIAL_LOCK_TIMEOUT
  = 2000
@@ -783,11 +800,6 @@ Constants are fixed values that are used in the whole database code.<br /><br />
 </span></h4>
 <div class="item">The default value for the MAX_MEMORY_UNDO setting.</div>
 <hr />
-<h4 id="c6"><span class="methodName">TRANSACTION_SNAPSHOT
- = 6
-</span></h4>
-<div class="item">SNAPSHOT isolation level of transaction.</div>
-<hr />
 <h4 id="c64"><span class="methodName">MEMORY_FACTOR
  = 64
 </span></h4>
@@ -843,18 +855,6 @@ Constants are fixed values that are used in the whole database code.<br /><br />
  a unique vendor id (to distinguish from official releases).
  Additionally, a version number should be set to distinguish releases.
  Example: ACME_SVN1651_BUILD3</div>
-<hr />
-<h4 id="full_version"><span class="methodName">FULL_VERSION
-
-</span></h4>
-<div class="item">The complete version number of this database, consisting of
- the major version, the minor version, the build id, and the build date.</div>
-<hr />
-<h4 id="version"><span class="methodName">VERSION
-
-</span></h4>
-<div class="item">The version of this product, consisting of major version, minor
- version, and build id.</div>
 <hr />
 <h4 id="false"><span class="methodName">BLOB_SEARCH
  = false

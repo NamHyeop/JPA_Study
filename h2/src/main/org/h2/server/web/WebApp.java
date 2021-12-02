@@ -1,6 +1,6 @@
 /*
  * Copyright 2004-2019 H2 Group. Multiple-Licensed under the MPL 2.0,
- * and the EPL 1.0 (https://h2database.com/html/license.html).
+ * and the EPL 1.0 (http://h2database.com/html/license.html).
  * Initial Developer: H2 Group
  */
 package org.h2.server.web;
@@ -40,7 +40,6 @@ import org.h2.bnf.context.DbColumn;
 import org.h2.bnf.context.DbContents;
 import org.h2.bnf.context.DbSchema;
 import org.h2.bnf.context.DbTableOrView;
-import org.h2.command.Parser;
 import org.h2.engine.Constants;
 import org.h2.engine.SysProperties;
 import org.h2.jdbc.JdbcException;
@@ -57,8 +56,6 @@ import org.h2.tools.RunScript;
 import org.h2.tools.Script;
 import org.h2.tools.SimpleResultSet;
 import org.h2.util.JdbcUtils;
-import org.h2.util.NetUtils;
-import org.h2.util.NetworkConnectionInfo;
 import org.h2.util.Profiler;
 import org.h2.util.ScriptReader;
 import org.h2.util.SortedProperties;
@@ -128,10 +125,10 @@ public class WebApp {
      * Process an HTTP request.
      *
      * @param file the file that was requested
-     * @param networkConnectionInfo the network connection information
+     * @param hostAddr the host address
      * @return the name of the file to return to the client
      */
-    String processRequest(String file, NetworkConnectionInfo networkConnectionInfo) {
+    String processRequest(String file, String hostAddr) {
         int index = file.lastIndexOf('.');
         String suffix;
         if (index >= 0) {
@@ -154,8 +151,7 @@ public class WebApp {
             cache = false;
             mimeType = "text/html";
             if (session == null) {
-                session = server.createNewSession(
-                        NetUtils.ipToShortForm(null, networkConnectionInfo.getClientAddr(), false).toString());
+                session = server.createNewSession(hostAddr);
                 if (!"notAllowed.jsp".equals(file)) {
                     file = "index.do";
                 }
@@ -170,13 +166,13 @@ public class WebApp {
         trace("mimeType=" + mimeType);
         trace(file);
         if (file.endsWith(".do")) {
-            file = process(file, networkConnectionInfo);
+            file = process(file);
         } else if (file.endsWith(".jsp")) {
             switch (file) {
             case "admin.jsp":
             case "tools.jsp":
                 if (!checkAdmin(file)) {
-                    file = process("adminLogin.do", networkConnectionInfo);
+                    file = process("adminLogin.do");
                 }
             }
         }
@@ -215,12 +211,12 @@ public class WebApp {
         return buff.toString();
     }
 
-    private String process(String file, NetworkConnectionInfo networkConnectionInfo) {
+    private String process(String file) {
         trace("process " + file);
         while (file.endsWith(".do")) {
             switch (file) {
             case "login.do":
-                file = login(networkConnectionInfo);
+                file = login();
                 break;
             case "index.do":
                 file = index();
@@ -235,7 +231,7 @@ public class WebApp {
                 file = settingSave();
                 break;
             case "test.do":
-                file = test(networkConnectionInfo);
+                file = test();
                 break;
             case "query.do":
                 file = query();
@@ -866,7 +862,7 @@ public class WebApp {
                 error += " " + se.getSQLState() + "/" + se.getErrorCode();
                 if (isH2) {
                     int code = se.getErrorCode();
-                    error += " <a href=\"https://h2database.com/javadoc/" +
+                    error += " <a href=\"http://h2database.com/javadoc/" +
                             "org/h2/api/ErrorCode.html#c" + code +
                             "\">(${text.a.help})</a>";
                 }
@@ -907,7 +903,7 @@ public class WebApp {
                 String file = element.substring(open + 1, colon);
                 String lineNumber = element.substring(colon + 1, element.length());
                 String fullFileName = packageName.replace('.', '/') + "/" + file;
-                result.append("<a href=\"https://h2database.com/html/source.html?file=");
+                result.append("<a href=\"http://h2database.com/html/source.html?file=");
                 result.append(fullFileName);
                 result.append("&line=");
                 result.append(lineNumber);
@@ -928,7 +924,7 @@ public class WebApp {
         return "<div class=\"error\">" + s + "</div>";
     }
 
-    private String test(NetworkConnectionInfo networkConnectionInfo) {
+    private String test() {
         String driver = attributes.getProperty("driver", "");
         String url = attributes.getProperty("url", "");
         String user = attributes.getProperty("user", "");
@@ -944,7 +940,7 @@ public class WebApp {
             prof.startCollecting();
             Connection conn;
             try {
-                conn = server.getConnection(driver, url, user, password, null, networkConnectionInfo);
+                conn = server.getConnection(driver, url, user, password, null);
             } finally {
                 prof.stopCollecting();
                 profOpen = prof.getTop(3);
@@ -995,7 +991,7 @@ public class WebApp {
         return getStackTrace(0, e, isH2);
     }
 
-    private String login(NetworkConnectionInfo networkConnectionInfo) {
+    private String login() {
         String driver = attributes.getProperty("driver", "");
         String url = attributes.getProperty("url", "");
         String user = attributes.getProperty("user", "");
@@ -1005,8 +1001,7 @@ public class WebApp {
         session.put("maxrows", "1000");
         boolean isH2 = url.startsWith("jdbc:h2:");
         try {
-            Connection conn = server.getConnection(driver, url, user, password, (String) session.get("key"),
-                    networkConnectionInfo);
+            Connection conn = server.getConnection(driver, url, user, password, (String) session.get("key"));
             session.setConnection(conn);
             session.put("url", url);
             session.put("user", user);
@@ -1338,7 +1333,7 @@ public class WebApp {
             ResultSet rs;
             long time = System.currentTimeMillis();
             boolean metadata = false;
-            Object generatedKeys = null;
+            int generatedKeys = Statement.NO_GENERATED_KEYS;
             boolean edit = false;
             boolean list = false;
             if (isBuiltIn(sql, "@autocommit_true")) {
@@ -1370,22 +1365,8 @@ public class WebApp {
                 sql = StringUtils.trimSubstring(sql, "@meta".length());
             }
             if (isBuiltIn(sql, "@generated")) {
-                generatedKeys = true;
-                int offset = "@generated".length();
-                int length = sql.length();
-                for (; offset < length; offset++) {
-                    char c = sql.charAt(offset);
-                    if (c == '(') {
-                        Parser p = new Parser();
-                        generatedKeys = p.parseColumnList(sql, offset);
-                        offset = p.getLastParseIndex();
-                        break;
-                    }
-                    if (!Character.isWhitespace(c)) {
-                        break;
-                    }
-                }
-                sql = StringUtils.trimSubstring(sql, offset);
+                generatedKeys = Statement.RETURN_GENERATED_KEYS;
+                sql = StringUtils.trimSubstring(sql, "@generated".length());
             } else if (isBuiltIn(sql, "@history")) {
                 buff.append(getCommandHistoryString());
                 return buff.toString();
@@ -1439,8 +1420,6 @@ public class WebApp {
                         .append(": read_committed<br />");
                 buff.append(Connection.TRANSACTION_REPEATABLE_READ)
                         .append(": repeatable_read<br />");
-                buff.append(Constants.TRANSACTION_SNAPSHOT)
-                        .append(": snapshot<br />");
                 buff.append(Connection.TRANSACTION_SERIALIZABLE)
                         .append(": serializable");
             }
@@ -1454,19 +1433,9 @@ public class WebApp {
                 int maxrows = getMaxrows();
                 stat.setMaxRows(maxrows);
                 session.executingStatement = stat;
-                boolean isResultSet;
-                if (generatedKeys == null) {
-                    isResultSet = stat.execute(sql);
-                } else if (generatedKeys instanceof Boolean) {
-                    isResultSet = stat.execute(sql,
-                            ((Boolean) generatedKeys) ? Statement.RETURN_GENERATED_KEYS : Statement.NO_GENERATED_KEYS);
-                } else if (generatedKeys instanceof String[]) {
-                    isResultSet = stat.execute(sql, (String[]) generatedKeys);
-                } else {
-                    isResultSet = stat.execute(sql, (int[]) generatedKeys);
-                }
+                boolean isResultSet = stat.execute(sql, generatedKeys);
                 session.addCommand(sql);
-                if (generatedKeys != null) {
+                if (generatedKeys == Statement.RETURN_GENERATED_KEYS) {
                     rs = null;
                     rs = stat.getGeneratedKeys();
                 } else {
@@ -1501,7 +1470,8 @@ public class WebApp {
     }
 
     private static boolean isBuiltIn(String sql, String builtIn) {
-        return sql.regionMatches(true, 0, builtIn, 0, builtIn.length());
+        int len = builtIn.length();
+        return sql.length() >= len && sql.regionMatches(true, 0, builtIn, 0, len);
     }
 
     private String executeLoop(Connection conn, int count, String sql)

@@ -1,6 +1,6 @@
 /*
  * Copyright 2004-2019 H2 Group. Multiple-Licensed under the MPL 2.0,
- * and the EPL 1.0 (https://h2database.com/html/license.html).
+ * and the EPL 1.0 (http://h2database.com/html/license.html).
  * Initial Developer: H2 Group
  */
 package org.h2.test.unit;
@@ -167,49 +167,60 @@ public class TestValue extends TestDb {
         Value v;
         String spaces = new String(new char[100]).replace((char) 0, ' ');
 
-        v = ValueArray.get(new Value[] { ValueString.get("hello"), ValueString.get("world") });
-        assertEquals(2, v.getType().getPrecision());
-        assertEquals(1, v.convertPrecision(1).getType().getPrecision());
+        v = ValueArray.get(new Value[] { ValueString.get("hello"),
+                ValueString.get("world") });
+        assertEquals(10, v.getType().getPrecision());
+        assertEquals(5, v.convertPrecision(5, true).getType().getPrecision());
         v = ValueArray.get(new Value[]{ValueString.get(""), ValueString.get("")});
-        assertEquals(2, v.getType().getPrecision());
-        assertEquals("['']", v.convertPrecision(1).toString());
+        assertEquals(0, v.getType().getPrecision());
+        assertEquals("['']", v.convertPrecision(1, true).toString());
 
         v = ValueBytes.get(spaces.getBytes());
         assertEquals(100, v.getType().getPrecision());
-        assertEquals(10, v.convertPrecision(10).getType().getPrecision());
-        assertEquals(10, v.convertPrecision(10).getBytes().length);
-        assertEquals(32, v.convertPrecision(10).getBytes()[9]);
-        assertEquals(10, v.convertPrecision(10).getType().getPrecision());
+        assertEquals(10, v.convertPrecision(10, false).getType().getPrecision());
+        assertEquals(10, v.convertPrecision(10, false).getBytes().length);
+        assertEquals(32, v.convertPrecision(10, false).getBytes()[9]);
+        assertEquals(10, v.convertPrecision(10, true).getType().getPrecision());
 
         final Value vd = ValueDecimal.get(new BigDecimal("1234567890.123456789"));
         assertEquals(19, vd.getType().getPrecision());
-        assertEquals("1234567890", vd.convertPrecision(10).getString());
+        assertEquals("1234567890.1234567", vd.convertPrecision(10, true).getString());
         new AssertThrows(ErrorCode.NUMERIC_VALUE_OUT_OF_RANGE_1) {
             @Override
             public void test() {
-                vd.convertPrecision(0);
+                vd.convertPrecision(10, false);
             }
         };
 
         v = ValueLobDb.createSmallLob(Value.CLOB, spaces.getBytes(), 100);
         assertEquals(100, v.getType().getPrecision());
-        assertEquals(10, v.convertPrecision(10).getType().getPrecision());
-        assertEquals(10, v.convertPrecision(10).getString().length());
-        assertEquals("          ", v.convertPrecision(10).getString());
-        assertEquals(10, v.convertPrecision(10).getType().getPrecision());
+        assertEquals(10, v.convertPrecision(10, false).getType().getPrecision());
+        assertEquals(10, v.convertPrecision(10, false).getString().length());
+        assertEquals("          ", v.convertPrecision(10, false).getString());
+        assertEquals(10, v.convertPrecision(10, true).getType().getPrecision());
 
         v = ValueLobDb.createSmallLob(Value.BLOB, spaces.getBytes(), 100);
         assertEquals(100, v.getType().getPrecision());
-        assertEquals(10, v.convertPrecision(10).getType().getPrecision());
-        assertEquals(10, v.convertPrecision(10).getBytes().length);
-        assertEquals(32, v.convertPrecision(10).getBytes()[9]);
-        assertEquals(10, v.convertPrecision(10).getType().getPrecision());
+        assertEquals(10, v.convertPrecision(10, false).getType().getPrecision());
+        assertEquals(10, v.convertPrecision(10, false).getBytes().length);
+        assertEquals(32, v.convertPrecision(10, false).getBytes()[9]);
+        assertEquals(10, v.convertPrecision(10, true).getType().getPrecision());
+
+        SimpleResult rs = new SimpleResult();
+        rs.addColumn("X", "X", Value.INT, 0, 0);
+        rs.addRow(ValueInt.get(1));
+        v = ValueResultSet.get(rs);
+        assertEquals(Integer.MAX_VALUE, v.getType().getPrecision());
+        assertEquals(Integer.MAX_VALUE, v.convertPrecision(10, false).getType().getPrecision());
+        assertEquals(1, v.convertPrecision(10, false).getResult().getRowCount());
+        assertEquals(0, v.convertPrecision(10, true).getResult().getRowCount());
+        assertEquals(Integer.MAX_VALUE, v.convertPrecision(10, true).getType().getPrecision());
 
         v = ValueString.get(spaces);
         assertEquals(100, v.getType().getPrecision());
-        assertEquals(10, v.convertPrecision(10).getType().getPrecision());
-        assertEquals("          ", v.convertPrecision(10).getString());
-        assertEquals("          ", v.convertPrecision(10).getString());
+        assertEquals(10, v.convertPrecision(10, false).getType().getPrecision());
+        assertEquals("          ", v.convertPrecision(10, false).getString());
+        assertEquals("          ", v.convertPrecision(10, true).getString());
 
     }
 
@@ -323,13 +334,13 @@ public class TestValue extends TestDb {
             Value v = useFloat ? (Value) ValueFloat.get((float) d[i])
                     : (Value) ValueDouble.get(d[i]);
             values[i] = v;
-            assertTrue(values[i].compareTypeSafe(values[i], null, null) == 0);
+            assertTrue(values[i].compareTypeSafe(values[i], null) == 0);
             assertTrue(v.equals(v));
             assertEquals(Integer.compare(i, 2), v.getSignum());
         }
         for (int i = 0; i < d.length - 1; i++) {
-            assertTrue(values[i].compareTypeSafe(values[i+1], null, null) < 0);
-            assertTrue(values[i + 1].compareTypeSafe(values[i], null, null) > 0);
+            assertTrue(values[i].compareTypeSafe(values[i+1], null) < 0);
+            assertTrue(values[i + 1].compareTypeSafe(values[i], null) > 0);
             assertFalse(values[i].equals(values[i+1]));
         }
     }
@@ -338,22 +349,22 @@ public class TestValue extends TestDb {
         ValueTimestamp valueTs = ValueTimestamp.parse("2000-01-15 10:20:30.333222111");
         Timestamp ts = Timestamp.valueOf("2000-01-15 10:20:30.333222111");
         assertEquals(ts.toString(), valueTs.getString());
-        assertEquals(ts, valueTs.getTimestamp(null));
+        assertEquals(ts, valueTs.getTimestamp());
         Calendar c = Calendar.getInstance(TimeZone.getTimeZone("Europe/Berlin"));
         c.set(2018, 02, 25, 1, 59, 00);
         c.set(Calendar.MILLISECOND, 123);
         long expected = c.getTimeInMillis();
-        ts = ValueTimestamp.parse("2018-03-25 01:59:00.123123123 Europe/Berlin").getTimestamp(null);
+        ts = ValueTimestamp.parse("2018-03-25 01:59:00.123123123 Europe/Berlin").getTimestamp();
         assertEquals(expected, ts.getTime());
         assertEquals(123123123, ts.getNanos());
-        ts = ValueTimestamp.parse("2018-03-25 01:59:00.123123123+01").getTimestamp(null);
+        ts = ValueTimestamp.parse("2018-03-25 01:59:00.123123123+01").getTimestamp();
         assertEquals(expected, ts.getTime());
         assertEquals(123123123, ts.getNanos());
         expected += 60000; // 1 minute
-        ts = ValueTimestamp.parse("2018-03-25 03:00:00.123123123 Europe/Berlin").getTimestamp(null);
+        ts = ValueTimestamp.parse("2018-03-25 03:00:00.123123123 Europe/Berlin").getTimestamp();
         assertEquals(expected, ts.getTime());
         assertEquals(123123123, ts.getNanos());
-        ts = ValueTimestamp.parse("2018-03-25 03:00:00.123123123+02").getTimestamp(null);
+        ts = ValueTimestamp.parse("2018-03-25 03:00:00.123123123+02").getTimestamp();
         assertEquals(expected, ts.getTime());
         assertEquals(123123123, ts.getNanos());
     }
@@ -361,15 +372,20 @@ public class TestValue extends TestDb {
     private void testArray() {
         ValueArray src = ValueArray.get(String.class,
                 new Value[] {ValueString.get("1"), ValueString.get("22"), ValueString.get("333")});
-        assertEquals(3, src.getType().getPrecision());
-        assertSame(src, src.convertPrecision(3));
+        assertEquals(6, src.getType().getPrecision());
+        assertSame(src, src.convertPrecision(5, false));
+        assertSame(src, src.convertPrecision(6, true));
         ValueArray exp = ValueArray.get(String.class,
-                new Value[] {ValueString.get("1"), ValueString.get("22")});
-        Value got = src.convertPrecision(2);
+                new Value[] {ValueString.get("1"), ValueString.get("22"), ValueString.get("33")});
+        Value got = src.convertPrecision(5, true);
+        assertEquals(exp, got);
+        assertEquals(String.class, ((ValueArray) got).getComponentType());
+        exp = ValueArray.get(String.class, new Value[] {ValueString.get("1"), ValueString.get("22")});
+        got = src.convertPrecision(3, true);
         assertEquals(exp, got);
         assertEquals(String.class, ((ValueArray) got).getComponentType());
         exp = ValueArray.get(String.class, new Value[0]);
-        got = src.convertPrecision(0);
+        got = src.convertPrecision(0, true);
         assertEquals(exp, got);
         assertEquals(String.class, ((ValueArray) got).getComponentType());
     }
@@ -473,7 +489,7 @@ public class TestValue extends TestDb {
         }
         Value lob1 = createLob(dh, type, bytes1);
         Value lob2 = createLob(dh, type, bytes2);
-        return lob1.compareTypeSafe(lob2, null, null);
+        return lob1.compareTypeSafe(lob2, null);
     }
 
     private static Value createLob(DataHandler dh, int type, byte[] bytes) {
@@ -569,9 +585,6 @@ public class TestValue extends TestDb {
         testTypeInfoInterval1(Value.INTERVAL_HOUR_TO_MINUTE);
         testTypeInfoInterval2(Value.INTERVAL_HOUR_TO_SECOND);
         testTypeInfoInterval2(Value.INTERVAL_MINUTE_TO_SECOND);
-
-        testTypeInfoCheck(Value.JSON, Integer.MAX_VALUE, 0, Integer.MAX_VALUE, TypeInfo.TYPE_JSON,
-                TypeInfo.getTypeInfo(Value.JSON));
     }
 
     private void testTypeInfoInterval1(int type) {

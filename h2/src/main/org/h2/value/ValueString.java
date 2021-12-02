@@ -1,6 +1,6 @@
 /*
  * Copyright 2004-2019 H2 Group. Multiple-Licensed under the MPL 2.0,
- * and the EPL 1.0 (https://h2database.com/html/license.html).
+ * and the EPL 1.0 (http://h2database.com/html/license.html).
  * Initial Developer: H2 Group
  */
 package org.h2.value;
@@ -8,7 +8,6 @@ package org.h2.value;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
-import org.h2.engine.CastDataProvider;
 import org.h2.engine.SysProperties;
 import org.h2.util.MathUtils;
 import org.h2.util.StringUtils;
@@ -48,7 +47,7 @@ public class ValueString extends Value {
     }
 
     @Override
-    public int compareTypeSafe(Value o, CompareMode mode, CastDataProvider provider) {
+    public int compareTypeSafe(Value o, CompareMode mode) {
         return mode.compareString(value, ((ValueString) o).value, false);
     }
 
@@ -79,11 +78,11 @@ public class ValueString extends Value {
     }
 
     @Override
-    public Value convertPrecision(long precision) {
-        int p = MathUtils.convertLongToInt(precision);
-        if (value.length() <= p) {
+    public Value convertPrecision(long precision, boolean force) {
+        if (precision == 0 || value.length() <= precision) {
             return this;
         }
+        int p = MathUtils.convertLongToInt(precision);
         return getNew(value.substring(0, p));
     }
 
@@ -141,19 +140,20 @@ public class ValueString extends Value {
      * @return the value
      */
     public static Value get(String s) {
-        return get(s, null);
+        return get(s, false);
     }
 
     /**
      * Get or create a string value for the given string.
      *
      * @param s the string
-     * @param provider the cast information provider, or {@code null}
+     * @param treatEmptyStringsAsNull whether or not to treat empty strings as
+     *            NULL
      * @return the value
      */
-    public static Value get(String s, CastDataProvider provider) {
+    public static Value get(String s, boolean treatEmptyStringsAsNull) {
         if (s.isEmpty()) {
-            return provider != null && provider.getMode().treatEmptyStringsAsNull ? ValueNull.INSTANCE : EMPTY;
+            return treatEmptyStringsAsNull ? ValueNull.INSTANCE : EMPTY;
         }
         ValueString obj = new ValueString(StringUtils.cache(s));
         if (s.length() > SysProperties.OBJECT_CACHE_MAX_PER_ELEMENT_SIZE) {

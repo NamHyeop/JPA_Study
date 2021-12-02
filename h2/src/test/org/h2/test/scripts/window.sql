@@ -1,5 +1,5 @@
 -- Copyright 2004-2019 H2 Group. Multiple-Licensed under the MPL 2.0,
--- and the EPL 1.0 (https://h2database.com/html/license.html).
+-- and the EPL 1.0 (http://h2database.com/html/license.html).
 -- Initial Developer: H2 Group
 --
 
@@ -226,7 +226,4 @@ SELECT SUM(A) OVER (ORDER BY A, B RANGE BETWEEN 1 PRECEDING AND UNBOUNDED FOLLOW
 > exception SYNTAX_ERROR_2
 
 SELECT SUM(A) OVER (ORDER BY A, B RANGE BETWEEN UNBOUNDED PRECEDING AND 1 FOLLOWING) S FROM VALUES (1, 2) T(A, B);
-> exception SYNTAX_ERROR_2
-
-SELECT SUM(A) OVER (GROUPS BETWEEN UNBOUNDED PRECEDING AND 1 FOLLOWING) S FROM VALUES (1, 2) T(A, B);
 > exception SYNTAX_ERROR_2

@@ -1,6 +1,6 @@
 /*
  * Copyright 2004-2019 H2 Group. Multiple-Licensed under the MPL 2.0,
- * and the EPL 1.0 (https://h2database.com/html/license.html).
+ * and the EPL 1.0 (http://h2database.com/html/license.html).
  * Initial Developer: H2 Group
  */
 package org.h2.value;
@@ -8,15 +8,10 @@ package org.h2.value;
 import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.sql.Types;
-import java.util.TimeZone;
 
 import org.h2.api.ErrorCode;
-import org.h2.engine.CastDataProvider;
 import org.h2.message.DbException;
 import org.h2.util.DateTimeUtils;
-import org.h2.util.JSR310;
-import org.h2.util.JSR310Utils;
 
 /**
  * Implementation of the DATE data type.
@@ -32,9 +27,6 @@ public class ValueDate extends Value {
     private final long dateValue;
 
     private ValueDate(long dateValue) {
-        if (dateValue < DateTimeUtils.MIN_DATE_VALUE || dateValue > DateTimeUtils.MAX_DATE_VALUE) {
-            throw new IllegalArgumentException("dateValue out of range " + dateValue);
-        }
         this.dateValue = dateValue;
     }
 
@@ -51,14 +43,23 @@ public class ValueDate extends Value {
     /**
      * Get or create a date value for the given date.
      *
-     * @param timeZone time zone, or {@code null} for default
      * @param date the date
      * @return the value
      */
-    public static ValueDate get(TimeZone timeZone, Date date) {
+    public static ValueDate get(Date date) {
         long ms = date.getTime();
-        return fromDateValue(DateTimeUtils.dateValueFromLocalMillis(
-                ms + (timeZone == null ? DateTimeUtils.getTimeZoneOffsetMillis(ms) : timeZone.getOffset(ms))));
+        return fromDateValue(DateTimeUtils.dateValueFromLocalMillis(ms + DateTimeUtils.getTimeZoneOffset(ms)));
+    }
+
+    /**
+     * Calculate the date value (in the default timezone) from a given time in
+     * milliseconds in UTC.
+     *
+     * @param ms the milliseconds
+     * @return the value
+     */
+    public static ValueDate fromMillis(long ms) {
+        return fromDateValue(DateTimeUtils.dateValueFromLocalMillis(ms + DateTimeUtils.getTimeZoneOffset(ms)));
     }
 
     /**
@@ -81,8 +82,8 @@ public class ValueDate extends Value {
     }
 
     @Override
-    public Date getDate(TimeZone timeZone) {
-        return new Date(DateTimeUtils.getMillis(timeZone, dateValue, 0));
+    public Date getDate() {
+        return DateTimeUtils.convertDateValueToDate(dateValue);
     }
 
     @Override
@@ -110,7 +111,7 @@ public class ValueDate extends Value {
     }
 
     @Override
-    public int compareTypeSafe(Value o, CompareMode mode, CastDataProvider provider) {
+    public int compareTypeSafe(Value o, CompareMode mode) {
         return Long.compare(dateValue, ((ValueDate) o).dateValue);
     }
 
@@ -130,20 +131,13 @@ public class ValueDate extends Value {
 
     @Override
     public Object getObject() {
-        return getDate(null);
+        return getDate();
     }
 
     @Override
-    public void set(PreparedStatement prep, int parameterIndex) throws SQLException {
-        if (JSR310.PRESENT) {
-            try {
-                prep.setObject(parameterIndex, JSR310Utils.valueToLocalDate(this), Types.DATE);
-                return;
-            } catch (SQLException ignore) {
-                // Nothing to do
-            }
-        }
-        prep.setDate(parameterIndex, getDate(null));
+    public void set(PreparedStatement prep, int parameterIndex)
+            throws SQLException {
+        prep.setDate(parameterIndex, getDate());
     }
 
 }
