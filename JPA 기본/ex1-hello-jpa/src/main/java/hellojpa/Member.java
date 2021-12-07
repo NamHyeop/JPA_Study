@@ -5,12 +5,10 @@ import org.hibernate.annotations.common.reflection.XMember;
 import javax.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @Entity
-public class Member extends BaseEntity{
+public class Member{
     @Id @GeneratedValue
     @Column(name = "MEMBER_ID")
     private Long id;
@@ -18,40 +16,23 @@ public class Member extends BaseEntity{
     @Column(name = "USERNAME")
     private String username;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn
-    private Team team;
+    @Embedded
+    private Period workPeriod;
+    @Embedded
+    private Address homeAddress;
 
-    public Team getTeam() {
-        return team;
-    }
+    @ElementCollection
+    @CollectionTable(name = "FAVORITE FOOD", joinColumns =
+        @JoinColumn(name = "MEMBER_ID")
+    )
+    @Column(name = "FOOD_NAME")
+    private Set<String> favoriteFoods = new HashSet<>();
 
-    public void setTeam(Team team) {
-        this.team = team;
-    }
-
-    public Locker getLocker() {
-        return locker;
-    }
-
-    public void setLocker(Locker locker) {
-        this.locker = locker;
-    }
-
-    public List<MemberProduct> getMemberProducts() {
-        return memberProducts;
-    }
-
-    public void setMemberProducts(List<MemberProduct> memberProducts) {
-        this.memberProducts = memberProducts;
-    }
-
-    @OneToOne
-    @JoinColumn(name ="LOCKER_ID")
-    private Locker locker;
-
-    @OneToMany(mappedBy = "member")
-    private List<MemberProduct> memberProducts = new ArrayList<>();
+    @ElementCollection
+    @CollectionTable(name = "ADDRESS", joinColumns =
+         @JoinColumn(name = "MEMBER_ID")
+    )
+    private List<Address> addressHistory = new ArrayList<>();
 
     public Long getId() {
         return id;
@@ -62,10 +43,19 @@ public class Member extends BaseEntity{
     }
 
     public String getUsername() {
+
         return username;
     }
 
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    public Address getHomeAddress() {
+        return homeAddress;
+    }
+
+    public void setHomeAddress(Address homeAddress) {
+        this.homeAddress = homeAddress;
     }
 }

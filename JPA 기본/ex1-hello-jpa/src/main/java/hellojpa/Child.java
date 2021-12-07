@@ -3,6 +3,10 @@ package hellojpa;
 import org.hibernate.mapping.Join;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 @Entity
 public class Child {
@@ -13,6 +17,10 @@ public class Child {
     @ManyToOne
     @JoinColumn(name = "parent_id")
     private Parent parent;
+
+    @Embedded
+    private Address homeAddress;
+
 
     public Long getId() {
         return id;
