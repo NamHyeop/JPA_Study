@@ -12,7 +12,7 @@ import javax.persistence.QueryHint;
 import java.util.List;
 import java.util.Optional;
 
-public interface MemberRepository extends JpaRepository<Member, Long>, MemberRepositoryCustom {
+public interface MemberRepository extends JpaRepository<Member, Long>, MemberRepositoryCustom, JpaSpecificationExecutor<Member> {
 
     List<Member> findByUsernameAndAgeGreaterThan(String username, int age);
 
@@ -62,7 +62,9 @@ public interface MemberRepository extends JpaRepository<Member, Long>, MemberRep
      * Spring Data Jpa의 리턴값들. 종류가 이것보다 더 많다.
      */
     List<Member> findListByUsername(String name);
+
     Member findMemberByUsername(String name);
+
     Optional<Member> findOptionalByUsername(String name);
 
     /**
@@ -123,4 +125,27 @@ public interface MemberRepository extends JpaRepository<Member, Long>, MemberRep
      */
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     List<Member> findLockByUsername(String username);
+
+    /**
+     * Projections 예제
+     */
+    List<UsernameOnlyDto> findProjectionsByUsername(@Param("username") String username);
+    List<Age1OnlyDto> findProjectionsByAge(@Param("age") int age);
+
+    <T> List<T> findProjectionsByUsername(@Param("username") String username, Class<T> type);
+
+    /**
+     * NativeQuery 예제
+     */
+    @Query(value = "select * from Member where username = ?", nativeQuery = true)
+    Member findByNativeQuery(String username);
+
+    /**
+     * Spring Data JPA Native Query + 인터페이스 기반 Projections 활용한 예제
+     */
+    @Query(value = "select m.member_id as id, m.username, t.name as teamName " +
+            "from member m left join team t",
+            countQuery = "select count(*) from member",
+            nativeQuery = true)
+    Page<MemberProjection> findByNativeProjection(Pageable pageable);
 }
