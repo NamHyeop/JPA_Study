@@ -17,3 +17,4 @@ logging.level: #띄어쓰기 없음
   org.hibernate.SQL: debug #띄어쓰기 2칸
 #  파라미터 쿼리 로그 남기는 옵션
   org.hibernate.type: trace #띄어쓰기 2
+

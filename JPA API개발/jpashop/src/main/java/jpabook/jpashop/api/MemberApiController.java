@@ -27,6 +27,11 @@ public class MemberApiController {
         return memberService.findMembers();
     }
 
+    @GetMapping("/test")
+    public String test1(){
+        return "OK";
+    }
+
     /**
      * DTO를 만듬으로써 V1의 문제들을 보완
      */
