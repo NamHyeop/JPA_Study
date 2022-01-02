@@ -1,0 +1,22 @@
+spring:
+  datasource:
+    url: jdbc:h2:tcp://localhost/~/querydsl
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: create
+    properties:
+      hibernate:
+#        system.pout.printlin()으로 출력
+#        show_sql: true
+        format_sql: true
+        use_sql_comments: true
+
+# 로그로 출력
+logging.level:
+  org.hibernate.SQL: debug
+# binding prameter로 안에 들어가는 값을 보여주는데 불편함. build.gradle에 추가하는 p6spy가 좀 더 편함
+#  org.hibernate.type: trace
