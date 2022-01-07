@@ -1,11 +1,10 @@
 package study.querydsl.repository;
 
-import org.assertj.core.api.AbstractListAssert;
-import org.assertj.core.api.ObjectAssert;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.stereotype.Repository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import study.querydsl.dto.MemberSearchCondition;
 import study.querydsl.dto.MemberTeamDto;
 import study.querydsl.entity.Member;
@@ -17,37 +16,30 @@ import javax.transaction.Transactional;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
-class MemberJpaRepositoryTest {
+class MemberRepositoryTest {
     @Autowired
     EntityManager em;
 
-    @Autowired MemberJpaRepository memberJpaRepository;
+    @Autowired
+    MemberRepository memberRepository;
 
     @Test
-    public void basicTest(){
+    public void basicTest() {
         Member member = new Member("member1", 10);
-        memberJpaRepository.save(member);
+        memberRepository.save(member);
 
-        Member findMember = memberJpaRepository.findById(member.getId()).get();
+        Member findMember = memberRepository.findById(member.getId()).get();
         assertThat(findMember).isEqualTo(member);
 
-        List<Member> result1 = memberJpaRepository.findAll();
+        List<Member> result1 = memberRepository.findAll();
         assertThat(result1).containsExactly(member);
 
-        List<Member> result2 = memberJpaRepository.findByUsername("member1");
+        List<Member> result2 = memberRepository.findByUsername("member1");
         assertThat(result2).containsExactly(member);
-
-        List<Member> result3 = memberJpaRepository.findAll_QueryDsl();
-        assertThat(result3).containsExactly(member);
-
-        List<Member> result4 = memberJpaRepository.findByUsername_Querydsl("member1");
-        assertThat(result4).containsExactly(member);
     }
-
     @Test
     public void searchTest(){
         Team teamA = new Team("teamA");
@@ -73,7 +65,36 @@ class MemberJpaRepositoryTest {
          * 조건 비교문이 없으면 모든 데이터를 끌어온뒤 마지막 데이터를 반환함.
          * 그러므로 기본조건이 있는게 좋다.
          */
-        List<MemberTeamDto> result = memberJpaRepository.search(condition);
+        List<MemberTeamDto> result = memberRepository.search(condition);
         assertThat(result).extracting("username").containsExactly("member4");
+    }
+
+    /**
+     * 페이징 test
+     */
+    @Test
+    public void searchPageSimple(){
+        Team teamA = new Team("teamA");
+        Team teamB = new Team("teamB");
+        em.persist(teamA);
+        em.persist(teamB);
+
+        Member member1 = new Member("member1", 10, teamA);
+        Member member2 = new Member("member2", 20, teamA);
+        Member member3 = new Member("member3", 30, teamB);
+        Member member4 = new Member("member4", 40, teamB);
+        em.persist(member1);
+        em.persist(member2);
+        em.persist(member3);
+        em.persist(member4);
+
+        MemberSearchCondition condition = new MemberSearchCondition();
+        PageRequest pageRequest = PageRequest.of(0, 3);
+
+        Page<MemberTeamDto> result = memberRepository.searchPageSimple(condition, pageRequest);
+
+        assertThat(result.getSize()).isEqualTo(3);
+        assertThat(result.getContent()).extracting("username").containsExactly("member1", "member2", "member3");
+
     }
 }
